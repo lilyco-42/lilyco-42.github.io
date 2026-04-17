@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lyco_code CI Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    header a {
+      color: #58a6ff;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    header a:hover { text-decoration: underline; }
+
+    #refresh-btn {
+      margin-left: auto;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    #refresh-btn:hover { background: #30363d; }
+
+    #last-updated {
+      font-size: 0.75rem;
+      color: #8b949e;
+      margin-bottom: 1.5rem;
+    }
+
+    #runs-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .run-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-dot.success    { background: #3fb950; box-shadow: 0 0 6px #3fb950; }
+    .status-dot.failure    { background: #f85149; box-shadow: 0 0 6px #f85149; }
+    .status-dot.in_progress { background: #d29922; box-shadow: 0 0 6px #d29922; animation: pulse 1.2s infinite; }
+    .status-dot.cancelled  { background: #8b949e; }
+    .status-dot.skipped    { background: #8b949e; }
+    .status-dot.unknown    { background: #8b949e; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    .run-info { flex: 1; min-width: 0; }
+
+    .run-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .run-meta {
+      font-size: 0.78rem;
+      color: #8b949e;
+      margin-top: 0.2rem;
+    }
+
+    .run-meta span { margin-right: 1rem; }
+
+    .run-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .badge-success    { background: #1a3a2a; color: #3fb950; border: 1px solid #3fb950; }
+    .badge-failure    { background: #3a1a1a; color: #f85149; border: 1px solid #f85149; }
+    .badge-in_progress { background: #3a2e1a; color: #d29922; border: 1px solid #d29922; }
+    .badge-cancelled  { background: #21262d; color: #8b949e; border: 1px solid #8b949e; }
+    .badge-skipped    { background: #21262d; color: #8b949e; border: 1px solid #8b949e; }
+    .badge-unknown    { background: #21262d; color: #8b949e; border: 1px solid #8b949e; }
+
+    .run-link {
+      color: #58a6ff;
+      font-size: 0.8rem;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .run-link:hover { text-decoration: underline; }
+
+    #loading {
+      color: #8b949e;
+      font-size: 0.9rem;
+      padding: 2rem 0;
+    }
+
+    #error-msg {
+      color: #f85149;
+      background: #3a1a1a;
+      border: 1px solid #f85149;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .summary-bar {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .summary-item {
+      font-size: 0.85rem;
+      color: #8b949e;
+    }
+
+    .summary-item strong { color: #e6edf3; }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg width="24" height="24" viewBox="0 0 16 16" fill="#e6edf3">
+    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+             0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+             -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
+             .07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15
+             -.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27
+             .68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12
+             .51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48
+             0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+  </svg>
+  <h1>lyco_code · CI Dashboard</h1>
+  <a href="https://github.com/llilyco-42/lyco_code" target="_blank">llilyco-42/lyco_code ↗</a>
+  <button id="refresh-btn" onclick="loadRuns()">↻ 刷新</button>
+</header>
+
+<div id="last-updated"></div>
+<div class="summary-bar" id="summary-bar"></div>
+<div id="error-msg"></div>
+<div id="loading">加载中...</div>
+<div id="runs-container"></div>
+
+<script>
+  const OWNER = 'llilyco-42';
+  const REPO  = 'lyco_code';
+  const API   = `https://api.github.com/repos/${OWNER}/${REPO}/actions/runs?per_page=20`;
+
+  function statusClass(conclusion, status) {
+    if (status === 'in_progress' || status === 'queued') return 'in_progress';
+    return conclusion || 'unknown';
+  }
+
+  function statusLabel(conclusion, status) {
+    if (status === 'in_progress') return 'Running';
+    if (status === 'queued')      return 'Queued';
+    const map = {
+      success:   '成功',
+      failure:   '失败',
+      cancelled: '已取消',
+      skipped:   '已跳过',
+    };
+    return map[conclusion] || conclusion || '未知';
+  }
+
+  function timeAgo(dateStr) {
+    const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+    if (diff < 60)   return `${diff}秒前`;
+    if (diff < 3600) return `${Math.floor(diff/60)}分钟前`;
+    if (diff < 86400)return `${Math.floor(diff/3600)}小时前`;
+    return `${Math.floor(diff/86400)}天前`;
+  }
+
+  async function loadRuns() {
+    const container = document.getElementById('runs-container');
+    const loading   = document.getElementById('loading');
+    const errEl     = document.getElementById('error-msg');
+    const summaryEl = document.getElementById('summary-bar');
+
+    loading.style.display = 'block';
+    container.innerHTML   = '';
+    errEl.style.display   = 'none';
+    summaryEl.innerHTML   = '';
+
+    try {
+      const res = await fetch(API, {
+        headers: { Accept: 'application/vnd.github+json' }
+      });
+
+      if (res.status === 404) throw new Error('仓库不存在或尚未有 Actions 运行记录');
+      if (!res.ok) throw new Error(`GitHub API 返回 ${res.status}`);
+
+      const data = await res.json();
+      const runs = data.workflow_runs || [];
+
+      loading.style.display = 'none';
+
+      if (runs.length === 0) {
+        container.innerHTML = '<div style="color:#8b949e;padding:2rem 0">暂无 Actions 运行记录</div>';
+        return;
+      }
+
+      // Summary
+      const counts = { success: 0, failure: 0, in_progress: 0, other: 0 };
+      runs.forEach(r => {
+        const s = statusClass(r.conclusion, r.status);
+        if (s in counts) counts[s]++;
+        else counts.other++;
+      });
+
+      summaryEl.innerHTML = `
+        <div class="summary-item">共 <strong>${runs.length}</strong> 条记录</div>
+        <div class="summary-item">✅ 成功 <strong>${counts.success}</strong></div>
+        <div class="summary-item">❌ 失败 <strong>${counts.failure}</strong></div>
+        <div class="summary-item">🔄 运行中 <strong>${counts.in_progress}</strong></div>
+      `;
+
+      runs.forEach(run => {
+        const sc    = statusClass(run.conclusion, run.status);
+        const label = statusLabel(run.conclusion, run.status);
+        const card  = document.createElement('div');
+        card.className = 'run-card';
+        card.innerHTML = `
+          <div class="status-dot ${sc}"></div>
+          <div class="run-info">
+            <div class="run-name">${run.display_title || run.name}</div>
+            <div class="run-meta">
+              <span>🔀 ${run.head_branch}</span>
+              <span>⚡ ${run.event}</span>
+              <span>🕐 ${timeAgo(run.created_at)}</span>
+              <span>#${run.run_number}</span>
+            </div>
+          </div>
+          <span class="run-badge badge-${sc}">${label}</span>
+          <a class="run-link" href="${run.html_url}" target="_blank">查看 →</a>
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById('last-updated').textContent =
+        `最后更新：${new Date().toLocaleTimeString('zh-CN')}`;
+
+    } catch (err) {
+      loading.style.display = 'none';
+      errEl.style.display   = 'block';
+      errEl.textContent     = `加载失败：${err.message}`;
+    }
+  }
+
+  // 初始加载 + 每 60 秒自动刷新
+  loadRuns();
+  setInterval(loadRuns, 60000);
+</script>
+
+</body>
+</html>
