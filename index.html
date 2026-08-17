@@ -155,6 +155,49 @@
     ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     #summary { display:flex; gap:16px; margin-bottom:14px; flex-wrap:wrap; }
     .sum-item { font-size:0.8rem; color:var(--muted); } .sum-item strong { color:var(--text); }
+
+    /* ── Featured projects ── */
+    .featured-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 14px; padding-bottom: 24px;
+    }
+    .fcard {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px 18px;
+      display: flex; flex-direction: column; gap: 10px;
+      transition: border-color .15s, transform .15s;
+    }
+    .fcard:hover { border-color: var(--blue); transform: translateY(-2px); }
+    .fcard-top { display: flex; align-items: center; gap: 10px; }
+    .fcard-icon {
+      width: 38px; height: 38px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; font-weight: 700;
+      background: var(--bg3); border: 1px solid var(--border);
+    }
+    .fcard-title { font-size: 1.05rem; font-weight: 700; }
+    .fcard-title a { color: var(--text); }
+    .fcard-title a:hover { color: var(--blue); }
+    .fcard-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.55; min-height: 2.5em; }
+    .fcard-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ftag {
+      font-size: 0.68rem; font-weight: 600; padding: 2px 8px;
+      border-radius: 20px; background: #1f6feb22; color: var(--blue);
+      border: 1px solid #1f6feb55;
+    }
+    .fcard-meta { display: flex; align-items: center; gap: 14px; font-size: 0.75rem; color: var(--muted); }
+    .fcard-meta .lang-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .fcard-links { display: flex; gap: 8px; margin-top: auto; }
+    .fcard-links .btn { flex: 1; text-align: center; font-size: 0.78rem; }
+    .fcard-rank {
+      position: absolute; /* placeholder */
+    }
+    .f-hero {
+      background: linear-gradient(135deg, #1f6feb22, #bc8cff11);
+      border: 1px solid #1f6feb55;
+      grid-column: 1 / -1;
+    }
+    .f-hero .fcard-desc { min-height: auto; }
   </style>
 </head>
 <body>
@@ -184,12 +227,14 @@
   <!-- Content -->
   <div id="content">
     <div id="tabs">
-      <div class="tab active" onclick="switchTab('actions')">Actions</div>
+      <div class="tab active" onclick="switchTab('featured')">精选项目</div>
+      <div class="tab" onclick="switchTab('actions')">Actions</div>
       <div class="tab" onclick="switchTab('repos')">所有仓库</div>
       <div class="tab" onclick="switchTab('console')">JS 控制台</div>
     </div>
 
-    <div id="actions-panel" class="panel active"><div class="empty">选择左侧仓库查看 Actions</div></div>
+    <div id="featured-panel" class="panel active"><div class="empty">加载精选项目...</div></div>
+    <div id="actions-panel" class="panel"><div class="empty">选择左侧仓库查看 Actions</div></div>
     <div id="repos-panel" class="panel"><div class="empty">点击「加载」获取仓库列表</div></div>
     <div id="console-panel" class="panel">
       <div id="console-output"></div>
@@ -209,6 +254,41 @@ let repos = [];
 let autoRefreshTimer = null;
 let consoleHistory = [];
 let historyIdx = -1;
+
+// ── Featured projects（精选，按重要度排序）────────────────────
+const FEATURED = [
+  {
+    name: 'lilyco',
+    hero: true,
+    icon: 'L',
+    tags: ['AI 优先', '一套代码四端生成', 'MCP 原生', '跨平台含 Android'],
+    blurb: '让人类远离计算机，AI 可做任何事 —— 一个 struct 生成 CLI/TUI/Web/MCP，天然可被 Agent 调用。',
+  },
+  {
+    name: 'lyco-engine',
+    icon: 'Y',
+    tags: ['WASM', '视觉小说引擎', '资源流后端'],
+    blurb: 'YuzuSoft —— WASM 跨平台视觉小说引擎 + 资源流式后端，浏览器即玩。',
+  },
+  {
+    name: 'lyco-cli',
+    icon: 'C',
+    tags: ['脚手架', 'gh api 驱动', '声明式渲染'],
+    blurb: '统一多语言脚手架：gh api 拉模板 + 声明式渲染，一套配置生成项目骨架。',
+  },
+  {
+    name: 'lyco_chat',
+    icon: 'T',
+    tags: ['transformer', 'tinyGPT 核心', '从零实现'],
+    blurb: '研究 transformer 原理的聊天 AI —— 核心源自 tinyGPT，跑通注意力与自回归生成。',
+  },
+  {
+    name: 'lyco-skill',
+    icon: 'S',
+    tags: ['写代码前先侦察', 'build-vs-buy', '论坛挖坑'],
+    blurb: '项目预研技能：需求钉死一句话 → gh 近义词搜索 → 论坛冷门知识 → 决策，少造 80% 轮子。',
+  },
+];
 
 // ── API ──────────────────────────────────────────────────────
 async function api(path) {
@@ -230,10 +310,51 @@ async function init() {
     document.getElementById('repo-count').textContent = repos.length;
     renderSidebar();
     renderReposPanel();
+    renderFeatured();
     setStatus(`✓ ${repos.length} 个仓库  ${new Date().toLocaleTimeString('zh-CN')}`);
   } catch(e) {
     setStatus('❌ ' + e.message);
   }
+}
+
+// ── Featured panel ──────────────────────────────────────────
+function renderFeatured() {
+  const el = document.getElementById('featured-panel');
+  const byName = new Map(repos.map(r => [r.name, r]));
+  const cards = FEATURED.map(f => {
+    const r = byName.get(f.name);
+    if (!r) return '';
+    const hero = f.hero ? ' f-hero' : '';
+    return `
+    <div class="fcard${hero}">
+      <div class="fcard-top">
+        <div class="fcard-icon">${f.icon}</div>
+        <div>
+          <div class="fcard-title"><a href="${r.html_url}" target="_blank">${r.name}</a>${f.hero ? ' <span style="color:var(--yellow);font-size:0.7rem;font-weight:600">★ 主推</span>' : ''}</div>
+          <div class="fcard-meta">
+            <span><span class="lang-dot" style="background:${langColor(r.language)}"></span> ${r.language || 'N/A'}</span>
+            <span>⭐ ${r.stargazers_count}</span>
+            <span>🕐 ${timeAgo(r.updated_at)}</span>
+          </div>
+        </div>
+      </div>
+      <div class="fcard-desc">${f.blurb}</div>
+      <div class="fcard-tags">${f.tags.map(t => `<span class="ftag">${t}</span>`).join('')}</div>
+      <div class="fcard-links">
+        <a class="btn" href="${r.html_url}" target="_blank">GitHub →</a>
+        <a class="btn" href="${r.html_url}/actions" target="_blank">Actions</a>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML = cards ? `<div class="featured-grid">${cards}</div>` : '<div class="empty">仓库数据未加载，先点「加载」</div>';
+}
+
+// 语言 → 颜色（GitHub 色板近似）
+function langColor(lang) {
+  return ({
+    Rust: '#dea584', Shell: '#89e051', TypeScript: '#3178c6',
+    JavaScript: '#f1e05a', Python: '#3572A5', HTML: '#e34c26',
+  })[lang] || '#8b949e';
 }
 
 // ── Sidebar ──────────────────────────────────────────────────
@@ -408,12 +529,13 @@ function handleConsoleKey(e) {
 }
 
 // ── Tabs ─────────────────────────────────────────────────────
+const TAB_NAMES = ['featured', 'actions', 'repos', 'console'];
+const TAB_PANELS = ['featured-panel', 'actions-panel', 'repos-panel', 'console-panel'];
 function switchTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    const names = ['actions','repos','console'];
-    t.classList.toggle('active', names[i] === name);
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', TAB_NAMES[i] === name);
   });
-  ['actions-panel','repos-panel','console-panel'].forEach(id => {
+  TAB_PANELS.forEach(id => {
     const el = document.getElementById(id);
     el.classList.toggle('active', id === `${name}-panel`);
     if (id === 'console-panel') el.style.display = name === 'console' ? 'flex' : 'none';
