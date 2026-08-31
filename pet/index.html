@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>丛雨 - 桌宠</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* 和风背景: 渐变 + 圆月 + 云朵 */
+        body {
+            background: linear-gradient(170deg, #fdf0f6 0%, #f7e3ee 28%, #ecdcf2 58%, #dcd0ec 100%);
+        }
+
+        #bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* 圆月 */
+        #bg::before {
+            content: "";
+            position: absolute;
+            top: 12%;
+            right: 16%;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 38% 35%, #fffdf4 0%, #fdf3d8 45%, #f3e3c2 100%);
+            box-shadow: 0 0 46px 12px rgba(253, 243, 216, 0.75);
+        }
+
+        /* 云朵(两朵, 缓慢漂移) */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 60px;
+            animation: drift 46s linear infinite;
+        }
+        .cloud::before,
+        .cloud::after {
+            content: "";
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+        .cloud::before { width: 60%; height: 130%; left: 16%; top: -70%; }
+        .cloud::after  { width: 44%; height: 100%; left: 48%; top: -55%; }
+        .cloud.c1 { width: 180px; height: 40px; top: 18%; left: -200px; }
+        .cloud.c2 { width: 130px; height: 30px; top: 32%; left: -160px; animation-duration: 62s; animation-delay: -20s; opacity: 0.7; }
+        @keyframes drift {
+            from { transform: translateX(0); }
+            to   { transform: translateX(calc(100vw + 400px)); }
+        }
+
+        /* 花瓣点缀 */
+        #bg i {
+            position: absolute;
+            width: 9px;
+            height: 9px;
+            border-radius: 50% 0 50% 50%;
+            background: rgba(232, 150, 190, 0.55);
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0%   { transform: translateY(-6vh) rotate(0deg); opacity: 0; }
+            10%  { opacity: 0.8; }
+            100% { transform: translateY(106vh) rotate(340deg); opacity: 0; }
+        }
+
+        canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 加载层 */
+        #loading {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            background: linear-gradient(170deg, #fdf0f6 0%, #f7e3ee 28%, #ecdcf2 58%, #dcd0ec 100%);
+            transition: opacity 0.6s ease;
+        }
+        #loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #loading .title {
+            font-family: "KaiTi", "STKaiti", "Microsoft YaHei", sans-serif;
+            font-size: 30px;
+            color: #6d4a8a;
+            letter-spacing: 6px;
+            text-shadow: 0 2px 6px rgba(109, 74, 138, 0.2);
+        }
+        #loading .bar {
+            width: 280px;
+            height: 8px;
+            border-radius: 6px;
+            background: rgba(109, 74, 138, 0.15);
+            overflow: hidden;
+        }
+        #loading .bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #e8a0c8, #b48ae8);
+            transition: width 0.25s ease;
+        }
+        #loading .pct {
+            font-size: 14px;
+            color: #8a6ba8;
+        }
+    </style>
+</head>
+<body>
+    <div id="bg">
+        <div class="cloud c1"></div>
+        <div class="cloud c2"></div>
+    </div>
+    <canvas id="glcanvas" tabindex="0"></canvas>
+
+    <div id="loading">
+        <div class="title">丛雨</div>
+        <div class="bar"><div class="bar-fill" id="bar-fill"></div></div>
+        <div class="pct" id="pct">正在加载…</div>
+    </div>
+
+    <!-- 花瓣点缀 -->
+    <script>
+        (function () {
+            var bg = document.getElementById("bg");
+            for (var i = 0; i < 14; i++) {
+                var p = document.createElement("i");
+                p.style.left = (Math.random() * 100) + "vw";
+                p.style.animationDuration = (8 + Math.random() * 10) + "s";
+                p.style.animationDelay = (-Math.random() * 14) + "s";
+                p.style.transform = "scale(" + (0.6 + Math.random() * 0.9) + ")";
+                bg.appendChild(p);
+            }
+            // 加载进度钩子(ply_bundle.js 调用)
+            window.__petProgress = function (ratio) {
+                var fill = document.getElementById("bar-fill");
+                var pct = document.getElementById("pct");
+                var r = Math.max(0, Math.min(1, ratio));
+                fill.style.width = (r * 100) + "%";
+                pct.textContent = "正在加载… " + Math.round(r * 100) + "%";
+            };
+            // wasm 完成 → 淡出加载层
+            window.__petLoaded = function () {
+                window.__petProgress(1);
+                var el = document.getElementById("loading");
+                setTimeout(function () { el.classList.add("hidden"); }, 200);
+            };
+        })();
+    </script>
+    <script src="./ply_bundle.js"></script>
+    <script>
+        // 端侧朗读: wasm 输出 "SPEAK:文本" 到 console.log, 这里拦截并交给
+        // Web Speech API(免费、无服务器、浏览器原生, 适合"给大伙用")
+        // 免费模型提示: wasm 输出 "OPENURL:链接" → 新标签页打开
+        (function () {
+            var origLog = console.log;
+            console.log = function () {
+                var s = Array.prototype.slice.call(arguments).join(" ");
+                if (s.indexOf("SPEAK:") === 0) {
+                    try {
+                        var u = new SpeechSynthesisUtterance(s.slice(6));
+                        u.lang = "zh-CN";
+                        u.rate = 1.0;
+                        u.pitch = 1.0;
+                        window.speechSynthesis.cancel();
+                        window.speechSynthesis.speak(u);
+                    } catch (e) { /* 无 TTS 语音时静默 */ }
+                    return;
+                }
+                if (s.indexOf("OPENURL:") === 0) {
+                    try { window.open(s.slice(8), "_blank"); } catch (e) {}
+                    return;
+                }
+                origLog.apply(console, arguments);
+            };
+        })();
+        load("./app.wasm?v=16");
+    </script>
+</body>
+</html>

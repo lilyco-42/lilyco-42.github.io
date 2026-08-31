@@ -288,6 +288,13 @@ const FEATURED = [
     tags: ['写代码前先侦察', 'build-vs-buy', '论坛挖坑'],
     blurb: '项目预研技能：需求钉死一句话 → gh 近义词搜索 → 论坛冷门知识 → 决策，少造 80% 轮子。',
   },
+  {
+    name: 'cute-pet',
+    local: '/pet/',          // 本地首页(丛雨桌宠 WASM)；有 local 优先指向本地页
+    icon: '丛',
+    tags: ['Rust', 'WASM', 'lazy-UI', '桌宠', '跨平台'],
+    blurb: '丛雨桌宠 —— 跨平台悬浮桌宠(Rust + WASM + lazy-UI)。点击玩耍、聊天、看屏幕。浏览器即玩。',
+  },
 ];
 
 // ── API ──────────────────────────────────────────────────────
@@ -323,26 +330,27 @@ function renderFeatured() {
   const byName = new Map(repos.map(r => [r.name, r]));
   const cards = FEATURED.map(f => {
     const r = byName.get(f.name);
-    if (!r) return '';
+    if (!r && !f.local) return '';
     const hero = f.hero ? ' f-hero' : '';
+    const href = f.local ? f.local : (r ? r.html_url : '#');
     return `
     <div class="fcard${hero}">
       <div class="fcard-top">
         <div class="fcard-icon">${f.icon}</div>
         <div>
-          <div class="fcard-title"><a href="${r.html_url}" target="_blank">${r.name}</a>${f.hero ? ' <span style="color:var(--yellow);font-size:0.7rem;font-weight:600">★ 主推</span>' : ''}</div>
+          <div class="fcard-title"><a href="${href}" ${f.local ? '' : 'target="_blank"'}>${f.name}</a>${f.hero ? ' <span style="color:var(--yellow);font-size:0.7rem;font-weight:600">★ 主推</span>' : ''}</div>
           <div class="fcard-meta">
-            <span><span class="lang-dot" style="background:${langColor(r.language)}"></span> ${r.language || 'N/A'}</span>
-            <span>⭐ ${r.stargazers_count}</span>
-            <span>🕐 ${timeAgo(r.updated_at)}</span>
+            <span><span class="lang-dot" style="background:${langColor(r ? r.language : 'Rust')}"></span> ${r ? (r.language || 'N/A') : 'WASM'}</span>
+            <span>⭐ ${r ? r.stargazers_count : '—'}</span>
+            <span>🕐 ${r ? timeAgo(r.updated_at) : '网页版'}</span>
           </div>
         </div>
       </div>
       <div class="fcard-desc">${f.blurb}</div>
       <div class="fcard-tags">${f.tags.map(t => `<span class="ftag">${t}</span>`).join('')}</div>
       <div class="fcard-links">
-        <a class="btn" href="${r.html_url}" target="_blank">GitHub →</a>
-        <a class="btn" href="${r.html_url}/actions" target="_blank">Actions</a>
+        <a class="btn" href="${href}" ${f.local ? '' : 'target="_blank"'}>${f.local ? '立即游玩 →' : 'GitHub →'}</a>
+        ${f.local ? '' : `<a class="btn" href="${r.html_url}/actions" target="_blank">Actions</a>`}
       </div>
     </div>`;
   }).join('');
