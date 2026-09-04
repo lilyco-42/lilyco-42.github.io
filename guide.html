@@ -3,76 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>webview-mini & webview-capi · 快速入门</title>
+<title>webview-mini · 极速 WebView2 封装</title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--purple:#bc8cff}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",monospace;background:var(--bg);color:var(--text);line-height:1.6}
-.container{max-width:900px;margin:0 auto;padding:40px 20px}
-h1{font-size:2rem;margin-bottom:8px;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-h2{font-size:1.3rem;color:var(--blue);margin-top:40px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:6px}
-h3{font-size:1.1rem;color:var(--green);margin-top:24px;margin-bottom:8px}
-p{margin-bottom:12px;color:var(--muted)}
-.code-block{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;overflow-x:auto;position:relative}
-.code-block pre{font-family:"Cascadia Code",Consolas,monospace;font-size:0.85rem;color:var(--text);white-space:pre-wrap;word-break:break-all}
-.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.75rem}
-.copy-btn:hover{color:var(--text);background:var(--border)}
-.tag{display:inline-block;background:var(--bg3);border:1px solid var(--border);color:var(--blue);padding:2px 8px;border-radius:12px;font-size:0.75rem;margin-right:6px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;margin:20px 0}
-.card h3{margin-top:0}
-.steps{counter-reset:step;list-style:none;padding:0}
-.steps li{counter-increment:step;position:relative;padding-left:48px;margin-bottom:20px}
-.steps li::before{content:counter(step);position:absolute;left:0;top:0;width:32px;height:32px;background:var(--blue);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem}
-.comparison{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
-@media(max-width:600px){.comparison{grid-template-columns:1fr}}
-.comparison .item{background:var(--bg3);border-radius:8px;padding:16px;text-align:center}
-.comparison .size{font-size:2rem;font-weight:700;color:var(--green)}
-.comparison .label{color:var(--muted);font-size:0.8rem}
+.c{max-width:880px;margin:0 auto;padding:40px 20px}
+h1{font-size:2.2rem;margin:20px 0 8px;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:1.3rem;color:var(--blue);margin-top:36px;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px}
+p{color:var(--muted);margin-bottom:12px}
+.code{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;overflow-x:auto;position:relative}
+.code pre{font-family:"Cascadia Code",Consolas,monospace;font-size:0.82rem;color:var(--text);white-space:pre-wrap}
+.copy{position:absolute;top:8px;right:8px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:0.7rem}
+.copy:hover{color:var(--text)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.stat{background:var(--bg3);border-radius:8px;padding:16px;text-align:center}
+.stat .num{font-size:2rem;font-weight:700;color:var(--green)}
+.stat .lbl{color:var(--muted);font-size:0.78rem}
+.tag{display:inline-block;background:var(--bg3);border:1px solid var(--border);color:var(--blue);padding:2px 8px;border-radius:12px;font-size:0.72rem;margin:3px}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="c">
 
 <h1>WebView2 极速封装</h1>
-<p>Windows 端 <strong>200KB</strong> 独立 exe,对标 Android 23KB WebView 薄包装。<br>单头文件引入 · xmake 一键构建 · 零外部依赖。</p>
+<p>Windows <strong style="color:var(--green)">200KB</strong> 独立 exe &nbsp;|&nbsp; 单头文件引入 &nbsp;|&nbsp; xmake 一键构建</p>
+<p>对标 Android 23KB WebView 薄包装,纯 C/C++ ,零外部依赖。</p>
 
-<div class="comparison">
-  <div class="item">
-    <div class="size">191 KB</div>
-    <div class="label">C 壳 (Windows)</div>
-  </div>
-  <div class="item">
-    <div class="size">23 KB</div>
-    <div class="label">Android WebView</div>
-  </div>
+<div class="grid">
+  <div class="stat"><div class="num">191 KB</div><div class="lbl">C 壳 (Windows)</div></div>
+  <div class="stat"><div class="num">23 KB</div><div class="lbl">Android WebView</div></div>
 </div>
 
-<h2>🚀 webview-mini · 快速入门</h2>
-
+<h2>🚀 快速入门 (30 秒)</h2>
 <div class="card">
-<h3>方式 1: xmake (推荐)</h3>
-<div class="code-block">
-<pre><code class="language-lua">-- xmake.lua
-add_rules("mode.debug", "mode.release")
+<h3 style="color:var(--green);margin-top:0">xmake (推荐)</h3>
+<div class="code">
+<pre>-- xmake.lua
 add_requires("webview-mini")
-
 target("my-app")
     set_kind("binary")
     add_files("main.c")
     add_packages("webview-mini")
-    add_syslinks("user32","shell32","ole32","oleaut32","shlwapi","version")
-    set_languages("c11")
-    if is_mode("release") then set_optimize("smallest") end
-target_end()</code></pre>
-<button class="copy-btn" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText)">复制</button>
+    add_syslinks("user32","shell32","ole32","shlwapi","version")</pre>
+<button class="copy" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText)">复制</button>
 </div>
-
-<p>然后将以下代码保存为 <code>main.c</code>:</p>
-
-<div class="code-block">
-<pre><code class="language-c">#include "webview.h"
+<div class="code">
+<pre>// main.c
+#include "webview.h"
 int main(void) {
     webview_t w = webview_create(0, NULL);
     webview_set_title(w, "MC Console");
@@ -81,98 +63,49 @@ int main(void) {
     webview_run(w);
     webview_destroy(w);
     return 0;
-}</code></pre>
-<button class="copy-btn" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText)">复制</button>
+}</pre>
+<button class="copy" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText)">复制</button>
+</div>
+<p><code>xmake</code> → 完成!</p>
 </div>
 
-<p>编译运行:</p>
-<div class="code-block">
-<pre><code class="language-bash">xmake
-xmake run</code></pre>
-</div>
-</div>
-
+<h2>🔌 跨语言绑定 (C API DLL)</h2>
+<div class="grid">
 <div class="card">
-<h3>方式 2: 单头文件直链</h3>
-<p>下载 <a href="https://github.com/lilyco-42/webview-mini/releases" target="_blank">webview.h (211 KB)</a>,放到项目目录:</p>
-<div class="code-block">
-<pre><code class="language-bash">curl -O https://raw.githubusercontent.com/lilyco-42/webview-mini/main/webview.h
-cl /O2 /MT main.c /link /SUBSYSTEM:WINDOWS user32.lib shell32.lib ole32.lib oleaut32.lib shlwapi.lib version.lib</code></pre>
-</div>
-</div>
-
-<h2>🔌 webview-capi · 跨语言绑定</h2>
-<p>DLL 导出 17 个 C 函数,支持 <span class="tag">Python</span><span class="tag">Go</span><span class="tag">Rust</span><span class="tag">Node.js</span></p>
-
-<div class="card">
-<h3>Python (ctypes) · 5 行</h3>
-<div class="code-block">
-<pre><code class="language-python">import ctypes
+<h3 style="color:var(--green);margin-top:0">Python</h3>
+<div class="code"><pre style="font-size:0.78rem">import ctypes
 lib = ctypes.CDLL('./webview.dll')
 lib.webview_create.restype = ctypes.c_void_p
 w = lib.webview_create(0, None)
-lib.webview_set_title(w, b"Hello from Python")
-lib.webview_navigate(w, b"https://example.com")
-lib.webview_run(w)</code></pre>
-<button class="copy-btn" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText)">复制</button>
+lib.webview_set_title(w, b"Hello")
+lib.webview_run(w)</pre></div>
 </div>
-</div>
-
 <div class="card">
-<h3>Go (cgo) · 6 行</h3>
-<div class="code-block">
-<pre><code class="language-go">// #cgo LDFLAGS: -L. -lwebview
+<h3 style="color:var(--green);margin-top:0">Go</h3>
+<div class="code"><pre style="font-size:0.78rem">// #cgo LDFLAGS: -lwebview
 // #include "webview.h"
-import "C"
 w := C.webview_create(0, nil)
-C.webview_set_title(w, C.CString("Hello from Go"))
-C.webview_navigate(w, C.CString("https://example.com"))
-C.webview_run(w)</code></pre>
-<button class="copy-btn" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText)">复制</button>
+C.webview_run(w)</pre></div>
 </div>
 </div>
 
-<h2>📦 安装</h2>
-<ol class="steps">
-<li><strong>下载 Release</strong> — <a href="https://github.com/lilyco-42/webview-capi/releases/download/v1.0.0/webview-capi-v1.0.0-windows-x64.zip">webview-capi-v1.0.0-windows-x64.zip</a> (150 KB)</li>
-<li><strong>解压到项目</strong> — 得到 webview.dll + webview.h + webview.lib</li>
-<li><strong>复制示例代码</strong> — 8 行 C 代码即可运行</li>
-<li><strong>编译链接</strong> — cl /O2 /MT main.c /link webview.lib</li>
-</ol>
-
-<h2>⚠️ 避坑指南</h2>
+<h2>⚠️ 避坑</h2>
 <div class="card">
-<h3>Clash TUN 代理白屏</h3>
-<p>若 WebView2 窗口白屏(页面不加载),在代码中添加:</p>
-<div class="code-block">
-<pre><code class="language-c">SetEnvironmentVariableW(L"WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", L"--no-proxy-server");</code></pre>
-</div>
-</div>
-
-<div class="card">
-<h3>DLL 导出失败</h3>
-<p>必须用 CMake 构建: <code>cmake -DWEBVIEW_BUILD_SHARED_LIBRARY=ON ..</code></p>
-<p>不要用 cl 直接编译 amalgamated webview.h —— 函数默认展开为 static inline。</p>
+<p><strong>Clash TUN 代理白屏:</strong></p>
+<div class="code"><pre>SetEnvironmentVariableW(L"WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", L"--no-proxy-server");</pre></div>
+<p><strong>DLL 导出失败:</strong> 必须用 <code>cmake -DWEBVIEW_BUILD_SHARED_LIBRARY=ON</code> 构建。</p>
 </div>
 
 <h2>🔗 链接</h2>
 <p>
-<a href="https://github.com/lilyco-42/webview-mini" target="_blank">webview-mini (单头文件)</a> ·
-<a href="https://github.com/lilyco-42/webview-capi" target="_blank">webview-capi (C API)</a> ·
-<a href="https://github.com/lilyco-42/webview-capi/releases/tag/v1.0.0" target="_blank">Release v1.0.0</a> ·
-<a href="https://github.com/lilyco-42/webview-capi/blob/main/release/PITFALLS.md" target="_blank">完整避坑手册</a>
+<a href="https://github.com/lilyco-42/webview-mini">webview-mini</a> ·
+<a href="https://github.com/lilyco-42/webview-capi">webview-capi</a> ·
+<a href="https://github.com/lilyco-42/webview-capi/releases/tag/v1.0.0">Release v1.0.0</a>
 </p>
-
 </div>
 <script>
-// 复制按钮
-document.querySelectorAll('.copy-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const text = btn.previousElementSibling.innerText;
-    navigator.clipboard.writeText(text);
-    btn.textContent = '已复制!';
-    setTimeout(() => btn.textContent = '复制', 1500);
-  });
+document.querySelectorAll('.copy').forEach(b=>{
+  b.onclick=()=>{navigator.clipboard.writeText(b.previousElementSibling.innerText);b.textContent='✓';setTimeout(()=>b.textContent='复制',1200)};
 });
 </script>
 </body>
