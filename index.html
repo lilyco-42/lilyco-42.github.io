@@ -362,7 +362,7 @@ function renderFeatured() {
       <div class="fcard-tags">${f.tags.map(t => `<span class="ftag">${t}</span>`).join('')}</div>
       <div class="fcard-links">
         <a class="btn" href="${href}" ${f.local ? '' : 'target="_blank"'}>${f.local ? '立即游玩 →' : 'GitHub →'}</a>
-        ${f.local ? '' : `<a class="btn" href="${r.html_url}/actions" target="_blank">Actions</a>`}
+        ${f.local ? '' : `<a class="btn" href="${r.html_url}/actions" target="_blank">Actions</a>`} <a class="btn" href="guide.html?name=${f.name}" target="_blank">快速入门</a>
       </div>
     </div>`;
   }).join('');
