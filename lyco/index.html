@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco web tools — 开源 WASM 轻量套件</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff;--ok:#7ee787}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:40px 20px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:26px}h1 span{color:var(--acc)}
+.sub{color:var(--dim);font-size:13px;margin:8px 0 30px;line-height:1.7}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+a.card{display:block;background:var(--card);border:1px solid #30363d;border-radius:12px;padding:20px;color:var(--fg);text-decoration:none;transition:border-color .15s, transform .15s}
+a.card:hover{border-color:var(--acc);transform:translateY(-2px)}
+.card .ico{font-size:30px}
+.card h2{font-size:16px;margin:8px 0 6px}
+.card p{color:var(--dim);font-size:12px;line-height:1.7}
+.card .sz{color:var(--ok);font-size:11px;margin-top:10px}
+.note{background:var(--card);border:1px solid #30363d;border-left:3px solid var(--acc);border-radius:8px;padding:14px 16px;margin-top:26px;color:var(--dim);font-size:12px;line-height:1.8}
+.note b{color:var(--fg)}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco <span>web tools</span></h1>
+  <div class="sub">开源 WASM 轻量套件 — 每个工具的内核都是手写 C,经 <code>zig cc --target=wasm32-freestanding</code> 编译,共 <b style="color:var(--ok)">25KB wasm</b>。<a href="/" style="color:var(--acc)">← 主页</a> · <a href="../wasm-demo/" style="color:var(--acc)">wasm-demo 原理演示</a></div>
+
+  <div class="grid">
+    <a class="card" href="photo/">
+      <div class="ico">🖼️</div><h2>lyco photo</h2>
+      <p>图像滤镜:灰度 / 反相 / 亮度 / 对比度 / 像素化 / Sobel 边缘 / 盒模糊,撤销 5 步,导出 PNG。</p>
+      <div class="sz">photo.wasm · 7.2 KB</div>
+    </a>
+    <a class="card" href="sheet/">
+      <div class="ico">📊</div><h2>lyco sheet</h2>
+      <p>表格公式引擎:=算式 / A1 引用 / SUM·AVG·MIN·MAX·COUNT / 括号 / 负号,递归下降解析在 WASM 内,重入取值。</p>
+      <div class="sz">sheet.wasm · 11 KB</div>
+    </a>
+    <a class="card" href="paint/">
+      <div class="ico">🎨</div><h2>lyco paint</h2>
+      <p>画板:画笔 / 橡皮 / 油漆桶,扫描线泛洪填充带颜色容差,填充在 WASM 一次完成。</p>
+      <div class="sz">paint.wasm · 4.2 KB</div>
+    </a>
+    <a class="card" href="pad/">
+      <div class="ico">📝</div><h2>lyco pad</h2>
+      <p>记事本:实时统计字符 / 词 / 中文字数 / 行数 / 阅读时长,UPPER·lower·snake_case 转换。</p>
+      <div class="sz">pad.wasm · 3 KB</div>
+    </a>
+  </div>
+
+  <div class="note">
+    <b>关于名字:</b> Adobe / Microsoft 套件是闭源桌面软件,任何人都无法把它们"移植"到 WASM(官方上 Web 也是用源码重写数年)。本套件取其<b>日常高频场景</b>,用可审计的小内核提供开源轻量替代 —— 所有源码在本仓库 <code>lyco/</code> 目录,构建命令:<code>zig cc --target=wasm32-freestanding -O2 -nostdlib</code>。数据全程本地处理,不上传任何服务器。
+  </div>
+</div>
+</body></html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco paint — WASM 油漆桶</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:20px}.sub{color:var(--dim);font-size:12px;margin:6px 0 18px}
+.card{background:var(--card);border:1px solid #30363d;border-radius:10px;padding:16px;margin-bottom:16px}
+canvas{width:100%;border-radius:6px;background:#fff;cursor:crosshair;touch-action:none;display:block}
+button{background:var(--acc);border:0;color:#000;font:inherit;font-weight:600;padding:6px 12px;border-radius:6px;cursor:pointer;margin-right:6px}
+button.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+button.on{outline:2px solid #7ee787}
+input[type=range]{width:120px;vertical-align:middle}
+.stat{color:var(--dim);font-size:12px;margin-top:8px}
+a{color:var(--acc);text-decoration:none}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco paint <span style="color:var(--dim);font-size:12px">paint.wasm 4.2KB · 扫描线填充在 WASM 内</span></h1>
+  <div class="sub">画笔 / 油漆桶(容差) · <a href="../">← lyco 工具箱</a></div>
+  <div class="card">
+    <button id="bBrush" class="on" onclick="tool='brush';mark()">✏ 画笔</button>
+    <button id="bFill" onclick="tool='fill';mark()">🪣 油漆桶</button>
+    <button id="bErase" onclick="tool='erase';mark()">⌫ 橡皮</button>
+    <input type="color" id="col" value="#58a6ff">
+    画笔 <input type="range" id="bsz" min="1" max="40" value="6">
+    容差 <input type="range" id="tol" min="0" max="128" value="32">
+    <button class="ghost" onclick="clearAll()">清空</button>
+    <button class="ghost" onclick="dl()">下载 PNG</button>
+    <div class="stat" id="st"></div>
+  </div>
+  <div class="card"><canvas id="cv" width="860" height="520"></canvas></div>
+</div>
+<script>
+let e, ctx, tool = 'brush', drawing = false, last = null;
+(async () => {
+  const { instance } = await WebAssembly.instantiateStreaming(fetch('paint.wasm'));
+  e = instance.exports;
+  ctx = document.getElementById('cv').getContext('2d', { willReadFrequently: true });
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 860, 520);
+})();
+const cv = () => document.getElementById('cv');
+const pos = ev => { const r = cv().getBoundingClientRect();
+  return [Math.round((ev.clientX - r.left) * cv().width / r.width), Math.round((ev.clientY - r.top) * cv().height / r.height)]; };
+cv().addEventListener('pointerdown', ev => {
+  const [x, y] = pos(ev); drawing = true; last = [x, y];
+  if (tool === 'fill') {
+    const img = ctx.getImageData(0, 0, cv().width, cv().height);
+    new Uint8Array(e.memory.buffer, e.kbuf(), img.data.length).set(img.data);
+    const [r, g, b] = hex2rgb(document.getElementById('col').value);
+    const n = e.flood(cv().width, cv().height, x, y, r, g, b, +document.getElementById('tol').value);
+    const out = new Uint8Array(e.memory.buffer, e.kbuf(), img.data.length);
+    ctx.putImageData(new ImageData(new Uint8ClampedArray(out), cv().width, cv().height), 0, 0);
+    document.getElementById('st').textContent = `flood 填充 ${n} 像素 (WASM 扫描线)`;
+    drawing = false;
+  }
+});
+cv().addEventListener('pointermove', ev => {
+  if (!drawing || tool === 'fill') return;
+  const [x, y] = pos(ev);
+  ctx.strokeStyle = tool === 'erase' ? '#ffffff' : document.getElementById('col').value;
+  ctx.lineWidth = +document.getElementById('bsz').value; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(...last); ctx.lineTo(x, y); ctx.stroke();
+  last = [x, y];
+});
+addEventListener('pointerup', () => drawing = false);
+function mark(){ ['bBrush','bFill','bErase'].forEach(id => document.getElementById(id).classList.toggle('on', id.toLowerCase().includes(tool))); }
+function clearAll(){ ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cv().width, cv().height); }
+function dl(){ const a = document.createElement('a'); a.download = 'lyco-paint.png'; a.href = cv().toDataURL(); a.click(); }
+function hex2rgb(h){ return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]; }
+</script>
+</body></html>

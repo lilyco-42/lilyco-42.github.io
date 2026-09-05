@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco pad — WASM 文本统计</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:860px;margin:0 auto}
+h1{font-size:20px}.sub{color:var(--dim);font-size:12px;margin:6px 0 18px}
+.card{background:var(--card);border:1px solid #30363d;border-radius:10px;padding:16px;margin-bottom:16px}
+#ed{min-height:320px;outline:0;font:14px/1.7 ui-monospace,monospace;white-space:pre-wrap}
+button{background:var(--acc);border:0;color:#000;font:inherit;font-weight:600;padding:6px 12px;border-radius:6px;cursor:pointer;margin-right:6px}
+button.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+.stat{color:var(--dim);font-size:12px}
+b{color:#7ee787}
+a{color:var(--acc);text-decoration:none}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco pad <span style="color:var(--dim);font-size:12px">pad.wasm 3KB · UTF-8 统计内核在 WASM 内</span></h1>
+  <div class="sub">实时字数统计(中文按字/英文按词) + 大小写/蛇形转换 · <a href="../">← lyco 工具箱</a></div>
+  <div class="card">
+    <button onclick="tr(0)">UPPER</button>
+    <button onclick="tr(1)">lower</button>
+    <button onclick="tr(2)">snake_case</button>
+    <button class="ghost" onclick="ed.innerText='';up()">清空</button>
+    <div class="stat" style="margin-top:10px">
+      字符 <b id="s0">0</b> · 词 <b id="s1">0</b> · 中文字 <b id="s2">0</b> · 行 <b id="s3">1</b> · 阅读约 <b id="s4">0</b> 分钟
+    </div>
+  </div>
+  <div class="card"><div id="ed" contenteditable="true" spellcheck="false">在此粘贴或输入文本…
+
+中文字符逐字计数,英文按词计数,全部由 WASM 内核逐字节扫描 UTF-8 完成。</div></div>
+</div>
+<script>
+let e; const ed = document.getElementById('ed');
+(async () => {
+  const { instance } = await WebAssembly.instantiateStreaming(fetch('pad.wasm'));
+  e = instance.exports; up();
+})();
+function up() {
+  const s = ed.innerText.replace(/\u00a0/g, ' ');
+  const b = new TextEncoder().encode(s);
+  if (b.length > 60000) { document.getElementById('s0').textContent = '6 万字节上限'; return; }
+  new Uint8Array(e.memory.buffer, e.tbufp(), b.length).set(b);
+  e.stats(b.length);
+  const o = new Uint32Array(e.memory.buffer, e.statp(), 4);
+  ['s0','s1','s2','s3'].forEach((id, i) => document.getElementById(id).textContent = o[i]);
+  document.getElementById('s4').textContent = Math.max(1, Math.round((o[2] + o[1] * 2) / 400));
+  return b.length;
+}
+function tr(mode) {
+  const len = up(); if (!len) return;
+  e.transform(len, mode);
+  const out = new TextDecoder().decode(new Uint8Array(e.memory.buffer, e.tbufp(), len));
+  ed.innerText = out; up();
+}
+ed.addEventListener('input', up);
+</script>
+</body></html>

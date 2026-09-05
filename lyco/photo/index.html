@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco photo — WASM 图像滤镜</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:20px}.sub{color:var(--dim);font-size:12px;margin:6px 0 18px}
+.card{background:var(--card);border:1px solid #30363d;border-radius:10px;padding:16px;margin-bottom:16px}
+canvas{width:100%;image-rendering:auto;border-radius:6px;background:#000;display:block}
+button{background:var(--acc);border:0;color:#000;font:inherit;font-weight:600;padding:6px 12px;border-radius:6px;cursor:pointer;margin:4px 4px 0 0}
+button.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+input[type=range]{width:160px;vertical-align:middle}
+.stat{color:var(--dim);font-size:12px;margin-top:8px}
+a{color:var(--acc);text-decoration:none}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco photo <span style="color:var(--dim);font-size:12px">photo.wasm 7.2KB</span></h1>
+  <div class="sub">像素级滤波全部在 WASM 内完成 · <a href="../">← lyco 工具箱</a> · <a href="../../wasm-demo/">wasm-demo</a></div>
+  <div class="card">
+    <input type="file" id="file" accept="image/*">
+    <canvas id="cv" width="880" height="520"></canvas>
+  </div>
+  <div class="card">
+    <button onclick="f(0)">灰度</button>
+    <button onclick="f(1)">反相</button>
+    <button onclick="f(5)">Sobel 边缘</button>
+    <button class="ghost" onclick="f(2,+argv.value)">亮度 <span id="argv">0</span></button>
+    <input type="range" id="argr" min="-255" max="255" value="0" oninput="argv.textContent=this.value">
+    <button class="ghost" onclick="f(3,+argc.value)">对比度 <span id="arvc">100%</span></button>
+    <input type="range" id="argc" min="10" max="300" value="100" oninput="arvc.textContent=this.value+'%'">
+    <button class="ghost" onclick="f(4,+argp.value)">像素化 <span id="arvp">8</span></button>
+    <input type="range" id="argp" min="2" max="40" value="8" oninput="arvp.textContent=this.value">
+    <button class="ghost" onclick="f(6,+argb.value)">模糊 r=<span id="arvb">2</span></button>
+    <input type="range" id="argb" min="1" max="5" value="2" oninput="arvb.textContent=this.value">
+    <button onclick="undo()">↩ 撤销</button>
+    <button onclick="dl()">下载 PNG</button>
+    <div class="stat" id="st">加载图片开始 · 撤销栈 5 步</div>
+  </div>
+</div>
+<script>
+let e, ctx, W, H, hist = [];
+(async () => {
+  const { instance } = await WebAssembly.instantiateStreaming(fetch('photo.wasm'));
+  e = instance.exports;
+  ctx = document.getElementById('cv').getContext('2d', { willReadFrequently: true });
+  sample();
+})();
+function sample() {
+  const g = ctx.createLinearGradient(0, 0, 880, 520);
+  g.addColorStop(0, '#0f2027'); g.addColorStop(.5, '#203a43'); g.addColorStop(1, '#2c5364');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 880, 520);
+  for (let i = 0; i < 40; i++) { ctx.fillStyle = `hsl(${i * 9},70%,55%)`;
+    ctx.fillRect(20 + i * 21, 380 + Math.sin(i) * 60, 16, 90); }
+  push(); sync();
+}
+function push() { hist.push(ctx.getImageData(0, 0, W = ctx.canvas.width, H = ctx.canvas.height)); if (hist.length > 5) hist.shift(); }
+function sync() {
+  const img = ctx.getImageData(0, 0, W, H);
+  new Uint8Array(e.memory.buffer, e.pbuf(), W * H * 4).set(img.data);
+}
+function show() {
+  const src = new Uint8Array(e.memory.buffer, e.pbuf(), W * H * 4);
+  ctx.putImageData(new ImageData(new Uint8ClampedArray(src), W, H), 0, 0);
+}
+function f(mode, arg = 0) { push(); sync(); e.apply(W, H, mode, arg); show();
+  document.getElementById('st').textContent = `apply(mode=${mode}, arg=${arg}) @ ${W}×${H} — WASM 内核完成`; }
+function undo() { if (hist.length > 1) { hist.pop(); ctx.putImageData(hist[hist.length - 1], 0, 0); } }
+function dl() { const a = document.createElement('a'); a.download = 'lyco-photo.png'; a.href = document.getElementById('cv').toDataURL(); a.click(); }
+document.getElementById('file').onchange = ev => {
+  const img = new Image();
+  img.onload = () => {
+    const s = Math.min(1, 1024 / img.width, 1024 / img.height);
+    W = Math.round(img.width * s); H = Math.round(img.height * s);
+    document.getElementById('cv').width = W; document.getElementById('cv').height = H;
+    ctx.drawImage(img, 0, 0, W, H); hist = []; push();
+    document.getElementById('st').textContent = `已载入 ${W}×${H}`;
+  };
+  img.src = URL.createObjectURL(ev.target.files[0]);
+};
+</script>
+</body></html>
