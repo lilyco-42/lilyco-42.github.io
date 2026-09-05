@@ -48,6 +48,31 @@ a.card:hover{border-color:var(--acc);transform:translateY(-2px)}
     </a>
   </div>
 
+  <h1 style="font-size:20px;margin-top:34px">lyco <span>big ports</span> — 重型 C/C++ 项目的 WASM 移植</h1>
+  <div class="sub">同一个思路放大到真实世界的巨型项目:它们都有官方/社区 WASM 版,这里集成可直接用的入口。</div>
+  <div class="grid">
+    <a class="card" href="clang/">
+      <div class="ico">⚙️</div><h2>lyco clang</h2>
+      <p>浏览器里跑真 Clang+LLD:写 C → 编译 → 链接 → WASI 运行,全流程不出标签页。编译器内核来自本账号 clings 项目(browsercc 工具链,自托管 90MB)。</p>
+      <div class="sz">clang.wasm 40.6MB + lld.wasm 22.1MB + sysroot 27.3MB</div>
+    </a>
+    <a class="card" href="ffmpeg/">
+      <div class="ico">🎬</div><h2>lyco ffmpeg</h2>
+      <p>ffmpeg.wasm 官方移植:视频转 GIF / 提取 MP3 / 压缩 MP4 / 截帧,文件不出浏览器。内核经 unpkg CDN 加载。</p>
+      <div class="sz">@ffmpeg/core 31MB (CDN)</div>
+    </a>
+    <a class="card" href="opencv/">
+      <div class="ico">👁️</div><h2>lyco opencv</h2>
+      <p>OpenCV.js 官方移植:Canny 边缘 / 高斯模糊 / 二值化 / 灰度,cv.Mat 全程 WASM,双阈值实时可调。</p>
+      <div class="sz">opencv.js 10.9MB (官方 CDN)</div>
+    </a>
+    <span class="card" style="opacity:.6">
+      <div class="ico">🪄</div><h2>ImageMagick</h2>
+      <p>社区移植 @imagemagick/magick-wasm(格式转换/缩放/特效)。API 为 ESM+异步初始化,集成中 —— 先用官方源码:</p>
+      <div class="sz"><a href="https://github.com/dlemstra/Magick.WASM" style="color:var(--acc)">github.com/dlemstra/Magick.WASM</a></div>
+    </span>
+  </div>
+
   <div class="note">
     <b>关于名字:</b> Adobe / Microsoft 套件是闭源桌面软件,任何人都无法把它们"移植"到 WASM(官方上 Web 也是用源码重写数年)。本套件取其<b>日常高频场景</b>,用可审计的小内核提供开源轻量替代 —— 所有源码在本仓库 <code>lyco/</code> 目录,构建命令:<code>zig cc --target=wasm32-freestanding -O2 -nostdlib</code>。数据全程本地处理,不上传任何服务器。
   </div>

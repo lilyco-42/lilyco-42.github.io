@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco clang — 浏览器里的 C 编译器 (LLVM/Clang → WASM)</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff;--ok:#7ee787;--err:#f85149}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:1000px;margin:0 auto}
+h1{font-size:20px}.sub{color:var(--dim);font-size:12px;margin:6px 0 18px;line-height:1.7}
+.card{background:var(--card);border:1px solid #30363d;border-radius:10px;padding:14px;margin-bottom:14px}
+textarea{width:100%;min-height:260px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:var(--fg);font:13px/1.6 ui-monospace,monospace;padding:10px;resize:vertical}
+input{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:var(--fg);font:inherit;padding:6px 10px}
+button{background:var(--acc);border:0;color:#000;font:inherit;font-weight:700;padding:8px 18px;border-radius:6px;cursor:pointer}
+button.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+button:disabled{opacity:.5;cursor:wait}
+#out{background:#0d1117;border:1px solid #30363d;border-radius:6px;min-height:180px;max-height:420px;overflow:auto;padding:10px;font-size:12px;line-height:1.6;white-space:pre-wrap}
+.p{color:var(--dim)} .ok{color:var(--ok)} .er{color:var(--err)}
+.stat{color:var(--dim);font-size:12px;margin-top:8px}
+a{color:var(--acc);text-decoration:none}
+select{background:#0d1117;color:var(--fg);border:1px solid #30363d;border-radius:6px;font:inherit;padding:5px}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco clang <span style="color:var(--dim);font-size:12px">clang.wasm 40.6MB + lld.wasm 22.1MB + wasi-sysroot 27.3MB — 全部在本页自托管</span></h1>
+  <div class="sub">真正的 LLVM/Clang 编译到 WASM:在浏览器里把 C 编译成 wasm32-wasi 并立即运行。编译器内核来自 <a href="https://github.com/lilyco-42/clings">lilyco-42/clings</a>(browsercc 工具链)· <a href="../">← lyco 工具箱</a></div>
+
+  <div class="card">
+    <select id="sample" onchange="loadSample(this.value)">
+      <option value="hello">hello world</option>
+      <option value="fib">递归 fib</option>
+      <option value="scanf">stdin 读入 (scanf)</option>
+      <option value="ascii">ASCII 菱形</option>
+    </select>
+    <button onclick="cr(this)" id="go">▶ 编译并运行</button>
+    <span class="stat" id="st">首次点击需加载 ~63MB 编译器,浏览器会缓存</span>
+  </div>
+  <div class="card"><textarea id="code" spellcheck="false"></textarea></div>
+  <div class="card">
+    <div class="stat" style="margin-bottom:6px">stdin (供 scanf 使用):</div>
+    <input id="stdin" placeholder="程序用不到就留空">
+  </div>
+  <div class="card"><div id="out"><span class="p">输出将显示在这里…</span></div></div>
+</div>
+<script type="module">
+import { compile, runWasm } from './wasm/clingswasm.js';
+const $ = id => document.getElementById(id);
+const samples = {
+hello: `#include <stdio.h>
+int main(void) {
+    printf("Hello from clang.wasm!\n");
+    for (int i = 0; i < 5; i++)
+        printf("i=%d squared=%d\n", i, i*i);
+    return 0;
+}`,
+fib: `#include <stdio.h>
+long fib(int n) { return n < 2 ? n : fib(n-1) + fib(n-2); }
+int main(void) {
+    for (int i = 0; i <= 25; i++) printf("fib(%d) = %ld\n", i, fib(i));
+    return 0;
+}`,
+scanf: `#include <stdio.h>
+int main(void) {
+    int a, b;
+    printf("读入两个整数...\n");
+    if (scanf("%d %d", &a, &b) == 2)
+        printf("%d + %d = %d\n", a, b, a + b);
+    else
+        printf("输入无效\n");
+    return 0;
+}`,
+ascii: `#include <stdio.h>
+int main(void) {
+    int n = 7;
+    for (int i = 1; i <= n; i++) {
+        for (int s = 0; s < n - i; s++) putchar(' ');
+        for (int k = 0; k < 2*i - 1; k++) putchar('*');
+        putchar('\n');
+    }
+    return 0;
+}`};
+const out = t => { $('out').innerHTML = t; };
+const line = (cls, txt) => { $('out').innerHTML += `<span class="${cls}">${txt}</span>\n`; };
+window.loadSample = k => { $('code').value = samples[k]; };
+loadSample('hello');
+
+window.cr = async btn => {
+  btn.disabled = true; out('');
+  try {
+    line('p', '[1/4] 加载编译器 (首次 ~63MB, 之后走缓存)…');
+    const t0 = performance.now();
+    const src = $('code').value;
+    const r = await compile({ source: src, fileName: 'main.c', flags: ['-std=c11','-Wall','-Wextra'] });
+    if (r.compileOutput && r.compileOutput.trim()) line(r.module ? 'p' : 'er', r.compileOutput.trim());
+    if (!r.module) { line('er', '❌ 编译失败'); return; }
+    line('ok', `[2/4] 编译完成 (${Math.round((performance.now()-t0)/100)/10}s) — 运行 WASI 程序…`);
+    const t1 = performance.now();
+    const rr = await runWasm(r.module, $('stdin').value || '', 10);
+    if (rr.stdout) line('ok', rr.stdout.replace(/</g,'&lt;'));
+    if (rr.stderr) line('er', rr.stderr);
+    line('p', `[3/4] 进程退出, 耗时 ${Math.round((performance.now()-t1)/100)/10}s`);
+    line('ok', `[4/4] ✓ 全流程: C 源码 → clang.wasm 编译 → lld.wasm 链接 → WASI 运行, 全程浏览器内完成`);
+  } catch (err) {
+    line('er', '❌ ' + (err.message || err));
+  } finally { btn.disabled = false; }
+};
+</script>
+</body></html>

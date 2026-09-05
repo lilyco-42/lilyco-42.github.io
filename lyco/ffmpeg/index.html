@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco ffmpeg — 浏览器内转码</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff;--ok:#7ee787;--err:#f85149}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:20px}.sub{color:var(--dim);font-size:12px;margin:6px 0 18px;line-height:1.7}
+.card{background:var(--card);border:1px solid #30363d;border-radius:10px;padding:14px;margin-bottom:14px}
+button{background:var(--acc);border:0;color:#000;font:inherit;font-weight:700;padding:8px 14px;border-radius:6px;cursor:pointer;margin:4px 6px 0 0}
+button:disabled{opacity:.4;cursor:wait}
+#log{background:#0d1117;border:1px solid #30363d;border-radius:6px;min-height:200px;max-height:300px;overflow:auto;padding:10px;font-size:11px;line-height:1.6;white-space:pre-wrap;color:var(--dim)}
+.bar{height:8px;background:#0d1117;border-radius:4px;overflow:hidden;margin-top:10px}
+.bar>div{height:100%;width:0;background:linear-gradient(90deg,#58a6ff,#7ee787);transition:width .2s}
+a.dl{display:inline-block;background:#238636;color:#fff;padding:6px 12px;border-radius:6px;margin:6px 6px 0 0;text-decoration:none;font-size:13px}
+.stat{color:var(--dim);font-size:12px}
+a{color:var(--acc);text-decoration:none}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco ffmpeg <span style="color:var(--dim);font-size:12px">ffmpeg.wasm (官方移植) · core 31MB 经 unpkg CDN 加载</span></h1>
+  <div class="sub">视频/音频转码全程浏览器内完成,文件不上传 · <a href="../">← lyco 工具箱</a></div>
+  <div class="card">
+    <input type="file" id="file" accept="video/*,audio/*">
+    <div>
+      <button onclick="go('gif')" disabled>→ GIF (前3秒)</button>
+      <button onclick="go('mp3')" disabled>→ 提取 MP3</button>
+      <button onclick="go('mp4')" disabled>→ 压缩 MP4</button>
+      <button onclick="go('png')" disabled>→ 截帧 PNG</button>
+    </div>
+    <div class="bar"><div id="pb"></div></div>
+    <div class="stat" id="st" style="margin-top:8px">选择文件后自动加载内核 (~31MB, 首次较慢)</div>
+    <div id="dls"></div>
+  </div>
+  <div class="card"><div id="log">ffmpeg 日志…</div></div>
+</div>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+<script>
+const { FFmpeg } = FFmpegWASM, { fetchFile, toBlobURL } = FFmpegUtil;
+const ff = new FFmpeg();
+let loaded = false, inName = '';
+const log = (t, cls) => { const el = document.getElementById('log');
+  el.innerHTML += `<span${cls ? ` style="color:${cls}"` : ''}>${t}</span>\n`; el.scrollTop = el.scrollHeight; };
+ff.on('log', ({ message }) => log(message.replace(/</g, '&lt;')));
+ff.on('progress', ({ progress }) => { document.getElementById('pb').style.width = Math.min(100, progress * 100) + '%'; });
+
+async function load() {
+  if (loaded) return true;
+  try {
+    log('加载 ffmpeg 内核 (单线程版, ~31MB)…', '#58a6ff');
+    await ff.load({
+      coreURL: await toBlobURL('https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js', 'text/javascript'),
+      wasmURL: await toBlobURL('https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm', 'application/wasm'),
+    });
+    loaded = true;
+    document.querySelectorAll('button').forEach(b => b.disabled = false);
+    document.getElementById('st').textContent = '内核就绪 — 选择操作';
+    log('✓ ffmpeg 就绪', '#7ee787');
+    return true;
+  } catch (e) { log('加载失败: ' + e.message, '#f85149'); return false; }
+}
+document.getElementById('file').onchange = async ev => {
+  inName = ev.target.files[0].name;
+  document.getElementById('st').textContent = `已选 ${inName} (${(ev.target.files[0].size / 1048576).toFixed(1)}MB)`;
+  await load();
+};
+async function go(kind) {
+  if (!inName) return;
+  document.getElementById('dls').innerHTML = '';
+  const data = await fetchFile(document.getElementById('file').files[0]);
+  await ff.writeFile(inName, data);
+  const base = inName.replace(/\.[^.]+$/, '');
+  const jobs = {
+    gif: { out: base + '.gif', args: ['-t', '3', '-i', inName, '-vf', 'fps=10,scale=480:-1', '-y', base + '.gif'] },
+    mp3: { out: base + '.mp3', args: ['-i', inName, '-vn', '-c:a', 'libmp3lame', '-q:a', '4', '-y', base + '.mp3'] },
+    mp4: { out: base + '.small.mp4', args: ['-i', inName, '-c:v', 'libx264', '-crf', '28', '-preset', 'veryfast', '-c:a', 'aac', '-y', base + '.small.mp4'] },
+    png: { out: base + '.png', args: ['-ss', '1', '-i', inName, '-frames:v', '1', '-y', base + '.png'] },
+  };
+  const j = jobs[kind];
+  log(`▶ ffmpeg ${j.args.join(' ')}`, '#58a6ff');
+  try {
+    await ff.exec(j.args);
+    const out = await ff.readFile(j.out);
+    const url = URL.createObjectURL(new Blob([out.buffer]));
+    const type = kind === 'png' ? 'image/png' : kind === 'mp3' ? 'audio/mpeg' : kind === 'gif' ? 'image/gif' : 'video/mp4';
+    document.getElementById('dls').innerHTML += `<a class="dl" href="${url}" download="${j.out}">⬇ ${j.out} (${(out.length / 1048576).toFixed(2)}MB)</a>`;
+    log(`✓ ${j.out} 完成`, '#7ee787');
+  } catch (e) { log('✗ ' + e.message, '#f85149'); }
+  document.getElementById('pb').style.width = '100%';
+  await ff.deleteFile(inName);
+}
+</script>
+</body></html>

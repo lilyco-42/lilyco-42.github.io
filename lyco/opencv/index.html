@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco opencv — OpenCV.js 计算机视觉</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff;--ok:#7ee787;--err:#f85149}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:20px}.sub{color:var(--dim);font-size:12px;margin:6px 0 18px;line-height:1.7}
+.card{background:var(--card);border:1px solid #30363d;border-radius:10px;padding:14px;margin-bottom:14px}
+canvas{max-width:100%;border-radius:6px;background:#111;display:block;margin-top:8px}
+button{background:var(--acc);border:0;color:#000;font:inherit;font-weight:700;padding:7px 13px;border-radius:6px;cursor:pointer;margin:4px 6px 0 0}
+button.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+input[type=range]{width:140px;vertical-align:middle}
+.stat{color:var(--dim);font-size:12px;margin-top:8px}
+a{color:var(--acc);text-decoration:none}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:680px){.duo{grid-template-columns:1fr}}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco opencv <span style="color:var(--dim);font-size:12px">OpenCV.js 官方移植 10.9MB (docs.opencv.org)</span></h1>
+  <div class="sub">完整 OpenCV 子集编译到 WASM:Canny/模糊/阈值/色彩空间 全部走 cv.Mat · <a href="../">← lyco 工具箱</a></div>
+  <div class="card">
+    <input type="file" id="file" accept="image/*">
+    <span class="stat" id="st" style="margin-left:10px">正在加载 OpenCV.js (10.9MB)…</span>
+    <button onclick="op('gray')">灰度</button>
+    <button onclick="op('canny')">Canny 边缘</button>
+    <button class="ghost" onclick="op('blur')">高斯模糊</button>
+    <button class="ghost" onclick="op('thresh')">二值化</button>
+    <button onclick="op('orig')">原图</button>
+    <span style="margin-left:8px">阈值 <input type="range" id="t1" min="1" max="500" value="120"> <span id="t1v">120</span>/<input type="range" id="t2" min="1" max="500" value="240"> <span id="t2v">240</span></span>
+  </div>
+  <div class="card"><div class="duo">
+    <canvas id="src"></canvas>
+    <canvas id="dst"></canvas>
+  </div><div class="stat">原图 | 处理结果</div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+let ready = false, curImg = null;
+$('t1').oninput = e => { $('t1v').textContent = e.target.value; if (curImg && lastOp !== 'orig') op(lastOp); };
+$('t2').oninput = e => { $('t2v').textContent = e.target.value; if (curImg && lastOp !== 'orig') op(lastOp); };
+function waitCV() {
+  if (typeof cv !== 'undefined' && cv.Mat) { ready = true; $('st').textContent = 'OpenCV 就绪 — 选择图片'; return; }
+  setTimeout(waitCV, 200);
+}
+waitCV();
+$('file').onchange = ev => {
+  const img = new Image();
+  img.onload = () => {
+    const s = Math.min(1, 640 / img.width, 640 / img.height);
+    const w = Math.round(img.width * s), h = Math.round(img.height * s);
+    $('src').width = w; $('src').height = h; $('dst').width = w; $('dst').height = h;
+    $('src').getContext('2d').drawImage(img, 0, 0, w, h);
+    curImg = true; op('orig');
+  };
+  img.src = URL.createObjectURL(ev.target.files[0]);
+};
+let lastOp = 'orig';
+function op(kind) {
+  if (!ready || !curImg) return;
+  lastOp = kind;
+  const src = cv.imread($('src'));
+  const dst = new cv.Mat();
+  try {
+    if (kind === 'gray') cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
+    else if (kind === 'canny') { cv.Canny(src, dst, +$('t1').value, +$('t2').value, 3, false); }
+    else if (kind === 'blur') cv.GaussianBlur(src, dst, new cv.Size(9, 9), 0, 0, cv.BORDER_DEFAULT);
+    else if (kind === 'thresh') { cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0); cv.threshold(dst, dst, +$('t1').value, 255, cv.THRESH_BINARY); }
+    else dst.data.set(src.data);
+    if (kind === 'gray' || kind === 'canny' || kind === 'thresh') cv.cvtColor(dst, dst, cv.COLOR_GRAY2RGBA, 0);
+    cv.imshow($('dst'), dst);
+    $('st').textContent = `${kind} 完成 (cv.Mat 全程 WASM)`;
+  } finally { src.delete(); dst.delete(); }
+}
+</script>
+<script src="https://docs.opencv.org/4.13.0/opencv.js" async></script>
+</body></html>
