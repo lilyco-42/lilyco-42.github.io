@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WASM Demo — C in Browser (2KB)</title>
+<style>
+  :root { --bg:#0d1117; --card:#161b22; --fg:#c9d1d9; --dim:#8b949e; --acc:#58a6ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--fg); font-family:ui-monospace,Cascadia Code,Menlo,monospace; padding:40px 20px; }
+  .wrap { max-width:860px; margin:0 auto; }
+  h1 { font-size:22px; margin-bottom:6px; }
+  h1 .badge { background:var(--acc); color:#000; font-size:12px; padding:2px 8px; border-radius:10px; vertical-align:middle; }
+  .sub { color:var(--dim); font-size:13px; margin-bottom:24px; }
+  .card { background:var(--card); border:1px solid #30363d; border-radius:10px; padding:20px; margin-bottom:20px; }
+  canvas { width:100%; image-rendering:pixelated; border-radius:6px; display:block; background:#000; }
+  .row { display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap; }
+  input { background:#0d1117; border:1px solid #30363d; color:var(--acc); font:inherit; padding:6px 10px; border-radius:6px; width:90px; }
+  button { background:var(--acc); border:0; color:#000; font:inherit; font-weight:600; padding:6px 14px; border-radius:6px; cursor:pointer; }
+  .out { color:#7ee787; }
+  pre { background:#0d1117; border:1px solid #30363d; border-radius:6px; padding:12px; overflow-x:auto; font-size:12px; line-height:1.5; margin-top:12px; }
+  .stat { color:var(--dim); font-size:12px; }
+  a { color:var(--acc); text-decoration:none; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media (max-width:640px){ .grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>WASM Demo <span class="badge">demo.wasm = 2.1 KB</span></h1>
+  <div class="sub">纯 C 编译到 wasm32-freestanding (zig cc) — 无 Emscripten、无 libc、无框架。<a href="/">← 返回首页</a></div>
+
+  <div class="grid">
+    <div class="card">
+      <canvas id="cv" width="256" height="160"></canvas>
+      <div class="row"><span class="stat">render(t) — C 每帧写入 160KB 帧缓冲,JS 只负责搬显存</span></div>
+    </div>
+    <div class="card">
+      <div style="margin-bottom:10px">WASM 内计算 fib(n) <span class="stat">(u32,同步调用)</span></div>
+      <div class="row">
+        <input id="n" type="number" value="47" min="0" max="47">
+        <button onclick="calc()">计算</button>
+        <span class="out" id="out"></span>
+      </div>
+      <pre>zig cc --target=wasm32-freestanding -O2 -nostdlib \
+  -Wl,--no-entry -Wl,--export=render --export=buf --export=fib \
+  demo.c -o demo.wasm</pre>
+      <div class="stat" style="margin-top:10px" id="stat">…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(async () => {
+  const { instance } = await WebAssembly.instantiateStreaming(fetch('demo.wasm'));
+  const e = instance.exports;
+  const W = 256, H = 160, LEN = W * H * 4;
+  const u8 = new Uint8ClampedArray(e.memory.buffer, e.buf(), LEN);
+  const img = new ImageData(u8, W, H);
+  const ctx = document.getElementById('cv').getContext('2d');
+
+  function frame(ts) {
+    e.render((ts / 16) | 0);
+    ctx.putImageData(img, 0, 0);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  window.calc = () => {
+    const n = Math.max(0, Math.min(93, +document.getElementById('n').value || 0));
+    const t0 = performance.now();
+    const r = e.fib(n) >>> 0;
+    document.getElementById('out').textContent =
+      `fib(${n}) = ${r}  (${(performance.now() - t0).toFixed(3)} ms)`;
+  };
+  calc();
+  document.getElementById('stat').textContent =
+    `模块大小 ${(await (await fetch('demo.wasm')).blob()).size} 字节 · 导出 ${Object.keys(e).length} 个符号 · 静态内存 2MB`;
+})();
+</script>
+</body>
+</html>
