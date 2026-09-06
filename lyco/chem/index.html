@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco chem — RDKit.js 分子工作台</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff;--ok:#7ee787;--err:#f85149}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:20px}.sub{color:var(--dim);font-size:12px;margin:6px 0 18px;line-height:1.7}
+.card{background:var(--card);border:1px solid #30363d;border-radius:10px;padding:16px;margin-bottom:16px}
+input[type=text]{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:var(--fg);font:14px ui-monospace,monospace;padding:8px 10px}
+select{background:#0d1117;color:var(--fg);border:1px solid #30363d;border-radius:6px;font:inherit;padding:5px}
+button{background:var(--acc);border:0;color:#000;font:inherit;font-weight:700;padding:7px 14px;border-radius:6px;cursor:pointer;margin-left:8px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:680px){.duo{grid-template-columns:1fr}}
+#svg{background:#fff;border-radius:8px;min-height:280px;display:flex;align-items:center;justify-content:center}
+#svg img{max-width:100%}
+table{width:100%;font-size:12px;border-collapse:collapse;margin-top:8px}
+td{padding:5px 8px;border-bottom:1px solid #30363d}
+td:last-child{text-align:right;color:var(--ok)}
+.stat{color:var(--dim);font-size:12px;margin-top:10px}
+a{color:var(--acc);text-decoration:none}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco chem <span style="color:var(--dim);font-size:12px">RDKit.js — 官方 RDKit C++ 移植</span></h1>
+  <div class="sub">SMILES → 2D 结构渲染 + 分子描述符,化学信息学内核全程 WASM · <a href="../">← lyco 工具箱</a></div>
+  <div class="card">
+    <select id="preset" onchange="draw(this.value)">
+      <option value="CC(=O)Oc1ccccc1C(=O)O">阿司匹林 Aspirin</option>
+      <option value="Cn1cnc2c1c(=O)n(C)c(=O)n2C">咖啡因 Caffeine</option>
+      <option value="CCO">乙醇 Ethanol</option>
+      <option value="OC[C@H]1O[C@@H](O)[C@H](O)[C@@H](O)[C@@H]1O">葡萄糖 Glucose</option>
+      <option value="Cc1ccc(S(=O)(=O)N)cc1">对甲苯磺酰胺</option>
+      <option value="CC(C)Cc1ccc(C(C)C(=O)O)cc1">布洛芬 Ibuprofen</option>
+      <option value="C1CCCCC1">环己烷</option>
+    </select>
+    <input type="text" id="smiles" style="width:60%;margin-left:8px" value="CC(=O)Oc1ccccc1C(=O)O" placeholder="输入 SMILES, 如 CCO">
+    <button onclick="draw($('smiles').value)">解析</button>
+    <div class="stat" id="st">加载 RDKit.wasm 中…</div>
+  </div>
+  <div class="duo">
+    <div class="card" id="svg"></div>
+    <div class="card"><table id="desc"></table><div class="stat">描述符来自 RDKit C++ 内核 (RDKit_descriptors)</div></div>
+  </div>
+</div>
+<script src="https://unpkg.com/@rdkit/rdkit/dist/RDKit_minimal.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const NAMES = { 'Molecular Weight':'分子量', 'CrippenClogP':'logP(脂水分配)', 'TPSA':'TPSA(极性表面积)', 'NumHBD':'氢键供体', 'NumHBA':'氢键受体', 'NumRings':'环数', 'NumRotatableBonds':'可旋转键', 'Amber CPK?':'—' };
+window.draw = s => {
+  if (!window.RDKit) { setTimeout(() => draw(s), 300); return; }
+  const mol = window.RDKit.get_mol(s);
+  if (!mol || !mol.is_valid()) {
+    $('st').textContent = '❌ 无效 SMILES'; $('st').style.color = 'var(--err)'; $('svg').innerHTML = ''; $('desc').innerHTML = '';
+    if (mol) mol.delete(); return;
+  }
+  $('st').textContent = '✓ 解析成功'; $('st').style.color = 'var(--ok)';
+  $('svg').innerHTML = `<img src="data:image/svg+xml;base64,${btoa(mol.get_svg(380, 300))}">`;
+  const d = JSON.parse(mol.get_descriptors());
+  $('desc').innerHTML = Object.entries(d)
+    .filter(([k]) => k !== 'Amber CPK?')
+    .map(([k, v]) => `<tr><td>${NAMES[k] || k}</td><td>${typeof v === 'number' ? Math.round(v * 100) / 100 : v}</td></tr>`).join('');
+  mol.delete();
+};
+window.initRDKitModule().then(r => {
+  window.RDKit = r;
+  $('st').textContent = '✓ RDKit.js 就绪 (C++ → wasm)';
+  draw($('smiles').value);
+});
+</script>
+</body></html>

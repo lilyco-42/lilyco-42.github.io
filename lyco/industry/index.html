@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>现实产业 × WASM — 调研矩阵</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff;--ok:#7ee787;--warn:#d29922;--err:#f85149}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:1080px;margin:0 auto}
+h1{font-size:22px}.sub{color:var(--dim);font-size:13px;margin:8px 0 24px;line-height:1.8}
+h2{font-size:15px;margin:26px 0 10px;color:var(--acc)}
+table{width:100%;font-size:12px;border-collapse:collapse;background:var(--card);border-radius:8px;overflow:hidden}
+th{background:#1c2128;color:var(--dim);text-align:left;padding:8px 10px;font-size:11px}
+td{padding:8px 10px;border-top:1px solid #21262d;vertical-align:top}
+td a{color:var(--acc);text-decoration:none}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px}
+.ok{background:#1a3d2a;color:var(--ok)} .try{background:#3d2e1a;color:var(--warn)} .no{background:#3d1a1a;color:var(--err)}
+.dim{color:var(--dim)}
+.note{background:var(--card);border-left:3px solid var(--acc);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--dim);line-height:1.9;margin-top:22px}
+b{color:var(--fg)}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>现实产业 × WASM — 移植可行性调研</h1>
+  <div class="sub">逐产业核实「有没有真移植、内核多大、能不能集成」。判定标准:① 存在官方或高星社区 WASM 构建;② 可经 CDN/自托管加载;③ 浏览器内可用。 <a href="/">← 主页</a> · <a href="../">lyco 工具箱</a></div>
+
+  <h2>🧪 化工 / 化学</h2>
+  <table>
+    <tr><th>项目</th><th>领域</th><th>WASM 版</th><th>判定</th><th>入口</th></tr>
+    <tr><td><b>RDKit</b></td><td>化学信息学(SMILES/分子描述符)</td><td>RDKit.js 官方, ~7MB</td><td><span class="tag ok">✓ 已集成</span></td><td><a href="../chem/">lyco chem</a> · <a href="https://unpkg.com/@rdkit/rdkit/">npm</a></td></tr>
+    <tr><td>Cantera</td><td>化学反应动力学/热力学</td><td>无官方 wasm</td><td><span class="tag no">✗ 不可行</span></td><td class="dim">C++ 可编但无维护移植</td></tr>
+    <tr><td>DWSIM</td><td>流程模拟(Aspen 替代)</td><td>.NET, 无 wasm</td><td><span class="tag no">✗</span></td><td class="dim">—</td></tr>
+  </table>
+
+  <h2>⚡ 电子 / EDA</h2>
+  <table>
+    <tr><th>项目</th><th>领域</th><th>WASM 版</th><th>判定</th><th>入口</th></tr>
+    <tr><td><b>ngspice</b></td><td>电路仿真(SPICE)</td><td>danchitnis/ngspice-wasm</td><td><span class="tag try">○ 链接</span></td><td><a href="https://github.com/danchitnis/ngspice-wasm">GitHub</a></td></tr>
+    <tr><td><b>Yosys / nextpnr</b></td><td>FPGA 综合/布线</td><td>gpu-eda/yowasp-*(npm)</td><td><span class="tag try">○ 链接</span></td><td><a href="https://github.com/gpu-eda/yowasp-yosys">yowasp-yosys</a></td></tr>
+  </table>
+
+  <h2>🔧 加工 / CAD / 增材制造</h2>
+  <table>
+    <tr><th>项目</th><th>领域</th><th>WASM 版</th><th>判定</th><th>入口</th></tr>
+    <tr><td><b>OpenSCAD</b></td><td>CSG 实体建模(代码出 STL)</td><td>官方 openscad-playground ★468</td><td><span class="tag try">○ 链接</span></td><td><a href="https://openscad.cloud/openscad-playground/">官方 Playground</a></td></tr>
+    <tr><td><b>OpenCASCADE</b></td><td>工业 CAD 几何内核(STEP/BRep, FreeCAD 同源)</td><td>donalffons/opencascade.js, npm 200✓</td><td><span class="tag try">○ 链接</span></td><td><a href="https://github.com/donalffons/opencascade.js">GitHub</a> · <a href="https://donalffons.github.io/opencascade.js/">Demo</a></td></tr>
+    <tr><td><b>Assimp</b></td><td>网格格式互转(STL/OBJ/glTF)</td><td>assimpjs, npm 200✓</td><td><span class="tag try">○ 链接</span></td><td><a href="https://github.com/kovacsv/assimpjs">GitHub</a></td></tr>
+    <tr><td>FreeCAD / SolidWorks</td><td>全功能 CAD</td><td>无 wasm</td><td><span class="tag no">✗</span></td><td class="dim">体量与 GUI 依赖过大</td></tr>
+  </table>
+
+  <h2>🤖 制造 / 机器人仿真</h2>
+  <table>
+    <tr><th>项目</th><th>领域</th><th>WASM 版</th><th>判定</th><th>入口</th></tr>
+    <tr><td><b>MuJoCo</b></td><td>物理/机器人动力学仿真(DeepMind)</td><td>官方仓库 wasm/ 目录(mujoco_wasm)</td><td><span class="tag try">○ 链接</span></td><td><a href="https://github.com/google-deepmind/mujoco/tree/main/wasm">mujoco/wasm</a></td></tr>
+    <tr><td><b>Bullet</b></td><td>刚体物理</td><td>ammo.js (Emscripten 官方示例)</td><td><span class="tag try">○ 链接</span></td><td><a href="https://github.com/kripken/ammo.js">GitHub</a></td></tr>
+  </table>
+
+  <h2>🏭 生产排产 / 运筹</h2>
+  <table>
+    <tr><th>项目</th><th>领域</th><th>WASM 版</th><th>判定</th><th>入口</th></tr>
+    <tr><td><b>HiGHS</b></td><td>线性/整数规划(排产·配料·运输·下料)</td><td>highs-js, wasm 3.3MB, CDN 200✓</td><td><span class="tag ok">✓ 已集成</span></td><td><a href="../lp/">lyco lp</a> · <a href="https://lovasoa.github.io/highs-js/">官方demo</a></td></tr>
+    <tr><td>Google OR-Tools</td><td>约束规划/VRP</td><td>无官方 wasm</td><td><span class="tag no">✗</span></td><td class="dim">—</td></tr>
+  </table>
+
+  <h2>🗺️ 测绘 / GIS</h2>
+  <table>
+    <tr><th>项目</th><th>领域</th><th>WASM 版</th><th>判定</th><th>入口</th></tr>
+    <tr><td><b>GDAL/OGR</b></td><td>地理数据格式转换(Shapefile/GeoTIFF/GeoJSON…)</td><td>gdal3.js, npm 200✓</td><td><span class="tag try">○ 链接</span></td><td><a href="https://github.com/mmomtchev/gdal3.js">GitHub</a></td></tr>
+  </table>
+
+  <h2>💊 生物医药 / 生信</h2>
+  <table>
+    <tr><th>项目</th><th>领域</th><th>WASM 版</th><th>判定</th><th>入口</th></tr>
+    <tr><td><b>Biowasm 套件</b></td><td>seqtk/samtools/bwa/minimap2 等 70+ 生信工具</td><td>cdn.biowasm.com 官方分发</td><td><span class="tag try">○ 链接</span></td><td><a href="https://biowasm.com">biowasm.com</a></td></tr>
+  </table>
+
+  <h2>💻 计算机生产端(算力/编译/数据)</h2>
+  <table>
+    <tr><th>项目</th><th>领域</th><th>WASM 版</th><th>判定</th><th>入口</th></tr>
+    <tr><td><b>LLVM/Clang</b></td><td>C 编译器</td><td>clings(browsercc)</td><td><span class="tag ok">✓ 已集成</span></td><td><a href="../clang/">lyco clang</a></td></tr>
+    <tr><td><b>CPython</b></td><td>Python 运行时</td><td>Pyodide 官方 ★12k+</td><td><span class="tag try">○ 链接</span></td><td><a href="https://pyodide.org">pyodide.org</a></td></tr>
+    <tr><td><b>DuckDB</b></td><td>分析型数据库(生产数据)</td><td>@duckdb/duckdb-wasm 官方</td><td><span class="tag try">○ 链接</span></td><td><a href="https://duckdb.org/docs/stable/guides/overview/query_and_load#wasm">docs</a></td></tr>
+    <tr><td><b>SQLite</b></td><td>嵌入式数据库</td><td>sqlite.org 官方 wasm</td><td><span class="tag try">○ 链接</span></td><td><a href="https://sqlite.org/wasm">sqlite.org/wasm</a></td></tr>
+    <tr><td><b>FFmpeg</b></td><td>音视频转码</td><td>ffmpeg.wasm 官方</td><td><span class="tag ok">✓ 已集成</span></td><td><a href="../ffmpeg/">lyco ffmpeg</a></td></tr>
+    <tr><td><b>OpenCV</b></td><td>机器视觉</td><td>OpenCV.js 官方</td><td><span class="tag ok">✓ 已集成</span></td><td><a href="../opencv/">lyco opencv</a></td></tr>
+  </table>
+
+  <div class="note">
+    <b>方法论:</b> 「搬上 WASM」的可行性由三件事决定 —— ① 有没有<b>官方或高星社区</b>的 Emscripten/wasi 构建(自建移植成本 = 人年级);② 二进制体积与加载策略(CDN 流式 vs 自托管);③ 是否依赖 POSIX 线程/信号等 wasm 缺失能力(如 OR-Tools 需线程、Cantera 依赖外部数据大量 thermo 数据)。<br>
+    <b>下一步候选:</b> ImageMagick(ESM 集成)→ ngspice 电路工作台 → opencascade.js STEP 查看器 → DuckDB 数据分析页。
+  </div>
+</div>
+</body></html>

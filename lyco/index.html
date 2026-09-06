@@ -73,6 +73,26 @@ a.card:hover{border-color:var(--acc);transform:translateY(-2px)}
     </span>
   </div>
 
+  <h1 style="font-size:20px;margin-top:34px">lyco <span>industry</span> — 工业与科学</h1>
+  <div class="sub">化工/运筹等产业的真 WASM 内核:所有求解都在浏览器本地完成。</div>
+  <div class="grid">
+    <a class="card" href="chem/">
+      <div class="ico">🧪</div><h2>lyco chem</h2>
+      <p>RDKit.js 官方化学信息学:SMILES → 2D 结构 + 分子量/logP/TPSA 描述符。</p>
+      <div class="sz">RDKit ~7MB (官方 CDN)</div>
+    </a>
+    <a class="card" href="lp/">
+      <div class="ico">🏭</div><h2>lyco lp</h2>
+      <p>HiGHS 线性/整数规划:生产排产、饲料配比、运输问题,LP 文本直输。</p>
+      <div class="sz">highs.wasm 3.3MB</div>
+    </a>
+    <a class="card" href="industry/">
+      <div class="ico">📋</div><h2>产业调研矩阵</h2>
+      <p>化工/EDA/CAD/机器人/运筹/GIS/生信/编译器 × WASM 移植可行性全表(含判定与链接)。</p>
+      <div class="sz">10 产业 · 20+ 项目核实</div>
+    </a>
+  </div>
+
   <div class="note">
     <b>关于名字:</b> Adobe / Microsoft 套件是闭源桌面软件,任何人都无法把它们"移植"到 WASM(官方上 Web 也是用源码重写数年)。本套件取其<b>日常高频场景</b>,用可审计的小内核提供开源轻量替代 —— 所有源码在本仓库 <code>lyco/</code> 目录,构建命令:<code>zig cc --target=wasm32-freestanding -O2 -nostdlib</code>。数据全程本地处理,不上传任何服务器。
   </div>

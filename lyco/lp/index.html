@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco lp — HiGHS 线性规划 · 生产排产</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff;--ok:#7ee787;--err:#f85149}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:1000px;margin:0 auto}
+h1{font-size:20px}.sub{color:var(--dim);font-size:12px;margin:6px 0 18px;line-height:1.7}
+.card{background:var(--card);border:1px solid #30363d;border-radius:10px;padding:14px;margin-bottom:14px}
+textarea{width:100%;min-height:230px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:var(--fg);font:13px/1.6 ui-monospace,monospace;padding:10px;resize:vertical}
+button{background:var(--acc);border:0;color:#000;font:inherit;font-weight:700;padding:8px 16px;border-radius:6px;cursor:pointer}
+button.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+table{width:100%;font-size:13px;border-collapse:collapse;margin-top:10px}
+th{color:var(--dim);text-align:left;font-size:11px;padding:6px;border-bottom:1px solid #30363d}
+td{padding:6px;border-bottom:1px solid #21262d}
+td.num{text-align:right;color:var(--ok)}
+.obj{font-size:15px;color:var(--ok)}
+#out{margin-top:8px;font-size:12px;white-space:pre-wrap;color:var(--dim)}
+.err{color:var(--err)}
+.stat{color:var(--dim);font-size:12px;margin-top:10px;line-height:1.8}
+a{color:var(--acc);text-decoration:none}
+select{background:#0d1117;color:var(--fg);border:1px solid #30363d;border-radius:6px;font:inherit;padding:5px}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco lp <span style="color:var(--dim);font-size:12px">HiGHS (爱丁堡大学 C++ 求解器 → wasm 3.3MB) · LP 文本格式</span></h1>
+  <div class="sub">线性规划 / 整数规划:生产排产、配料、运输、下料 —— 求解全程浏览器 WASM · <a href="../">← lyco 工具箱</a></div>
+  <div class="card">
+    <select id="preset" onchange="load(this.value)">
+      <option value="prod">生产排产 — 两产品两约束</option>
+      <option value="diet">饲料配比 — 最低成本</option>
+      <option value="transport">运输问题 — 三产地三销地</option>
+    </select>
+    <button onclick="solve()">▶ 求解</button>
+    <button class="ghost" onclick="document.getElementById('lp').value=''">清空</button>
+  </div>
+  <div class="card"><textarea id="lp" spellcheck="false"></textarea></div>
+  <div class="card" id="res" style="display:none">
+    <div class="obj" id="obj"></div>
+    <table id="tbl"></table>
+    <div id="out"></div>
+  </div>
+  <div class="card"><div class="stat">
+    格式: <code>Maximize / Subject To / Bounds / End</code>, 反斜杠开头为注释; Integrality 区声明整数变量。<br>
+    参考: <a href="https://lovasoa.github.io/highs-js/">highs-js 官方 demo</a> · <a href="https://www.cvxgrp.org/simple/examplesbook/html/bob/lp_formulation.html">LP 格式</a>
+  </div></div>
+</div>
+<script type="module">
+const $ = id => document.getElementById(id);
+const PRESETS = {
+prod: `\ 生产排产: 产品A利润30需机器2h+原料1, 产品B利润20需机器1h+原料3
+\ 机器总工时100h, 原料90件 —— 求最大利润
+Maximize
+ obj: 30 xA + 20 xB
+Subject To
+ machine: 2 xA + xB <= 100
+ material: xA + 3 xB <= 90
+Bounds
+ xA >= 0
+ xB >= 0
+End`,
+diet: `\ 饲料配比: 三种原料, 满足蛋白>=15 能量>=10, 成本最低
+Minimize
+ obj: 0.8 corn + 1.2 soy + 0.6 fish
+Subject To
+ protein: 0.09 corn + 0.45 soy + 0.6 fish >= 15
+ energy: 0.7 corn + 0.4 soy + 0.1 fish >= 10
+Bounds
+ corn >= 0
+ soy >= 0
+ fish >= 0
+End`,
+transport: `\ 运输问题: 3产地(产量) 3销地(需求) 最小运费
+Minimize
+ obj: 4 x11 + 6 x12 + 9 x13 + 5 x21 + 3 x22 + 8 x23 + 7 x31 + 4 x32 + 3 x33
+Subject To
+ s1: x11 + x12 + x13 <= 30
+ s2: x21 + x22 + x23 <= 40
+ s3: x31 + x32 + x33 <= 20
+ d1: x11 + x21 + x31 >= 20
+ d2: x12 + x22 + x32 >= 35
+ d3: x13 + x23 + x33 >= 25
+Bounds
+ x11 >= 0
+ x12 >= 0
+ x13 >= 0
+ x21 >= 0
+ x22 >= 0
+ x23 >= 0
+ x31 >= 0
+ x32 >= 0
+ x33 >= 0
+End`};
+let highs = null;
+window.load = k => { $('lp').value = PRESETS[k]; };
+load('prod');
+
+window.solve = async () => {
+  const btn = document.querySelector('button');
+  btn.disabled = true;
+  try {
+    if (!highs) {
+      $('st')?.remove?.();
+      document.querySelector('.sub').textContent += ' · 内核加载中…';
+      const m = await import('https://cdn.jsdelivr.net/npm/highs@1.15.2/build/highs.js');
+      highs = await (m.default ?? m)({ locateFile: f => 'https://cdn.jsdelivr.net/npm/highs@1.15.2/build/' + f });
+    }
+    const r = highs.solve($('lp').value);
+    $('res').style.display = 'block';
+    $('obj').textContent = `${r.Status === 'Optimal' ? '✓ 最优解' : '⚠ ' + r.Status} — 目标值 = ${r.ObjectiveValue}`;
+    let h = '<tr><th>变量</th><th>取值</th><th>状态</th></tr>';
+    for (const [k, v] of Object.entries(r.Columns ?? {}))
+      h += `<tr><td>${k}</td><td class="num">${v.Primal}</td><td>${v.Status}</td></tr>`;
+    $('tbl').innerHTML = h;
+    $('out').textContent = '';
+  } catch (e) {
+    $('res').style.display = 'block';
+    $('obj').innerHTML = '<span class="err">解析/求解失败</span>';
+    $('tbl').innerHTML = ''; $('out').textContent = String(e.message || e);
+  } finally { btn.disabled = false; }
+};
+</script>
+</body></html>
