@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco magick — ImageMagick 图像转换</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff;--ok:#7ee787;--err:#f85149}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:20px}.sub{color:var(--dim);font-size:12px;margin:6px 0 18px;line-height:1.7}
+.card{background:var(--card);border:1px solid #30363d;border-radius:10px;padding:16px;margin-bottom:16px}
+button{background:var(--acc);border:0;color:#000;font:inherit;font-weight:700;padding:8px 14px;border-radius:6px;cursor:pointer;margin:4px 6px 0 0}
+button:disabled{opacity:.4;cursor:wait}
+canvas{max-width:100%;border-radius:6px;background:#fff;display:block}
+.row{margin-top:10px;font-size:13px}
+input[type=range]{width:140px;vertical-align:middle}
+a.dl{display:inline-block;background:#238636;color:#fff;padding:6px 12px;border-radius:6px;margin:6px 6px 0 0;text-decoration:none;font-size:13px}
+.stat{color:var(--dim);font-size:12px;margin-top:8px}
+a{color:var(--acc);text-decoration:none}
+select{background:#0d1117;color:var(--fg);border:1px solid #30363d;border-radius:6px;font:inherit;padding:5px}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco magick <span style="color:var(--dim);font-size:12px">ImageMagick 官方 C++ → WASM (100+ 图像格式)</span></h1>
+  <div class="sub">格式转换 / 缩放,全程浏览器内完成,文件不上传 · <a href="../">← lyco 工具箱</a></div>
+  <div class="card">
+    <input type="file" id="file" accept="image/*">
+    <div class="row">
+      目标格式
+      <select id="fmt"><option>Png</option><option>Jpeg</option><option>Webp</option><option>Gif</option><option>Bmp</option><option>Tiff</option><option>Avif</option><option>Jxl</option></select>
+      缩放 <input type="range" id="pct" min="5" max="200" value="100"> <span id="pv">100%</span>
+      <button id="go" onclick="conv()" disabled>转换</button>
+    </div>
+    <div class="stat" id="st">加载 ImageMagick 内核 (14.8MB)…</div>
+    <a class="dl" id="dl" style="display:none" download>⬇ 下载结果</a>
+  </div>
+  <div class="card"><canvas id="cv"></canvas></div>
+</div>
+<script type="module">
+import { initializeImageMagickx64, ImageMagick, MagickFormat, Percentage } from 'https://cdn.jsdelivr.net/npm/@imagemagick/magick-wasm@0.0.43/dist/index.js';
+const $ = id => document.getElementById(id);
+$('pct').oninput = e => $('pv').textContent = e.target.value + '%';
+let loaded = false;
+const WASM_URL = 'https://cdn.jsdelivr.net/npm/@imagemagick/magick-wasm@0.0.43/dist/x64/magick.wasm';
+$('st').textContent = '下载 ImageMagick 内核 (14.8MB, 浏览器会缓存)…';
+const wasmBytes = new Uint8Array(await (await fetch(WASM_URL)).arrayBuffer());
+await initializeImageMagickx64(wasmBytes);
+loaded = true;
+$('st').textContent = '✓ ' + ImageMagick?.imageMagickVersion ?? 'ImageMagick 就绪';
+$('go').disabled = false;
+let srcBytes = null, srcName = 'image';
+document.getElementById('file').onchange = ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  srcName = f.name.replace(/\.[^.]+$/, '');
+  f.arrayBuffer().then(b => { srcBytes = new Uint8Array(b); $('st').textContent = `已载入 ${srcName} (${(b.byteLength/1024).toFixed(1)}KB)`; });
+};
+window.conv = () => {
+  if (!srcBytes || !loaded) return;
+  const fmt = MagickFormat[$('fmt').value];
+  const pct = +$('pct').value;
+  ImageMagick.read(srcBytes, img => {
+    if (pct !== 100) img.resize(new Percentage(pct, pct));
+    img.write(fmt, data => {
+      const blob = new Blob([data], { type: 'application/octet-stream' });
+      const a = $('dl'); a.href = URL.createObjectURL(blob);
+      a.download = `${srcName}.${$('fmt').value.toLowerCase()}`;
+      a.style.display = 'inline-block';
+      a.textContent = `⬇ 下载 ${a.download} (${(data.byteLength/1024).toFixed(1)}KB)`;
+      $('st').textContent = `✓ 转换完成 ${img.width}×${img.height}`;
+    });
+  });
+};
+</script>
+</body></html>
