@@ -1,0 +1,17 @@
+{
+  "name": "云枢智创 WASM 工具箱",
+  "short_name": "云枢智创",
+  "description": "浏览器内运行原生代码的工具箱，离线可用，可下载 HTML 与 WASM 模块。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#4f6ef7",
+  "lang": "zh-CN",
+  "categories": ["utilities", "productivity", "developer"],
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>WASM 工具箱 · 云枢智创</title>
+<meta name="description" content="云枢智创 WASM 工具箱 — 浏览器内跑真原生代码，离线可用，支持下载 HTML 与 WASM 模块。" />
+<meta name="theme-color" content="#ffffff" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%234f6ef7'/%3E%3Cpath d='M9 21c3.5-14 9.5 4 14-10' stroke='white' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+<style>
+:root{
+  --bg:#fff;--bg-soft:#f7f8fa;--bg-elev:#fff;
+  --fg:#16181d;--fg-soft:#5b6172;--fg-mute:#8b90a0;
+  --line:#e8eaef;--line-soft:#f0f1f4;
+  --brand:#4f6ef7;--brand-2:#8b5cf6;--brand-soft:#eef1ff;
+  --ok:#10a37f;
+  --shadow:0 1px 2px rgba(16,18,28,.04),0 8px 24px rgba(16,18,28,.06);
+  --shadow-lg:0 4px 12px rgba(16,18,28,.06),0 24px 64px rgba(16,18,28,.10);
+  --r:16px;--r-lg:20px;
+}
+html[data-theme="dark"]{
+  --bg:#17181c;--bg-soft:#111217;--bg-elev:#1e1f25;
+  --fg:#ececf1;--fg-soft:#a7acbb;--fg-mute:#7b8090;
+  --line:#292b33;--line-soft:#23252b;
+  --brand:#6b86ff;--brand-2:#a78bfa;--brand-soft:#21243a;
+  --ok:#3ddc97;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.34),0 24px 64px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+nav{position:sticky;top:0;z-index:50;backdrop-filter:saturate(1.6) blur(14px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line-soft)}
+.nav{display:flex;align-items:center;gap:18px;height:58px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:650;font-size:16px;letter-spacing:-.01em}
+.logo svg{width:25px;height:25px;border-radius:8px}
+.nav-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.icon-btn{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--line);background:var(--bg-elev);cursor:pointer;color:var(--fg-soft);transition:.18s}
+.icon-btn:hover{color:var(--fg);border-color:var(--fg-mute)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:11px;font-size:14.5px;font-weight:550;border:1px solid transparent;cursor:pointer;transition:.18s}
+.btn-primary{background:var(--fg);color:var(--bg)}
+.btn-primary:hover{opacity:.86}
+.btn-ghost{border-color:var(--line);background:var(--bg-elev);color:var(--fg)}
+.btn-ghost:hover{border-color:var(--fg-mute)}
+
+.head{padding:60px 0 30px;text-align:center;position:relative;overflow:hidden}
+.head::before{content:"";position:absolute;inset:-60% 0 auto 0;height:460px;z-index:-1;background:radial-gradient(ellipse 58% 58% at 50% 42%,var(--brand-soft),transparent 70%)}
+h1{font-size:clamp(30px,5vw,46px);line-height:1.16;letter-spacing:-.032em;font-weight:700;margin-bottom:14px}
+h1 .grad{background:linear-gradient(120deg,var(--brand),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:16.5px;color:var(--fg-soft);max-width:620px;margin:0 auto}
+.stats{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+.stat{text-align:center}
+.stat b{display:block;font-size:22px;font-weight:680;letter-spacing:-.02em}
+.stat span{font-size:12.5px;color:var(--fg-mute)}
+
+section{padding:34px 0 70px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;display:flex;flex-direction:column;transition:.22s}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:color-mix(in srgb,var(--brand) 34%,transparent)}
+.top{display:flex;gap:12px;align-items:flex-start;margin-bottom:11px}
+.ic{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;background:var(--brand-soft);font-size:20px}
+.card h3{font-size:16px;font-weight:640;letter-spacing:-.01em}
+.meta{font-size:12px;color:var(--ok);font-weight:600;margin-top:3px}
+.card p{font-size:14px;color:var(--fg-soft);line-height:1.66;flex:1;margin-bottom:14px}
+.acts{display:flex;gap:7px;flex-wrap:wrap}
+.acts a{font-size:13px;padding:6px 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg-soft);color:var(--fg-soft);transition:.18s;display:inline-flex;align-items:center;gap:5px}
+.acts a:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
+.acts a.main{background:var(--fg);color:var(--bg);border-color:transparent}
+.acts a.main:hover{opacity:.85;color:var(--bg)}
+.acts a.off{opacity:.42;pointer-events:none}
+
+.note{background:var(--bg-soft);border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:12px;padding:16px 18px;margin-top:26px;color:var(--fg-soft);font-size:14px;line-height:1.85}
+.note b{color:var(--fg)}
+.note code{background:var(--bg-elev);padding:1px 6px;border-radius:5px;font-size:12.5px;border:1px solid var(--line)}
+
+footer{border-top:1px solid var(--line);padding:34px 0;background:var(--bg-soft)}
+.foot{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center}
+.foot p{font-size:13.5px;color:var(--fg-mute)}
+.foot-links{display:flex;flex-wrap:wrap;gap:16px}
+.foot-links a{font-size:14px;color:var(--fg-soft)}
+.foot-links a:hover{color:var(--brand)}
+@media(max-width:640px){.head{padding:42px 0 22px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav">
+    <a class="logo" href="/">
+      <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="url(#g)"/><defs><linearGradient id="g" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#4f6ef7"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><path d="M9 21c3.5-14 9.5 4 14-10" stroke="white" stroke-width="2.6" stroke-linecap="round"/></svg>
+      云枢智创
+    </a>
+    <div class="nav-right">
+      <button class="icon-btn" id="theme" title="切换主题" aria-label="切换主题">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+      <a class="btn btn-ghost" href="/">← 返回主页</a>
+      <a class="btn btn-primary" href="https://github.com/lilyco-42" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header class="head">
+  <div class="wrap">
+    <h1>浏览器里跑<span class="grad">真原生代码</span></h1>
+    <p class="sub">每个工具的内核都是编译成 WebAssembly 的原生程序 —— 不上传、不联网、装完就能离线用。可以整体下载，也可以只要那个 .wasm 模块。</p>
+    <div class="stats">
+      <div class="stat"><b>12</b><span>在线工具</span></div>
+      <div class="stat"><b>~25KB</b><span>轻量内核均值</span></div>
+      <div class="stat"><b>0</b><span>数据上传</span></div>
+      <div class="stat"><b>PWA</b><span>可安装为应用</span></div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="grid" id="grid"></div>
+    <div class="note">
+      <b>怎么离线用？</b>下载 HTML 后，把它和对应的 <code>.wasm</code> 放在<b>同一个目录</b>下，
+      双击 HTML 即可离线运行（部分浏览器需用本地服务器，因为 <code>file://</code> 下不能 fetch wasm）。<br>
+      <b>只要内核？</b>点「WASM」下载原生模块，自己写宿主页面 <code>fetch → WebAssembly.instantiate</code> 就能调用。<br>
+      <b>标注 CDN 的工具</b>内核体积较大（10–90MB），由官方 CDN 加载，不提供单文件下载。
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <p>© 云枢智创工作室 · 宿松县云枢智创数码信息科技服务工作室</p>
+    <div class="foot-links">
+      <a href="/">主页</a>
+      <a href="https://github.com/lilyco-42/lilyco-42.github.io" target="_blank" rel="noopener">源码</a>
+      <a href="https://github.com/lilyco-42" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+var BASE = "/lyco";
+var TOOLS = [
+  {n:"lyco photo", i:"🖼️", d:"photo", w:"photo.wasm", s:"图像滤镜 · 7.2 KB",
+   p:"灰度/反相/亮度/对比度/像素化/Sobel 边缘/盒模糊，撤销 5 步，导出 PNG。"},
+  {n:"lyco sheet", i:"📊", d:"sheet", w:"sheet.wasm", s:"表格公式 · 11 KB",
+   p:"=算式 / A1 引用 / SUM·AVG·MIN·MAX·COUNT，递归下降解析在 WASM 内完成。"},
+  {n:"lyco paint", i:"🎨", d:"paint", w:"paint.wasm", s:"画板 · 4.2 KB",
+   p:"画笔/橡皮/油漆桶，扫描线泛洪填充带颜色容差，填充一次完成。"},
+  {n:"lyco pad", i:"📝", d:"pad", w:"pad.wasm", s:"记事本 · 3 KB",
+   p:"实时统计字符/词/中文字数/行数/阅读时长，大小写与格式转换。"},
+  {n:"丛雨桌宠", i:"🌸", d:"/pet", w:"app.wasm", s:"Rust · 桌宠",
+   p:"会说话的桌面宠物，中日双语，语音气泡与交互全部本地运行。"},
+  {n:"lyco clang", i:"⚙️", d:"clang", w:"wasm/clang.wasm", s:"Clang+LLD · 90MB",
+   p:"浏览器里跑真 Clang+LLD：写 C → 编译 → 链接 → WASI 运行，全流程本地。"},
+  {n:"lyco ffmpeg", i:"🎬", d:"ffmpeg", w:"", s:"CDN · 31MB", cdn:1,
+   p:"视频转 GIF / 提取 MP3 / 压缩 MP4，ffmpeg.wasm 官方移植。"},
+  {n:"lyco opencv", i:"👁️", d:"opencv", w:"", s:"CDN · 10.9MB", cdn:1,
+   p:"Canny 边缘/高斯模糊/二值化/灰度，OpenCV.js 官方移植。"},
+  {n:"lyco magick", i:"🪄", d:"magick", w:"", s:"CDN · 14.8MB", cdn:1,
+   p:"PNG/JPEG/WebP/GIF 互转与批处理，ImageMagick 官方 wasm64。"},
+  {n:"lyco chem", i:"🧪", d:"chem", w:"", s:"CDN · 7MB", cdn:1,
+   p:"SMILES → 2D 结构 + 分子量/logP/TPSA，RDKit.js 化学信息学。"},
+  {n:"lyco lp", i:"🏭", d:"lp", w:"", s:"HiGHS · 3.3MB", cdn:1,
+   p:"线性/整数规划：生产排产、饲料配比、运输问题，LP 文本直接输入。"},
+  {n:"产业调研矩阵", i:"📋", d:"industry", w:"", s:"10 产业 · 20+ 项目", cdn:1,
+   p:"化工/EDA/CAD/机器人/运筹/GIS/生信/编译器 × WASM 移植可行性全表。"}
+];
+
+var g=document.getElementById('grid');
+TOOLS.forEach(function(t){
+  var dir = /^(\/|https?:)/.test(t.d)
+    ? (t.d.slice(-1) === '/' ? t.d : t.d + '/')
+    : (BASE + '/' + t.d + '/');
+  var card=document.createElement('div');
+  card.className='card';
+  card.innerHTML =
+    '<div class="top"><div class="ic">'+t.i+'</div><div><h3>'+t.n+'</h3>'+
+    '<div class="meta">'+t.s+'</div></div></div>'+
+    '<p>'+t.p+'</p><div class="acts">'+
+    '<a class="main" href="'+dir+'">打开 →</a>'+
+    '<a href="'+dir+'index.html" download>下载 HTML</a>'+
+    (t.w && !t.cdn
+      ? '<a href="'+dir+t.w+'" download>下载 WASM</a>'
+      : '<a class="off" href="#" title="内核由 CDN 加载，无单文件">WASM</a>')+
+    '</div>';
+  g.appendChild(card);
+});
+
+var root=document.documentElement;
+var th=localStorage.getItem('yz-theme'); if(th)root.setAttribute('data-theme',th);
+document.getElementById('theme').onclick=function(){
+  var n=root.getAttribute('data-theme')==='dark'?'light':'dark';
+  root.setAttribute('data-theme',n);localStorage.setItem('yz-theme',n);
+  document.querySelector('meta[name=theme-color]').setAttribute('content',n==='dark'?'#17181c':'#ffffff');
+};
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});
+}
+</script>
+</body>
+</html>
