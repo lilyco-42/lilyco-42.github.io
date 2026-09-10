@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>lyco_chat BitNet · 浏览器内 1.58-bit 推理</title>
+<meta name="description" content="lyco_chat 的 BitNet b1.58 内核编译为 WebAssembly —— 纯整数 LUT 查表矩阵乘，60KB，浏览器内实时运行。" />
+<style>
+:root{--bg:#fff;--bg-soft:#f7f8fa;--bg-elev:#fff;--fg:#16181d;--fg-soft:#5b6172;--fg-mute:#8b90a0;
+--line:#e8eaef;--brand:#4f6ef7;--brand-2:#8b5cf6;--brand-soft:#eef1ff;--ok:#10a37f;
+--shadow-lg:0 4px 12px rgba(16,18,28,.06),0 24px 64px rgba(16,18,28,.10);--r-lg:20px}
+html[data-theme="dark"]{--bg:#17181c;--bg-soft:#111217;--bg-elev:#1e1f25;--fg:#ececf1;--fg-soft:#a7acbb;
+--fg-mute:#7b8090;--line:#292b33;--brand:#6b86ff;--brand-2:#a78bfa;--brand-soft:#21243a;--ok:#3ddc97;
+--shadow-lg:0 4px 12px rgba(0,0,0,.34),0 24px 64px rgba(0,0,0,.4)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:940px;margin:0 auto;padding:0 22px}
+nav{position:sticky;top:0;z-index:40;backdrop-filter:blur(14px);background:var(--bg);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;height:56px;gap:14px}
+.logo{font-weight:650;display:flex;align-items:center;gap:9px}
+.logo i{width:24px;height:24px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand-2));display:block}
+.nav .r{margin-left:auto;display:flex;gap:8px}
+.btn{padding:7px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg-elev);font-size:14px;cursor:pointer;transition:.16s;color:var(--fg)}
+.btn:hover{border-color:var(--fg-mute)}
+.btn.pri{background:var(--fg);color:var(--bg);border-color:transparent;font-weight:560}
+.btn.pri:hover{opacity:.86}
+header{padding:52px 0 30px;text-align:center}
+h1{font-size:clamp(28px,4.6vw,42px);line-height:1.18;letter-spacing:-.03em;font-weight:700;margin-bottom:12px}
+.grad{background:linear-gradient(120deg,var(--brand),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--fg-soft);font-size:16px;max-width:600px;margin:0 auto}
+.stats{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.stat b{display:block;font-size:20px;font-weight:680}
+.stat span{font-size:12px;color:var(--fg-mute)}
+.card{background:var(--bg-elev);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;box-shadow:var(--shadow-lg);margin-bottom:18px}
+.ctrls{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+label{font-size:13px;color:var(--fg-soft);display:block;margin-bottom:5px}
+input,select{background:var(--bg-soft);border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:8px 11px;font:15px inherit;width:110px}
+h2{font-size:17px;font-weight:640;margin-bottom:14px}
+#log{font:13px/1.8 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--bg-soft);border-radius:12px;padding:14px;min-height:110px;white-space:pre-wrap;overflow-x:auto}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:16px}
+.kv div{background:var(--bg-soft);border-radius:11px;padding:12px 14px}
+.kv b{display:block;font-size:19px;font-weight:680;color:var(--ok)}
+.kv span{font-size:12px;color:var(--fg-mute)}
+.note{color:var(--fg-soft);font-size:14.5px;line-height:1.85}
+.note code{background:var(--bg-soft);padding:2px 7px;border-radius:6px;font-size:13px;border:1px solid var(--line)}
+.mono{font:13px/1.9 ui-monospace,Menlo,monospace;color:var(--fg-soft);white-space:pre-wrap}
+footer{border-top:1px solid var(--line);margin-top:32px;padding:26px 0;color:var(--fg-mute);font-size:13.5px;text-align:center}
+</style>
+</head>
+<body>
+<nav><div class="wrap nav">
+  <a class="logo" href="/"><i></i>云枢智创</a>
+  <div class="r">
+    <button class="btn" id="theme">主题</button>
+    <a class="btn" href="/tool/">← 工具箱</a>
+  </div>
+</div></nav>
+
+<header class="wrap">
+  <h1>浏览器里的 <span class="grad">1.58-bit 推理</span></h1>
+  <p class="sub">lyco_chat 的 BitNet b1.58 内核 —— 三值权重打包进 u8，矩阵乘靠 256 项 LUT 查表完成，纯整数加法。编译成 WebAssembly 只有 <b>60 KB</b>。</p>
+  <div class="stats">
+    <div class="stat"><b id="s-wasm">60 KB</b><span>wasm 体积</span></div>
+    <div class="stat"><b id="s-gs">4</b><span>GROUP_SIZE</span></div>
+    <div class="stat"><b id="s-lut">256</b><span>LUT 项</span></div>
+    <div class="stat"><b id="s-ver">—</b><span>scheme</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="card">
+    <h2>跑一次真实的 BitLinear 前向</h2>
+    <div class="ctrls">
+      <div><label>in_features (i)</label><input id="i" type="number" value="1024" step="4"></div>
+      <div><label>out_features (o)</label><input id="o" type="number" value="1024" step="1"></div>
+      <div><label>batch (b)</label><input id="b" type="number" value="8" step="1"></div>
+      <div><label>重复次数</label><input id="r" type="number" value="20" step="1"></div>
+      <button class="btn pri" id="run">运行</button>
+    </div>
+    <div class="kv">
+      <div><b id="k-time">—</b><span>单次耗时</span></div>
+      <div><b id="k-mac">—</b><span>等效 MAC 数</span></div>
+      <div><b id="k-tp">—</b><span>吞吐 (GOP/s)</span></div>
+      <div><b id="k-cmp">—</b><span>相比 fp32 体积</span></div>
+    </div>
+    <div id="log" style="margin-top:16px">点击「运行」开始。权重与激活在浏览器内随机生成，不联网。</div>
+  </div>
+
+  <div class="card">
+    <h2>为什么 BitNet 适合 WebAssembly</h2>
+    <p class="note">
+    fp32 模型做矩阵乘要跑浮点乘法，wasm 里需要 SIMD 才快。<br>
+    而 BitNet b1.58 把权重压成三值 <code>{-1, 0, +1}</code> —— 每 4 个权重塞进 1 字节（<code>GROUP_SIZE=4</code>，2 bit/权重）。<br>
+    乘加因此退化成<b>「按字节查表 + 整数求和」</b>：预建 256 项 LUT，<code>LUT[g][byte]</code> 就是该字节编码的 4 个权重与 4 个激活的点积，输出只需 <code>acc += lut[g][qw[g][j]]</code>。<br>
+    <b>全程没有一次浮点乘法</b> —— 这正是 wasm 擅长的事。所以 60KB 的模块就能在浏览器里跑真推理。
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>导出的 4 个接口</h2>
+    <div class="mono">bitlinear_forward(x, b, i, w, o) -&gt; f32[]
+pack_weights_js(w, i, o)           -&gt; f32[]   打包三值 + scales
+lut_matmul_js(xq, qw, b, i, ng, o) -&gt; f32[]   纯 LUT 查表
+bitnet_meta()                      -&gt; json    内核元信息</div>
+  </div>
+</main>
+
+<footer>云枢智创 · lyco_chat BitNet b1.58 on WebAssembly · 内核由 CloudStudio 云端编译</footer>
+
+<script type="module">
+import init, { bitlinear_forward, bitnet_meta } from './pkg/lyco_chat_wasm.js';
+
+const $ = id => document.getElementById(id);
+const log = s => { $('log').textContent = s; };
+
+let ready = false;
+try {
+  await init();
+  ready = true;
+  const meta = JSON.parse(bitnet_meta());
+  $('s-gs').textContent = meta.group_size;
+  $('s-lut').textContent = meta.lut_size;
+  $('s-ver').textContent = meta.scheme;
+  log('内核就绪 OK  ' + JSON.stringify(meta));
+} catch (e) {
+  log('内核加载失败：' + e);
+}
+
+function randn(n) {
+  const a = new Float32Array(n);
+  for (let k = 0; k < n; k++) {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random();
+    while (v === 0) v = Math.random();
+    a[k] = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+  return a;
+}
+
+$('run').onclick = () => {
+  if (!ready) { log('内核尚未就绪'); return; }
+  let i = Math.max(4, +$('i').value | 0);
+  if (i % 4) i = (i >> 2 << 2) || 4;
+  $('i').value = i;
+  const o = Math.max(1, +$('o').value | 0);
+  const b = Math.max(1, +$('b').value | 0);
+  const rep = Math.max(1, +$('r').value | 0);
+
+  const x = randn(b * i);
+  const w = new Float32Array(i * o);
+  for (let k = 0; k < w.length; k++) w[k] = Math.random() * 2 - 1;
+
+  bitlinear_forward(x, b, i, w, o);
+
+  const t0 = performance.now();
+  let out = null;
+  for (let r = 0; r < rep; r++) out = bitlinear_forward(x, b, i, w, o);
+  const t1 = performance.now();
+
+  const ms = (t1 - t0) / rep;
+  const macs = b * i * o;
+  const gops = macs / (ms / 1000) / 1e9;
+  const fp32KB = (i * o * 4) / 1024;
+  const qKB = (i * o / 4) / 1024;
+
+  $('k-time').textContent = ms.toFixed(2) + ' ms';
+  $('k-mac').textContent = macs.toLocaleString();
+  $('k-tp').textContent = gops.toFixed(2);
+  $('k-cmp').textContent = (fp32KB / qKB).toFixed(1) + 'x 更小';
+
+  const head = Array.from(out.slice(0, 6)).map(v => v.toFixed(4)).join(', ');
+  log(
+    '输入  x: (' + b + ' x ' + i + ') 随机高斯\n' +
+    '权重  w: (' + i + ' x ' + o + ') 均匀 [-1,1]\n' +
+    '输出  y: (' + b + ' x ' + o + ')\n\n' +
+    '前 6 个输出值: [ ' + head + ' ]\n\n' +
+    '单次耗时 ' + ms.toFixed(2) + ' ms  ·  ' + rep + ' 次平均\n' +
+    '等效 MAC ' + macs.toLocaleString() + '  ·  吞吐 ' + gops.toFixed(2) + ' GOP/s\n' +
+    '权重存储: fp32 ' + fp32KB.toFixed(0) + 'KB -> 三值打包 ' + qKB.toFixed(0) + 'KB'
+  );
+};
+
+const root = document.documentElement;
+const th = localStorage.getItem('yz-theme');
+if (th) root.setAttribute('data-theme', th);
+$('theme').onclick = () => {
+  const n = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', n);
+  localStorage.setItem('yz-theme', n);
+};
+</script>
+</body>
+</html>
