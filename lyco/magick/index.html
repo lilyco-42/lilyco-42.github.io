@@ -38,7 +38,7 @@ select{background:#0d1117;color:var(--fg);border:1px solid #30363d;border-radius
   <div class="card"><canvas id="cv"></canvas></div>
 </div>
 <script type="module">
-import { initializeImageMagickx64, ImageMagick, MagickFormat, Percentage } from 'https://cdn.jsdelivr.net/npm/@imagemagick/magick-wasm@0.0.43/dist/index.js';
+import { initializeImageMagickx64, ImageMagick, Magick, MagickFormat, Percentage } from 'https://cdn.jsdelivr.net/npm/@imagemagick/magick-wasm@0.0.43/dist/index.js';
 const $ = id => document.getElementById(id);
 $('pct').oninput = e => $('pv').textContent = e.target.value + '%';
 let loaded = false;
@@ -47,7 +47,7 @@ $('st').textContent = '下载 ImageMagick 内核 (14.8MB, 浏览器会缓存)…
 const wasmBytes = new Uint8Array(await (await fetch(WASM_URL)).arrayBuffer());
 await initializeImageMagickx64(wasmBytes);
 loaded = true;
-$('st').textContent = '✓ ' + ImageMagick?.imageMagickVersion ?? 'ImageMagick 就绪';
+$('st').textContent = '✓ ' + (Magick.imageMagickVersion || 'ImageMagick 就绪');
 $('go').disabled = false;
 let srcBytes = null, srcName = 'image';
 document.getElementById('file').onchange = ev => {
