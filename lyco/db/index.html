@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lyco db — DuckDB 浏览器内 SQL 分析</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--fg:#c9d1d9;--dim:#8b949e;--acc:#58a6ff;--ok:#7ee787;--err:#f85149}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:ui-monospace,Cascadia Code,monospace;padding:30px 16px}
+.wrap{max-width:1000px;margin:0 auto}
+h1{font-size:20px}.sub{color:var(--dim);font-size:12px;margin:6px 0 18px;line-height:1.7}
+.card{background:var(--card);border:1px solid #30363d;border-radius:10px;padding:14px;margin-bottom:14px}
+textarea{width:100%;min-height:120px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:var(--fg);font:13px/1.6 ui-monospace,monospace;padding:10px;resize:vertical}
+button{background:var(--acc);border:0;color:#000;font:inherit;font-weight:700;padding:7px 14px;border-radius:6px;cursor:pointer;margin-right:6px}
+button:disabled{opacity:.4;cursor:wait}
+button.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+table{width:100%;font-size:12px;border-collapse:collapse;margin-top:10px}
+th{background:#1c2128;color:var(--acc);text-align:left;padding:6px 8px;border:1px solid #30363d}
+td{padding:5px 8px;border:1px solid #21262d}
+.stat{color:var(--dim);font-size:12px;margin-top:8px}
+a{color:var(--acc);text-decoration:none}
+</style></head>
+<body>
+<div class="wrap">
+  <h1>lyco db <span style="color:var(--dim);font-size:12px">DuckDB-WASM 官方 · 列式分析数据库编译到浏览器</span></h1>
+  <div class="sub">加载 CSV → 直接写 SQL 聚合分析,数据全程本地 · <a href="../">← lyco 工具箱</a></div>
+  <div class="card">
+    <input type="file" id="csv" accept=".csv,.tsv,.txt">
+    <button class="ghost" onclick="sample()">载入示例数据</button>
+    <span class="stat" id="dataStat"></span>
+  </div>
+  <div class="card">
+    <textarea id="sql">SELECT product, SUM(amount) AS total, COUNT(*) AS orders
+FROM sales
+GROUP BY product
+ORDER BY total DESC;</textarea>
+    <div style="margin-top:8px"><button id="go" onclick="run()" disabled>▶ 运行 SQL</button>
+    <span class="stat" id="st">加载 DuckDB 内核中…</span></div>
+  </div>
+  <div class="card"><div id="resWrap"><table id="res"></table></div></div>
+</div>
+<script type="module">
+import * as duckdb from 'https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.1-dev132.0/+esm';
+const $ = id => document.getElementById(id);
+const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
+const worker_url = URL.createObjectURL(new Blob([`importScripts("${bundle.mainWorker}");`], { type: 'text/javascript' }));
+const db = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(), new Worker(worker_url));
+await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+const conn = await db.connect();
+window.__ready = true;
+$('go').disabled = false;
+$('st').textContent = '✓ DuckDB 就绪';
+window.sample = async () => {
+  const rows = ['product,amount,city'];
+  const prods = ['键盘','鼠标','显示器','耳机'], cities = ['北京','上海','广州'];
+  for (let i = 0; i < 500; i++)
+    rows.push(`${prods[i % 4]},${(Math.random() * 900 + 100).toFixed(2)},${cities[i % 3]}`);
+  await conn.registerFileText('sales.csv', rows.join('\n'));
+  await conn.query(`CREATE OR REPLACE TABLE sales AS SELECT * FROM read_csv_auto('sales.csv')`);
+  $('dataStat').textContent = '已载入 sales.csv (500 行)';
+  $('sql').value = $('sql').value; run();
+};
+window.run = async () => {
+  if (!window.__ready) return;
+  const t0 = performance.now();
+  try {
+    const table = await conn.query($('sql').value);
+    const cols = table.schema.fields.map(f => f.name);
+    const rows = table.toArray().map(r => cols.map(c => {
+      const v = r[c]; return v === null || v === undefined ? '' : String(v.value ?? v);
+    }));
+    let h = '<tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr>';
+    for (const r of rows.slice(0, 100)) h += '<tr>' + r.map(v => `<td>${v.replace(/</g,'&lt;')}</td>`).join('') + '</tr>';
+    if (rows.length > 100) h += `<tr><td colspan="${cols.length}" class="stat">… 前 100 行 / 共 ${rows.length} 行</td></tr>`;
+    $('res').innerHTML = h;
+    $('st').textContent = `✓ ${rows.length} 行 · ${Math.round(performance.now() - t0)}ms`;
+  } catch (e) {
+    $('res').innerHTML = `<tr><td style="color:var(--err)">${String(e).replace(/</g,'&lt;')}</td></tr>`;
+  }
+};
+sample();
+</script>
+</body></html>
