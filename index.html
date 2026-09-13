@@ -1,608 +1,163 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lilyco-42 · GitHub Dashboard</title>
-  <style>
-    :root {
-      --bg: #0d1117;
-      --bg2: #161b22;
-      --bg3: #21262d;
-      --border: #30363d;
-      --text: #e6edf3;
-      --muted: #8b949e;
-      --blue: #58a6ff;
-      --green: #3fb950;
-      --red: #f85149;
-      --yellow: #d29922;
-      --purple: #bc8cff;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Cascadia Code", "Noto Sans SC", "Microsoft YaHei UI", monospace; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-    /* ── Top Bar ── */
-    #topbar {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 16px; background: var(--bg2);
-      border-bottom: 1px solid var(--border); flex-shrink: 0;
-    }
-    #topbar h1 { font-size: 1rem; font-weight: 600; }
-    #token-input {
-      flex: 1; max-width: 340px;
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text); padding: 5px 10px; border-radius: 6px;
-      font-size: 0.8rem; font-family: monospace;
-    }
-    #token-input::placeholder { color: var(--muted); }
-    .btn {
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text); padding: 5px 12px; border-radius: 6px;
-      cursor: pointer; font-size: 0.8rem; transition: background .15s;
-    }
-    .btn:hover { background: var(--border); }
-    .btn.primary { background: #1f6feb; border-color: #1f6feb; }
-    .btn.primary:hover { background: #388bfd; }
-    #status-bar { margin-left: auto; font-size: 0.75rem; color: var(--muted); }
-
-    /* ── Layout ── */
-    #main { display: flex; flex: 1; overflow: hidden; }
-
-    /* ── Sidebar ── */
-    #sidebar {
-      width: 260px; flex-shrink: 0;
-      background: var(--bg2); border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; overflow: hidden;
-    }
-    #sidebar-header {
-      padding: 10px 12px; border-bottom: 1px solid var(--border);
-      font-size: 0.8rem; color: var(--muted); display: flex;
-      align-items: center; justify-content: space-between;
-    }
-    #repo-list { flex: 1; overflow-y: auto; }
-    .repo-item {
-      padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--border);
-      font-size: 0.82rem; display: flex; align-items: center; gap: 8px;
-      transition: background .1s;
-    }
-    .repo-item:hover { background: var(--bg3); }
-    .repo-item.active { background: #1f6feb22; border-left: 2px solid var(--blue); }
-    .repo-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .repo-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .repo-lang { font-size: 0.7rem; color: var(--muted); }
-
-    /* ── Content ── */
-    #content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-    /* ── Tabs ── */
-    #tabs {
-      display: flex; border-bottom: 1px solid var(--border);
-      background: var(--bg2); flex-shrink: 0;
-    }
-    .tab {
-      padding: 8px 16px; cursor: pointer; font-size: 0.82rem;
-      color: var(--muted); border-bottom: 2px solid transparent;
-      transition: color .15s;
-    }
-    .tab:hover { color: var(--text); }
-    .tab.active { color: var(--text); border-bottom-color: var(--blue); }
-
-    /* ── Panel ── */
-    .panel { flex: 1; overflow-y: auto; padding: 16px; display: none; }
-    .panel.active { display: block; }
-
-    /* ── Cards ── */
-    .card {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 12px 16px; margin-bottom: 10px;
-    }
-    .card-row { display: flex; align-items: center; gap: 10px; }
-    .card-title { font-weight: 600; font-size: 0.9rem; }
-    .card-meta { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
-    .card-meta span { margin-right: 12px; }
-
-    /* ── Status badges ── */
-    .badge {
-      font-size: 0.7rem; font-weight: 600; padding: 2px 8px;
-      border-radius: 20px; text-transform: uppercase; flex-shrink: 0;
-    }
-    .s-success    { background:#1a3a2a; color:var(--green); border:1px solid var(--green); }
-    .s-failure    { background:#3a1a1a; color:var(--red);   border:1px solid var(--red); }
-    .s-in_progress{ background:#3a2e1a; color:var(--yellow);border:1px solid var(--yellow); animation: pulse 1.2s infinite; }
-    .s-queued     { background:#3a2e1a; color:var(--yellow);border:1px solid var(--yellow); }
-    .s-cancelled  { background:var(--bg3); color:var(--muted); border:1px solid var(--border); }
-    .s-unknown    { background:var(--bg3); color:var(--muted); border:1px solid var(--border); }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-
-    .dot-success    { background: var(--green); }
-    .dot-failure    { background: var(--red); }
-    .dot-in_progress{ background: var(--yellow); }
-    .dot-other      { background: var(--muted); }
-
-    /* ── Console ── */
-    #console-panel {
-      display: none; flex-direction: column; flex: 1; overflow: hidden;
-    }
-    #console-panel.active { display: flex; }
-    #console-output {
-      flex: 1; overflow-y: auto; padding: 12px;
-      font-family: monospace; font-size: 0.8rem; line-height: 1.6;
-      background: #010409;
-    }
-    .log-info  { color: var(--text); }
-    .log-ok    { color: var(--green); }
-    .log-err   { color: var(--red); }
-    .log-warn  { color: var(--yellow); }
-    .log-json  { color: var(--purple); }
-    .log-cmd   { color: var(--blue); }
-    #console-input-row {
-      display: flex; border-top: 1px solid var(--border);
-      background: var(--bg2); flex-shrink: 0;
-    }
-    #console-prompt { padding: 8px 12px; color: var(--green); font-family: monospace; font-size: 0.85rem; }
-    #console-input {
-      flex: 1; background: transparent; border: none; outline: none;
-      color: var(--text); font-family: monospace; font-size: 0.85rem;
-      padding: 8px 0;
-    }
-    #console-run { padding: 8px 14px; background: var(--bg3); border: none; border-left: 1px solid var(--border); color: var(--blue); cursor: pointer; font-size: 0.8rem; }
-    #console-run:hover { background: var(--border); }
-
-    /* ── Misc ── */
-    a { color: var(--blue); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .empty { color: var(--muted); font-size: 0.85rem; padding: 24px 0; text-align: center; }
-    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    #summary { display:flex; gap:16px; margin-bottom:14px; flex-wrap:wrap; }
-    .sum-item { font-size:0.8rem; color:var(--muted); } .sum-item strong { color:var(--text); }
-
-    /* ── Featured projects ── */
-    .featured-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 14px; padding-bottom: 24px;
-    }
-    .fcard {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 10px; padding: 16px 18px;
-      display: flex; flex-direction: column; gap: 10px;
-      transition: border-color .15s, transform .15s;
-    }
-    .fcard:hover { border-color: var(--blue); transform: translateY(-2px); }
-    .fcard-top { display: flex; align-items: center; gap: 10px; }
-    .fcard-icon {
-      width: 38px; height: 38px; border-radius: 8px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.15rem; font-weight: 700;
-      background: var(--bg3); border: 1px solid var(--border);
-    }
-    .fcard-title { font-size: 1.05rem; font-weight: 700; }
-    .fcard-title a { color: var(--text); }
-    .fcard-title a:hover { color: var(--blue); }
-    .fcard-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.55; min-height: 2.5em; }
-    .fcard-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .ftag {
-      font-size: 0.68rem; font-weight: 600; padding: 2px 8px;
-      border-radius: 20px; background: #1f6feb22; color: var(--blue);
-      border: 1px solid #1f6feb55;
-    }
-    .fcard-meta { display: flex; align-items: center; gap: 14px; font-size: 0.75rem; color: var(--muted); }
-    .fcard-meta .lang-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-    .fcard-links { display: flex; gap: 8px; margin-top: auto; }
-    .fcard-links .btn { flex: 1; text-align: center; font-size: 0.78rem; }
-    .fcard-rank {
-      position: absolute; /* placeholder */
-    }
-    .f-hero {
-      background: linear-gradient(135deg, #1f6feb22, #bc8cff11);
-      border: 1px solid #1f6feb55;
-      grid-column: 1 / -1;
-    }
-    .f-hero .fcard-desc { min-height: auto; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mpkg-registry —— 记忆包市场</title>
+<style>
+:root { --bg:#0d1117; --card:#161b22; --edge:#30363d; --fg:#e6edf3; --dim:#8b949e; --acc:#58a6ff; --ok:#3fb950; }
+* { box-sizing:border-box; margin:0; }
+body { background:var(--bg); color:var(--fg); font-family:"Segoe UI",system-ui,sans-serif; max-width:1020px; margin-inline:auto; padding:1.5rem 1.5rem 3rem; }
+a { color:var(--acc); text-decoration:none; }
+a:hover { text-decoration:underline; }
+h1 { font-size:1.5rem; }
+h1 span { color:var(--acc); }
+nav { display:flex; gap:1rem; font-size:.85rem; margin-top:.4rem; flex-wrap:wrap; }
+nav a { color:var(--dim); }
+.hero { margin:1.4rem 0 1rem; }
+.hero p { color:var(--dim); font-size:.92rem; line-height:1.6; margin-top:.3rem; }
+.stats { display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.8rem; }
+.stat { background:var(--card); border:1px solid var(--edge); border-radius:8px; padding:.45rem .9rem; font-size:.82rem; }
+.stat b { color:var(--acc); }
+.sec-title { font-size:1.05rem; margin:1.6rem 0 .7rem; display:flex; align-items:center; gap:.5rem; }
+.sec-title::before { content:""; width:3px; height:1rem; background:var(--acc); border-radius:2px; }
+.steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:.8rem; }
+.step { background:var(--card); border:1px solid var(--edge); border-radius:10px; padding:.9rem 1rem; }
+.step .n { display:inline-block; width:1.5rem; height:1.5rem; line-height:1.5rem; text-align:center; background:var(--acc); color:#0d1117; border-radius:50%; font-weight:bold; font-size:.8rem; margin-bottom:.4rem; }
+.step h3 { font-size:.92rem; margin-bottom:.35rem; }
+.step p { color:var(--dim); font-size:.8rem; line-height:1.5; margin-bottom:.5rem; }
+.cmd { background:#0d1117; border:1px solid var(--edge); border-radius:6px; padding:.45rem .6rem; font-family:Consolas,monospace; font-size:.75rem; color:#7ee787; overflow-x:auto; cursor:pointer; white-space:nowrap; }
+.cmd:hover { border-color:var(--acc); }
+.filterbar { display:flex; gap:.5rem; flex-wrap:wrap; margin:.8rem 0 1rem; }
+.fbtn { background:var(--card); border:1px solid var(--edge); color:var(--dim); border-radius:20px; padding:.25rem .8rem; font-size:.78rem; cursor:pointer; }
+.fbtn.on { border-color:var(--acc); color:var(--acc); }
+.card { background:var(--card); border:1px solid var(--edge); border-radius:10px; padding:1rem 1.2rem; margin-bottom:.8rem; }
+.card h2 { font-size:1rem; margin-bottom:.3rem; }
+.card h2 a { color:var(--acc); }
+.card h2 .ver { color:var(--dim); font-size:.8rem; font-weight:normal; }
+.meta { display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; color:var(--dim); font-size:.78rem; margin-bottom:.45rem; }
+.badge { border-radius:20px; padding:.12rem .6rem; font-size:.72rem; background:#1f6feb33; color:var(--acc); }
+.badge.ok { background:#23863633; color:var(--ok); }
+.intent { font-size:.88rem; margin-bottom:.55rem; }
+.detail { display:none; border-top:1px dashed var(--edge); padding-top:.6rem; margin-top:.5rem; font-size:.8rem; color:var(--dim); line-height:1.6; }
+.card.open .detail { display:block; }
+.toggle { color:var(--acc); cursor:pointer; font-size:.78rem; user-select:none; }
+footer { color:var(--dim); font-size:.78rem; margin-top:2.5rem; line-height:1.7; border-top:1px solid var(--edge); padding-top:1rem; }
+.skel { background:linear-gradient(90deg,var(--card) 25%,#1f2733 50%,var(--card) 75%); background-size:200% 100%; animation:sk 1.2s infinite; border-radius:10px; height:90px; margin-bottom:.8rem; }
+@keyframes sk { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+</style>
 </head>
 <body>
+<h1>📦 <span>mpkg-registry</span> —— 记忆包市场</h1>
+<nav>
+  <a href="https://github.com/lilyco-42/lystack">lystack 主仓</a>
+  <a href="https://github.com/lilyco-42/lystack/blob/main/spec/mpkg-v0.md">mpkg 协议</a>
+  <a href="https://github.com/lilyco-42/cache-node">节点</a>
+  <a href="https://github.com/lilyco-42/lly">工具</a>
+  <a href="https://github.com/lilyco-42/mpkg-registry">registry 源</a>
+</nav>
 
-<!-- Top Bar -->
-<div id="topbar">
-  <svg width="20" height="20" viewBox="0 0 16 16" fill="var(--text)"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-  <h1>lilyco-42 · Dashboard</h1>
-  <input id="token-input" type="password" placeholder="GitHub Token (可选，提高 API 限额)" />
-  <button class="btn primary" onclick="init()">加载</button>
-  <button class="btn" onclick="startAutoRefresh()">↻ 自动刷新</button>
-  <span id="status-bar">未加载</span>
+<div class="hero">
+  <p>每个记忆包 = <b>CLI trace</b>（可回放的命令轨迹）+ <b>知识原子</b>（逐条源锚定）+ <b>验证配方</b>（确定性或统计容差）。content-hash 寻址、双实现互证（Python + Rust）、<b style="color:var(--ok)">attest</b> = 独立主机真实回放次数——信任随回放复利，不随承诺到账。</p>
+  <div class="stats" id="stats"></div>
 </div>
 
-<!-- Main -->
-<div id="main">
-
-  <!-- Sidebar -->
-  <div id="sidebar">
-    <div id="sidebar-header">
-      <span>仓库列表</span>
-      <span id="repo-count" style="color:var(--text)">-</span>
-    </div>
-    <div id="repo-list"><div class="empty">点击「加载」开始</div></div>
-  </div>
-
-  <!-- Content -->
-  <div id="content">
-    <div id="tabs">
-      <div class="tab active" onclick="switchTab('featured')">精选项目</div>
-      <div class="tab" onclick="switchTab('actions')">Actions</div>
-      <div class="tab" onclick="switchTab('repos')">所有仓库</div>
-      <div class="tab" onclick="switchTab('console')">JS 控制台</div>
-    </div>
-
-    <div id="featured-panel" class="panel active"><div class="empty">加载精选项目...</div></div>
-    <div id="actions-panel" class="panel"><div class="empty">选择左侧仓库查看 Actions</div></div>
-    <div id="repos-panel" class="panel"><div class="empty">点击「加载」获取仓库列表</div></div>
-    <div id="console-panel" class="panel">
-      <div id="console-output"></div>
-      <div id="console-input-row">
-        <span id="console-prompt">❯</span>
-        <input id="console-input" placeholder="输入 JS 或 GitHub API 路径，如: /repos/lilyco-42/claw-code/actions/runs" onkeydown="handleConsoleKey(event)" />
-        <button id="console-run" onclick="runConsole()">运行</button>
-      </div>
-    </div>
-  </div>
+<div class="sec-title">三步上手</div>
+<div class="steps">
+  <div class="step"><span class="n">1</span><h3>拿到 CLI</h3><p>单文件 Python，无第三方依赖。clone lystack 或直接下载 mpkg.py。</p><div class="cmd" onclick="navigator.clipboard.writeText(this.textContent)">git clone --depth 1 https://github.com/lilyco-42/lystack</div></div>
+  <div class="step"><span class="n">2</span><h3>安装并回放验证</h3><p>安装 = 下载 + content-id 校验 + 本机完整回放。任何一台机器的 PASS 都会成为这个包的 attest。</p><div class="cmd" onclick="navigator.clipboard.writeText(this.textContent)">python3 mpkg.py install &lt;包名&gt; -r lilyco-42/mpkg-registry --verify</div></div>
+  <div class="step"><span class="n">3</span><h3>发布你的知识</h3><p>把你的 CLI trace + 知识原子打包上架。别人搜到 → 回放 → 信任复利。</p><div class="cmd" onclick="navigator.clipboard.writeText(this.textContent)">python3 mpkg.py publish &lt;包目录&gt; -r lilyco-42/mpkg-registry</div></div>
 </div>
+
+<div class="sec-title">记忆包</div>
+<div class="filterbar" id="filterbar"></div>
+<div id="list"><div class="skel"></div><div class="skel"></div></div>
+
+<footer>
+  设计原则：AI 编排工具、工具操作数据、一切执行走 CLI 进程（可追踪 = 可回放 = 可信任）。<br>
+  协议：<a href="https://github.com/lilyco-42/lystack/blob/main/spec/mpkg-v0.md">mpkg-v0</a> ·
+  代码知识：<a href="https://github.com/lilyco-42/lystack/blob/main/spec/asr-code-v0.md">asr-code-v0</a> ·
+  视频知识：<a href="https://github.com/lilyco-42/lystack/blob/main/spec/kbv-v0.md">kbv-v0</a> ·
+  构建管线：<a href="https://github.com/lilyco-42/lystack/actions/workflows/asr-code.yml">asr-code CI</a>
+</footer>
 
 <script>
-const OWNER = 'lilyco-42';
-let token = '';
-let repos = [];
-let autoRefreshTimer = null;
-let consoleHistory = [];
-let historyIdx = -1;
-
-// ── Featured projects（精选，按重要度排序）────────────────────
-const FEATURED = [
-  {
-    name: 'lilyco',
-    hero: true,
-    icon: 'L',
-    tags: ['AI 优先', '一套代码四端生成', 'MCP 原生', '跨平台含 Android'],
-    blurb: '让人类远离计算机，AI 可做任何事 —— 一个 struct 生成 CLI/TUI/Web/MCP，天然可被 Agent 调用。',
-  },
-  {
-    name: 'lyco-engine',
-    icon: 'Y',
-    tags: ['WASM', '视觉小说引擎', '资源流后端'],
-    blurb: 'YuzuSoft —— WASM 跨平台视觉小说引擎 + 资源流式后端，浏览器即玩。',
-  },
-  {
-    name: 'lyco-cli',
-    icon: 'C',
-    tags: ['脚手架', 'gh api 驱动', '声明式渲染'],
-    blurb: '统一多语言脚手架：gh api 拉模板 + 声明式渲染，一套配置生成项目骨架。',
-  },
-  {
-    name: 'lyco_chat',
-    icon: 'T',
-    tags: ['transformer', 'tinyGPT 核心', '从零实现'],
-    blurb: '研究 transformer 原理的聊天 AI —— 核心源自 tinyGPT，跑通注意力与自回归生成。',
-  },
-  {
-    name: 'lyco-skill',
-    icon: 'S',
-    tags: ['写代码前先侦察', 'build-vs-buy', '论坛挖坑'],
-    blurb: '项目预研技能：需求钉死一句话 → gh 近义词搜索 → 论坛冷门知识 → 决策，少造 80% 轮子。',
-  },
-  {
-    name: 'cute-pet',
-    local: '/pet/',          // 本地首页(丛雨桌宠 WASM)；有 local 优先指向本地页
-    icon: '丛',
-    tags: ['Rust', 'WASM', 'lazy-UI', '桌宠', '跨平台'],
-    blurb: '丛雨桌宠 —— 跨平台悬浮桌宠(Rust + WASM + lazy-UI)。点击玩耍、聊天、看屏幕。浏览器即玩。',
-  },
-  {
-    name: 'webview-mini',
-    icon: 'W',
-    tags: ['C/C++', 'WebView2', '单头文件', 'xmake', '200KB exe'],
-    blurb: '极小 WebView2 封装 —— 单头文件引入,xmake 一键构建,编译产物仅 200KB。对标 Android 23KB WebView 薄包装。',
-  },
-  {
-    name: 'webview-capi',
-    icon: 'A',
-    tags: ['C API', 'DLL 导出', 'Python/Go/Rust/Node.js 绑定', '跨语言'],
-    blurb: 'WebView2 C API —— 17 个导出函数,支持 ctypes/cgo/FFI/ffi-nai 绑定,30 秒上手。',
-  },
-];
-
-// ── API ──────────────────────────────────────────────────────
-async function api(path) {
-  const headers = { Accept: 'application/vnd.github+json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  const url = path.startsWith('http') ? path : `https://api.github.com${path}`;
-  const res = await fetch(url, { headers });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText} — ${url}`);
-  return res.json();
+const REPO = "lilyco-42/mpkg-registry";
+function b64ToUtf8(b64) {
+  const bin = atob(b64);
+  const bytes = Uint8Array.from(bin, function (c) { return c.charCodeAt(0); });
+  return new TextDecoder("utf-8").decode(bytes);
 }
+function esc(s) { const d = document.createElement("div"); d.textContent = String(s); return d.innerHTML; }
+let ALL = [];
+let FILTER = "";
 
-// ── Init ─────────────────────────────────────────────────────
-async function init() {
-  token = document.getElementById('token-input').value.trim();
-  setStatus('加载中...');
-  try {
-    const data = await api(`/users/${OWNER}/repos?per_page=100&sort=updated`);
-    repos = data;
-    document.getElementById('repo-count').textContent = repos.length;
-    renderSidebar();
-    renderReposPanel();
-    renderFeatured();
-    setStatus(`✓ ${repos.length} 个仓库  ${new Date().toLocaleTimeString('zh-CN')}`);
-  } catch(e) {
-    setStatus('❌ ' + e.message);
-  }
-}
-
-// ── Featured panel ──────────────────────────────────────────
-function renderFeatured() {
-  const el = document.getElementById('featured-panel');
-  const byName = new Map(repos.map(r => [r.name, r]));
-  const cards = FEATURED.map(f => {
-    const r = byName.get(f.name);
-    if (!r && !f.local) return '';
-    const hero = f.hero ? ' f-hero' : '';
-    const href = f.local ? f.local : (r ? r.html_url : '#');
-    return `
-    <div class="fcard${hero}">
-      <div class="fcard-top">
-        <div class="fcard-icon">${f.icon}</div>
-        <div>
-          <div class="fcard-title"><a href="${href}" ${f.local ? '' : 'target="_blank"'}>${f.name}</a>${f.hero ? ' <span style="color:var(--yellow);font-size:0.7rem;font-weight:600">★ 主推</span>' : ''}</div>
-          <div class="fcard-meta">
-            <span><span class="lang-dot" style="background:${langColor(r ? r.language : 'Rust')}"></span> ${r ? (r.language || 'N/A') : 'WASM'}</span>
-            <span>⭐ ${r ? r.stargazers_count : '—'}</span>
-            <span>🕐 ${r ? timeAgo(r.updated_at) : '网页版'}</span>
-          </div>
-        </div>
-      </div>
-      <div class="fcard-desc">${f.blurb}</div>
-      <div class="fcard-tags">${f.tags.map(t => `<span class="ftag">${t}</span>`).join('')}</div>
-      <div class="fcard-links">
-        <a class="btn" href="${href}" ${f.local ? '' : 'target="_blank"'}>${f.local ? '立即游玩 →' : 'GitHub →'}</a>
-        ${f.local ? '' : `<a class="btn" href="${r.html_url}/actions" target="_blank">Actions</a>`} <a class="btn" href="guide.html?name=${f.name}" target="_blank">快速入门</a>
-      </div>
-    </div>`;
-  }).join('');
-  el.innerHTML = cards ? `<div class="featured-grid">${cards}</div>` : '<div class="empty">仓库数据未加载，先点「加载」</div>';
-}
-
-// 语言 → 颜色（GitHub 色板近似）
-function langColor(lang) {
-  return ({
-    Rust: '#dea584', Shell: '#89e051', TypeScript: '#3178c6',
-    JavaScript: '#f1e05a', Python: '#3572A5', HTML: '#e34c26',
-  })[lang] || '#8b949e';
-}
-
-// ── Sidebar ──────────────────────────────────────────────────
-function renderSidebar() {
-  const el = document.getElementById('repo-list');
-  el.innerHTML = repos.map(r => `
-    <div class="repo-item" onclick="loadActions('${r.name}', this)">
-      <div class="repo-dot dot-other" id="dot-${r.name}"></div>
-      <span class="repo-name">${r.name}</span>
-      <span class="repo-lang">${r.language || ''}</span>
-    </div>
-  `).join('');
-}
-
-// ── Repos Panel ──────────────────────────────────────────────
-function renderReposPanel() {
-  const el = document.getElementById('repos-panel');
-  el.innerHTML = repos.map(r => `
-    <div class="card">
-      <div class="card-row">
-        <div style="flex:1">
-          <div class="card-title"><a href="${r.html_url}" target="_blank">${r.name}</a></div>
-          <div class="card-meta">
-            <span>${r.description || '无描述'}</span>
-          </div>
-          <div class="card-meta" style="margin-top:6px">
-            <span>⭐ ${r.stargazers_count}</span>
-            <span>🍴 ${r.forks_count}</span>
-            <span>📦 ${r.language || 'N/A'}</span>
-            <span>🕐 ${timeAgo(r.updated_at)}</span>
-            ${r.private ? '<span style="color:var(--yellow)">🔒 私有</span>' : ''}
-          </div>
-        </div>
-        <button class="btn" onclick="loadActions('${r.name}', null); switchTab('actions')">查看 Actions</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ── Actions Panel ────────────────────────────────────────────
-let currentRepo = null;
-async function loadActions(repoName, el) {
-  currentRepo = repoName;
-  switchTab('actions');
-
-  // highlight sidebar
-  document.querySelectorAll('.repo-item').forEach(i => i.classList.remove('active'));
-  if (el) el.classList.add('active');
-
-  const panel = document.getElementById('actions-panel');
-  panel.innerHTML = `<div class="empty">加载 ${repoName} 的 Actions...</div>`;
-
-  try {
-    const data = await api(`/repos/${OWNER}/${repoName}/actions/runs?per_page=25`);
-    const runs = data.workflow_runs || [];
-
-    // update sidebar dot
-    const dot = document.getElementById(`dot-${repoName}`);
-    if (dot) {
-      const latest = runs[0];
-      if (!latest) { dot.className = 'repo-dot dot-other'; }
-      else {
-        const s = statusClass(latest.conclusion, latest.status);
-        dot.className = `repo-dot dot-${s === 'success' ? 'success' : s === 'failure' ? 'failure' : s === 'in_progress' ? 'in_progress' : 'other'}`;
-      }
-    }
-
-    if (runs.length === 0) {
-      panel.innerHTML = `<div class="empty">${repoName} 暂无 Actions 运行记录</div>`;
-      return;
-    }
-
-    const counts = { success:0, failure:0, in_progress:0 };
-    runs.forEach(r => {
-      const s = statusClass(r.conclusion, r.status);
-      if (s in counts) counts[s]++;
+function render() {
+  const list = document.getElementById("list");
+  const items = ALL.filter(function (p) {
+    if (!FILTER) return true;
+    return (p.tags || []).some(function (t) { return t === FILTER; });
+  });
+  if (!items.length) { list.innerHTML = '<div class="err">该标签下暂无包</div>'; return; }
+  list.innerHTML = items.map(function (p) {
+    const at = p.attestations || 0;
+    return '<div class="card">' +
+      '<h2><a href="https://github.com/' + REPO + '/tree/main/' + esc(p.file) + '" target="_blank">' + esc(p.name) + '</a> <span class="ver">@' + esc(p.version) + '</span></h2>' +
+      '<div class="meta">' +
+      '<span class="badge">id ' + esc(p.id.slice(7, 19)) + '</span>' +
+      '<span class="badge ' + (at > 0 ? 'ok' : '') + '">attest ' + at + '</span>' +
+      '<span>' + p.size + ' B</span><span>' + esc(p.created || "") + '</span></div>' +
+      '<div class="intent">' + esc(p.intent || "") + '</div>' +
+      '<div class="cmd" onclick="navigator.clipboard.writeText(this.textContent)">python3 mpkg.py install ' + esc(p.name) + ' -r ' + REPO + ' --verify</div>' +
+      '<div class="tags">' + (p.tags || []).map(function (t) { return '<span class="tag">#' + esc(t) + '</span>'; }).join("") + ' <span class="toggle" data-name="' + esc(p.name) + '">详情 ▾</span></div>' +
+      '<div class="detail" id="d-' + esc(p.name) + '">' +
+      '发布: ' + esc(p.published_at || "-") + ' · 作者: ' + esc(p.author || "-") + '<br>' +
+      '回执上架 (信任复利): <div class="cmd" onclick="navigator.clipboard.writeText(this.textContent)">python3 mpkg.py verify 包 --out att.json && python3 mpkg.py attest att.json -r ' + REPO + '</div></div>' +
+      '</div>';
+  }).join("");
+  list.querySelectorAll(".toggle").forEach(function (el) {
+    el.addEventListener("click", function () {
+      const card = el.closest(".card");
+      card.classList.toggle("open");
+      el.textContent = card.classList.contains("open") ? "详情 ▴" : "详情 ▾";
     });
-
-    panel.innerHTML = `
-      <div id="summary">
-        <div class="sum-item">📦 <strong>${repoName}</strong></div>
-        <div class="sum-item">共 <strong>${runs.length}</strong> 条</div>
-        <div class="sum-item" style="color:var(--green)">✅ <strong>${counts.success}</strong></div>
-        <div class="sum-item" style="color:var(--red)">❌ <strong>${counts.failure}</strong></div>
-        <div class="sum-item" style="color:var(--yellow)">🔄 <strong>${counts.in_progress}</strong></div>
-      </div>
-      ${runs.map(run => {
-        const sc = statusClass(run.conclusion, run.status);
-        return `
-        <div class="card">
-          <div class="card-row">
-            <div style="flex:1">
-              <div class="card-title">${run.display_title || run.name}</div>
-              <div class="card-meta" style="margin-top:5px">
-                <span>🔀 ${run.head_branch}</span>
-                <span>⚡ ${run.event}</span>
-                <span>🕐 ${timeAgo(run.created_at)}</span>
-                <span style="color:var(--muted)">#${run.run_number}</span>
-              </div>
-            </div>
-            <span class="badge s-${sc}">${statusLabel(run.conclusion, run.status)}</span>
-            <a href="${run.html_url}" target="_blank" style="margin-left:10px;font-size:0.8rem">查看 →</a>
-          </div>
-        </div>`;
-      }).join('')}
-    `;
-  } catch(e) {
-    panel.innerHTML = `<div class="empty" style="color:var(--red)">${e.message}</div>`;
-  }
+  });
 }
 
-// ── Console ──────────────────────────────────────────────────
-function log(msg, cls='log-info') {
-  const out = document.getElementById('console-output');
-  const line = document.createElement('div');
-  line.className = cls;
-  line.textContent = msg;
-  out.appendChild(line);
-  out.scrollTop = out.scrollHeight;
+function renderFilter() {
+  const bar = document.getElementById("filterbar");
+  const tags = new Set();
+  ALL.forEach(function (p) { (p.tags || []).forEach(function (t) { tags.add(t); }); });
+  bar.innerHTML = '<span class="fbtn on" data-t="">全部</span>' +
+    Array.from(tags).sort().map(function (t) { return '<span class="fbtn" data-t="' + esc(t) + '">#' + esc(t) + '</span>'; }).join("");
+  bar.querySelectorAll(".fbtn").forEach(function (b) {
+    b.addEventListener("click", function () {
+      bar.querySelectorAll(".fbtn").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+      FILTER = b.dataset.t;
+      render();
+    });
+  });
 }
 
-function logJson(obj) {
-  const out = document.getElementById('console-output');
-  const pre = document.createElement('pre');
-  pre.className = 'log-json';
-  pre.style.cssText = 'white-space:pre-wrap;word-break:break-all;margin:2px 0';
-  pre.textContent = JSON.stringify(obj, null, 2);
-  out.appendChild(pre);
-  out.scrollTop = out.scrollHeight;
-}
-
-async function runConsole() {
-  const input = document.getElementById('console-input');
-  const cmd = input.value.trim();
-  if (!cmd) return;
-
-  consoleHistory.unshift(cmd);
-  historyIdx = -1;
-  input.value = '';
-
-  log(`❯ ${cmd}`, 'log-cmd');
-
-  // API path shortcut
-  if (cmd.startsWith('/')) {
-    try {
-      const data = await api(cmd);
-      logJson(data);
-    } catch(e) { log('Error: ' + e.message, 'log-err'); }
-    return;
-  }
-
-  // JS eval
+async function load() {
   try {
-    // expose helpers
-    const result = await eval(`(async () => { ${cmd} })()`);
-    if (result !== undefined) logJson(result);
-  } catch(e) {
-    log('Error: ' + e.message, 'log-err');
+    const r = await fetch("https://api.github.com/repos/" + REPO + "/contents/index.json");
+    const j = await r.json();
+    ALL = JSON.parse(b64ToUtf8(j.content)).packages;
+    const att = ALL.reduce(function (s, p) { return s + (p.attestations || 0); }, 0);
+    document.getElementById("stats").innerHTML =
+      '<span class="stat">记忆包 <b>' + ALL.length + '</b></span>' +
+      '<span class="stat">独立回放 <b>' + att + '</b></span>' +
+      '<span class="stat">实现 <b>Python + Rust</b></span>' +
+      '<span class="stat">验证 <b>content-hash 双关</b></span>';
+    renderFilter();
+    render();
+  } catch (e) {
+    document.getElementById("list").innerHTML = '<div class="err">加载失败: ' + esc(e.message) + '</div>';
   }
 }
-
-function handleConsoleKey(e) {
-  if (e.key === 'Enter') { runConsole(); return; }
-  if (e.key === 'ArrowUp') {
-    historyIdx = Math.min(historyIdx + 1, consoleHistory.length - 1);
-    e.target.value = consoleHistory[historyIdx] || '';
-  }
-  if (e.key === 'ArrowDown') {
-    historyIdx = Math.max(historyIdx - 1, -1);
-    e.target.value = historyIdx >= 0 ? consoleHistory[historyIdx] : '';
-  }
-}
-
-// ── Tabs ─────────────────────────────────────────────────────
-const TAB_NAMES = ['featured', 'actions', 'repos', 'console'];
-const TAB_PANELS = ['featured-panel', 'actions-panel', 'repos-panel', 'console-panel'];
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach((t, i) => {
-    t.classList.toggle('active', TAB_NAMES[i] === name);
-  });
-  TAB_PANELS.forEach(id => {
-    const el = document.getElementById(id);
-    el.classList.toggle('active', id === `${name}-panel`);
-    if (id === 'console-panel') el.style.display = name === 'console' ? 'flex' : 'none';
-    else el.style.display = id === `${name}-panel` ? 'block' : 'none';
-  });
-}
-
-// ── Auto Refresh ─────────────────────────────────────────────
-function startAutoRefresh() {
-  if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; setStatus('自动刷新已停止'); return; }
-  autoRefreshTimer = setInterval(() => {
-    init();
-    if (currentRepo) loadActions(currentRepo, null);
-  }, 30000);
-  setStatus('自动刷新已开启（30s）');
-}
-
-// ── Helpers ──────────────────────────────────────────────────
-function statusClass(conclusion, status) {
-  if (status === 'in_progress' || status === 'queued') return status;
-  return conclusion || 'unknown';
-}
-function statusLabel(conclusion, status) {
-  if (status === 'in_progress') return 'Running';
-  if (status === 'queued') return 'Queued';
-  return { success:'成功', failure:'失败', cancelled:'取消', skipped:'跳过' }[conclusion] || conclusion || '未知';
-}
-function timeAgo(d) {
-  const s = Math.floor((Date.now() - new Date(d)) / 1000);
-  if (s < 60) return `${s}秒前`;
-  if (s < 3600) return `${Math.floor(s/60)}分钟前`;
-  if (s < 86400) return `${Math.floor(s/3600)}小时前`;
-  return `${Math.floor(s/86400)}天前`;
-}
-function setStatus(msg) { document.getElementById('status-bar').textContent = msg; }
-
-// ── Console welcome ──────────────────────────────────────────
-log('GitHub Dashboard — lilyco-42', 'log-ok');
-log('快捷用法：', 'log-info');
-log('  /repos/lilyco-42/claw-code/actions/runs   → 查看 Actions', 'log-info');
-log('  /user/repos?per_page=100                  → 查看所有仓库', 'log-info');
-log('  await api("/repos/lilyco-42/claw-code")   → 调用 API', 'log-info');
-log('  repos                                     → 当前仓库列表', 'log-info');
-log('', 'log-info');
-
-// 自动加载
-init();
+load();
 </script>
 </body>
 </html>
