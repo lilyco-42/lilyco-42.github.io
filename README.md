@@ -8,6 +8,7 @@
 | 路径 | 项目 | 如何跑 |
 |---|---|---|
 | `/` | 首页 Dashboard | 自动；编辑 `index.html` |
+| `/rembg/` | **Rembg Studio WASM** 抠图验证版 | 浏览器打开；源码与构建见 rembg-ui/web |
 | `/pet/` | **丛雨桌宠**（Rust + WASM + lazy-UI） | 浏览器打开 `/pet/` 即玩 |
 
 ## 如何加一个新项目（给新手，2 分钟）
