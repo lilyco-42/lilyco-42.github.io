@@ -132,7 +132,7 @@ const FEATURED = [
     blurb: "65 个 Photoshop / AE 常用像素算子编成单个 55 KB wasm，每个都在 CI 里与独立 JS 参考实现做过数值对照；模块清单已编目 485 项。",
     links: [["在线演示", "https://lilyco-42.github.io/wasm-pixel-kernels/"], ["GitHub →", "https://github.com/lilyco-42/wasm-pixel-kernels"]] },
   { name: "wasm-binary-formats", icon: "📦", tags: ["APK 解包", "网页版运行", "exe/PE", "可核对的清单"],
-    blurb: "APK 在浏览器里解包并把 assets/ 网页资源跑在独立不透明源的沙箱里；exe/dll 走 PE 头解析。含 1749 条格式编目（可行动 61）与「为什么不在网页里模拟 Windows」的取证结论。",
+    blurb: "APK 在浏览器里解包，assets/ 网页资源跑在独立不透明源的沙箱里——实测客户机脚本确实在 origin: null 下执行。exe/dll 只读 PE 头；「为什么不在网页里模拟 Windows」给出许可与体积两条取证结论。附 1749 条格式编目（可行动 61）。",
     links: [["在线演示", "https://lilyco-42.github.io/wasm-binary-formats/"], ["格式编目", "https://github.com/lilyco-42/wasm-binary-formats/blob/main/catalog/formats.json"], ["GitHub →", "https://github.com/lilyco-42/wasm-binary-formats"]] },
   { name: "lilyco", icon: "🧭", tags: ["AI 优先", "一套代码四端", "MCP 原生", "crates.io"],
     blurb: "让人类远离计算机 —— 一个 struct 生成 CLI/TUI/Web/MCP，天然可被 Agent 调用。已发布 crates.io。",
