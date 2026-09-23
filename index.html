@@ -129,9 +129,15 @@ footer { color:var(--dim); font-size:.76rem; margin-top:2rem; line-height:1.7; b
 <script>
 const OWNER = "lilyco-42";
 const FEATURED = [
+  { name: "dsh-termux", icon: "📱", tags: ["Termux", "Android", "DeepSeek DSH"],
+    blurb: "在 Termux 上一键装好 DeepSeek DSH CLI —— 顺手修掉 7 个让它在 Android 跑不起来的兼容问题（node-gyp 的 OS=android、koffi 的 statx、sharp 无 arm64 预编译、SELinux 拒硬链接等），装完即用。",
+    links: [["GitHub →", "https://github.com/lilyco-42/dsh-termux"]] },
   { name: "rembg-ui", icon: "✂️", tags: ["WASM", "Android", "商品图"],
     blurb: "图片留在设备处理，手机可安装 PWA；Android 10+ 原生端（arm64 / armv7 / x86_64）支持批量抠图、ZIP 交付与系统分享。",
     links: [["打开工作台", "/rembg/"], ["Android 下载", "https://github.com/lilyco-42/rembg-ui/releases/tag/v0.2.7-20260921-1349"], ["GitHub →", "https://github.com/lilyco-42/rembg-ui"]] },
+  { name: "ghboost", icon: "⚡", tags: ["Windows", "系统托盘", "免费开源"],
+    blurb: "Windows 托盘工具：点一下开 Google / YouTube / GitHub，再点一下关。支持导入订阅或自带节点，不用懂代理、不碰命令行。客户端本体永远免费开源。",
+    links: [["下载桌面版", "https://github.com/lilyco-42/ghboost/releases/latest"], ["产品页", "https://lilyco-42.github.io/ghboost/"], ["GitHub →", "https://github.com/lilyco-42/ghboost"]] },
   { name: "android-wasm-lab", icon: "🧪", tags: ["WASM", "Android", "实测"],
     blurb: "把浏览器版抠图放进 Android 模拟器跑通并量化：单图冷启动 9.5 秒、10 张批次 37.1 秒、Chrome 峰值内存 119 MB，附零依赖 CDP 脚本与踩坑清单。",
     links: [["实测结果", "https://lilyco-42.github.io/android-wasm-lab/"], ["GitHub →", "https://github.com/lilyco-42/android-wasm-lab"]] },
@@ -144,6 +150,9 @@ const FEATURED = [
   { name: "lilyco", icon: "🧭", tags: ["AI 优先", "一套代码四端", "MCP 原生", "crates.io"],
     blurb: "让人类远离计算机 —— 一个 struct 生成 CLI/TUI/Web/MCP，天然可被 Agent 调用。已发布 crates.io。",
     links: [["GitHub →", "https://github.com/lilyco-42/lilyco"], ["crates.io", "https://crates.io/crates/lilyco"], ["快速入门", "guide.html?name=lilyco"]] },
+  { name: "Lazy-UI", icon: "🧩", tags: ["Rust", "TUI", "中文即时模式"],
+    blurb: "基于 plyx 的 TUI 上层封装 —— 约定大于配置（Button.rs 配 Button.toml），并自带一整套中文即时模式组件（侧边栏 / 复选框 / 滑块 / 数据表格…），写中文就能搭界面。",
+    links: [["GitHub →", "https://github.com/lilyco-42/Lazy-UI"]] },
   { name: "lyco-engine", icon: "🎨", tags: ["WASM", "视觉小说引擎"],
     blurb: "YuzuSoft 风格视觉小说引擎 + 资源流式后端，浏览器即玩。",
     links: [["GitHub →", "https://github.com/lilyco-42/lyco-engine"], ["在线玩", "/lyco/"], ["快速入门", "guide.html?name=lyco-engine"]] },
