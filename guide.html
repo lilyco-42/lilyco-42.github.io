@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="lilyco-42 各项目的快速入门：安装、最小示例、常见坑，每条命令都可直接复制。">
+<link rel="icon" href="assets/logos/brand.svg" type="image/svg+xml">
 <title>快速入门 —— lilyco-42</title>
 <style>
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--blue:#58a6ff;--green:#3fb950;--purple:#bc8cff}
+@media (prefers-color-scheme: light){:root{--bg:#ffffff;--bg2:#f6f8fa;--bg3:#eaeef2;--border:#d0d7de;--text:#1f2328;--muted:#59636e;--blue:#0969da;--green:#1a7f37;--purple:#8250df}}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
 .c{max-width:880px;margin:0 auto;padding:40px 20px}
@@ -22,10 +28,18 @@ p{color:var(--muted);margin-bottom:12px}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline}
 .picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin:20px 0}
+.site-foot{max-width:880px;margin:40px auto 0;padding:16px 20px 40px;border-top:1px solid var(--border);color:var(--muted);font-size:.78rem;display:flex;flex-wrap:wrap;gap:.4rem 1.1rem}
+.site-foot a{color:var(--muted)}
+.site-foot a:hover{color:var(--blue)}
 </style>
 </head>
 <body>
 <div class="c" id="app"></div>
+<footer class="site-foot">
+  <a href="/">← 首页</a>
+  <a href="design.html">设计规范</a>
+  <a href="https://github.com/lilyco-42/lilyco-42.github.io" target="_blank" rel="noopener">GitHub</a>
+</footer>
 <script>
 const GUIDES = {
   "lilyco": {
@@ -109,7 +123,7 @@ const app = document.getElementById("app");
 const g = GUIDES[NAME];
 
 if (!g) {
-  let h = "<h1>快速入门 · 选择项目</h1><p>从 <a href='/'>首页</a> 精选卡片点「快速入门」进入本页。</p><div class='picker'>";
+  let h = "<h1>快速入门 · 选择项目</h1><p>共 " + Object.keys(GUIDES).length + " 篇 · 从 <a href='/'>首页</a> 精选卡片点「快速入门」也能直达。</p><div class='picker'>";
   for (const k of Object.keys(GUIDES)) {
     h += "<a class='card' href='guide.html?name=" + k + "'><b>" + k + "</b><br><span style='color:var(--muted);font-size:.82rem'>" + GUIDES[k].s.slice(0, 60) + "…</span></a>";
   }

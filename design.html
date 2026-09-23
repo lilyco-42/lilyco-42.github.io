@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>设计系统 · lilyco-42</title>
+<meta name="description" content="lilyco-42 展示层的设计系统可视化：色板、字阶、组件、布局刻度。对应仓库根目录的 DESIGN.md。">
+<link rel="icon" href="assets/logos/brand.svg" type="image/svg+xml">
+<style>
+:root {
+  --sidebar:#171717; --main:#212121; --card:#2f2f2f; --card2:#383838;
+  --edge:#ffffff1a; --fg:#ececec; --dim:#a3a3a3; --acc:#58a6ff; --ok:#3fb950;
+  --on-acc:#0d1117; --tagbg:#ffffff0d;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --sidebar:#f7f7f7; --main:#ffffff; --card:#f2f2f2; --card2:#e8e8e8;
+    --edge:#00000014; --fg:#1f1f1f; --dim:#5c5c5c; --acc:#0969da; --ok:#1a7f37;
+    --on-acc:#ffffff; --tagbg:#0000000a;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+* { box-sizing:border-box; margin:0; }
+body { background:var(--main); color:var(--fg); font-family:"Segoe UI","Noto Sans SC",system-ui,sans-serif;
+       line-height:1.65; padding:2rem 2.4rem 4rem; }
+.wrap { max-width:860px; margin-inline:auto; }
+a { color:var(--acc); text-decoration:none; }
+a:hover { text-decoration:underline; }
+:focus-visible { outline:2px solid var(--acc); outline-offset:2px; border-radius:4px; }
+
+header { border-bottom:1px solid var(--edge); padding-bottom:1.2rem; margin-bottom:2rem; }
+h1 { font-size:1.45rem; font-weight:600; }
+.tagline { color:var(--dim); font-size:.9rem; margin-top:.25rem; }
+h2 { font-size:.95rem; font-weight:600; margin:2.2rem 0 .9rem; }
+h2:first-of-type { margin-top:0; }
+h2 .n { color:var(--dim); font-weight:400; margin-right:.4rem; }
+p.note { color:var(--dim); font-size:.85rem; margin-bottom:.9rem; }
+
+.card { background:var(--card); border:1px solid var(--edge); border-radius:14px; padding:1.2rem 1.3rem; margin-bottom:.9rem; }
+.rcard { background:var(--card); border:1px solid var(--edge); border-radius:12px; padding:.9rem 1.05rem; }
+
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:.8rem; }
+.subapps { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:.7rem; }
+.sapp { background:var(--card); border:1px solid var(--edge); border-radius:12px; padding:.85rem 1rem;
+        color:var(--fg); display:flex; gap:.65rem; align-items:center; }
+.sapp .slogo { width:26px; height:26px; border-radius:7px; flex:none; display:block; }
+.sapp b { font-size:.88rem; }
+.sapp .d { color:var(--dim); font-size:.76rem; margin-top:.2rem; }
+
+/* 色板 */
+.swatches { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.7rem; }
+.sw { border:1px solid var(--edge); border-radius:12px; overflow:hidden; }
+.sw .chip { height:52px; }
+.sw .meta { padding:.55rem .7rem; }
+.sw code { font-size:.75rem; color:var(--fg); display:block; }
+.sw .role { font-size:.72rem; color:var(--dim); margin-top:.15rem; }
+
+/* 字阶 */
+.type-row { display:flex; align-items:baseline; gap:1rem; padding:.55rem 0; border-bottom:1px solid var(--edge); }
+.type-row:last-child { border-bottom:0; }
+.type-row .lbl { flex:none; width:130px; color:var(--dim); font-size:.75rem; }
+.type-row .demo { min-width:0; }
+
+/* 按钮 */
+.btns { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+.btn { border:1px solid var(--edge); border-radius:10px; padding:.42rem .85rem; font-size:.8rem;
+       color:var(--fg); background:transparent; cursor:pointer; font-family:inherit; }
+.btn:hover { background:var(--card2); }
+.btn.pri { background:var(--acc); border-color:var(--acc); color:var(--on-acc); font-weight:600; }
+.btn.play { background:var(--ok); border-color:var(--ok); color:var(--on-acc); font-weight:600; }
+
+/* 标签 / 筛选 */
+.tags { }
+.tag { display:inline-block; background:var(--tagbg); border:1px solid var(--edge); color:var(--acc);
+       padding:2px 10px; border-radius:14px; font-size:.72rem; margin:2px 4px 2px 0; }
+.langs { display:flex; gap:.4rem; flex-wrap:wrap; }
+.lang { border:1px solid var(--edge); color:var(--dim); background:transparent; border-radius:16px;
+        padding:.18rem .7rem; font-size:.74rem; cursor:pointer; font-family:inherit; }
+.lang.on { border-color:var(--acc); color:var(--acc); }
+
+/* 侧栏项演示 */
+.side-demo { background:var(--sidebar); border:1px solid var(--edge); border-radius:12px; padding:12px; max-width:280px; }
+.nav-item { display:flex; align-items:center; gap:.6rem; padding:.55rem .7rem; border-radius:10px;
+            color:var(--dim); font-size:.88rem; }
+.nav-item .ic { width:1.1rem; text-align:center; }
+.nav-item:hover { background:var(--card); color:var(--fg); }
+.nav-item.on { background:var(--card); color:var(--fg); }
+.side-repo { padding:.45rem .7rem; border-radius:8px; font-size:.8rem; color:var(--dim);
+             white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.side-repo:hover { background:var(--card); color:var(--fg); }
+.nav-sec { display:flex; align-items:center; justify-content:space-between; gap:.5rem; color:var(--dim);
+           font-size:.7rem; padding:.9rem .7rem .3rem; letter-spacing:.05em; }
+.nav-sec a { color:var(--dim); letter-spacing:0; }
+.nav-sec a:hover { color:var(--acc); text-decoration:none; }
+.side-foot { border-top:1px solid var(--edge); padding-top:.7rem; margin-top:.4rem; font-size:.75rem; }
+.side-foot a { color:var(--dim); display:flex; gap:.5rem; padding:.35rem .6rem; border-radius:8px; }
+.side-foot a:hover { background:var(--card); color:var(--fg); text-decoration:none; }
+.flinks { display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin-top:.55rem; font-size:.76rem; }
+
+/* 语言色点 */
+.dots { display:flex; gap:.9rem; flex-wrap:wrap; font-size:.78rem; color:var(--dim); align-items:center; }
+.dot { width:.6rem; height:.6rem; border-radius:50%; display:inline-block; margin-right:.3rem; }
+
+/* 间距刻度 */
+.scale { display:flex; align-items:flex-end; gap:.6rem; flex-wrap:wrap; }
+.scale .bar { background:var(--acc); border-radius:3px 3px 0 0; width:16px; }
+.scale .lb { font-size:.7rem; color:var(--dim); text-align:center; width:16px; }
+
+/* Do / Don't */
+.dd { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:.8rem; }
+.dd .do, .dd .dont { border:1px solid var(--edge); border-radius:12px; padding:.9rem 1.05rem; background:var(--card); }
+.dd h3 { font-size:.85rem; font-weight:600; margin-bottom:.5rem; }
+.dd .do h3 { color:var(--ok); }
+.dd .dont h3 { color:#f85149; }
+.dd ul { margin:0; padding-left:1.1rem; }
+.dd li { font-size:.8rem; color:var(--dim); margin-bottom:.3rem; line-height:1.55; }
+.dd code { font-size:.75rem; color:var(--fg); }
+
+table { width:100%; border-collapse:collapse; font-size:.8rem; }
+th, td { text-align:left; padding:.45rem .6rem; border-bottom:1px solid var(--edge); }
+th { color:var(--dim); font-weight:400; font-size:.74rem; }
+td code { font-size:.75rem; }
+
+footer { color:var(--dim); font-size:.76rem; margin-top:2.4rem; line-height:1.7;
+         border-top:1px solid var(--edge); padding-top:1rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>设计系统 · lilyco-42</h1>
+  <div class="tagline">
+    本页是 <a href="https://github.com/lilyco-42/lilyco-42.github.io/blob/HEAD/DESIGN.md">DESIGN.md</a>
+    的可视化版本 —— 规范以那份文件为准，本页只做展示。 ·
+    <a href="./">← 回仪表盘</a>
+  </div>
+</header>
+
+<h2><span class="n">01</span>视觉主题</h2>
+<p class="note">
+  像 ChatGPT / Kimi 的深色工作台：左侧固定导航，右侧单列内容。工具感、可信、低噪音。
+  本页会跟随你的系统主题 —— 切到浅色模式可看到浅色版本（<code>prefers-color-scheme</code>）。
+</p>
+<div class="dd">
+  <div class="do"><h3>气质</h3><ul>
+    <li>密度中等：卡片间距 <code>.9rem</code>，正文行高 <code>1.65</code></li>
+    <li>动效极少：只有侧栏抽屉有 <code>transform .2s</code></li>
+    <li>无插画、无渐变滥用、无糖果色大圆角</li>
+  </ul></div>
+  <div class="do"><h3>三条哲学（冲突时按序）</h3><ul>
+    <li><b>内容 &gt; 容器</b> —— 卡片只分组，不装饰</li>
+    <li><b><code>--acc</code> 是唯一强调色</b> —— 只给可点击元素与 <code>.tag</code> 标签</li>
+    <li><b>一个视图一件事</b> —— 不堆叠信息</li>
+  </ul></div>
+</div>
+
+<h2><span class="n">02</span>色板与角色</h2>
+<p class="note">Dark 是默认（<code>:root</code>）；Light 由 <code>prefers-color-scheme: light</code> 覆盖同一批变量。组件里不写死颜色。</p>
+<div class="swatches">
+  <div class="sw"><div class="chip" style="background:#171717"></div><div class="meta"><code>--sidebar</code><div class="role">侧栏底 · #171717 / #f7f7f7</div></div></div>
+  <div class="sw"><div class="chip" style="background:#212121"></div><div class="meta"><code>--main</code><div class="role">主内容底 · #212121 / #ffffff</div></div></div>
+  <div class="sw"><div class="chip" style="background:#2f2f2f"></div><div class="meta"><code>--card</code><div class="role">卡片 / 输入框 · #2f2f2f / #f2f2f2</div></div></div>
+  <div class="sw"><div class="chip" style="background:#383838"></div><div class="meta"><code>--card2</code><div class="role">hover 加深 · #383838 / #e8e8e8</div></div></div>
+  <div class="sw"><div class="chip" style="background:#ececec"></div><div class="meta"><code>--fg</code><div class="role">正文 / 标题 · #ececec / #1f1f1f</div></div></div>
+  <div class="sw"><div class="chip" style="background:#a3a3a3"></div><div class="meta"><code>--dim</code><div class="role">次要文字 · #a3a3a3 / #5c5c5c</div></div></div>
+  <div class="sw"><div class="chip" style="background:#58a6ff"></div><div class="meta"><code>--acc</code><div class="role"><b>唯一强调色</b> · #58a6ff / #0969da</div></div></div>
+  <div class="sw"><div class="chip" style="background:#3fb950"></div><div class="meta"><code>--ok</code><div class="role">可玩 / 可用 · #3fb950 / #1a7f37</div></div></div>
+  <div class="sw"><div class="chip" style="background:#ffffff1a;border-bottom:1px solid var(--edge)"></div><div class="meta"><code>--edge</code><div class="role">描边 / 分隔 · #ffffff1a / #00000014</div></div></div>
+  <div class="sw"><div class="chip" style="background:#0d1117;border-bottom:1px solid var(--edge)"></div><div class="meta"><code>--on-acc</code><div class="role">实底按钮上的字色 · #0d1117 / #ffffff</div></div></div>
+</div>
+
+<h2><span class="n">03</span>字阶</h2>
+<p class="note">字体栈 <code>"Segoe UI","Noto Sans SC",system-ui,sans-serif</code> —— <b>零 webfont 请求</b>。字重只用 400 与 600。</p>
+<div class="card">
+  <div class="type-row"><div class="lbl">h1 · 1.45rem / 600</div><div class="demo" style="font-size:1.45rem;font-weight:600">精选项目</div></div>
+  <div class="type-row"><div class="lbl">h2 · 1.08rem / 600</div><div class="demo" style="font-size:1.08rem;font-weight:600">dsh-termux</div></div>
+  <div class="type-row"><div class="lbl">.sec-title · .95rem / 600</div><div class="demo" style="font-size:.95rem;font-weight:600">本站应用</div></div>
+  <div class="type-row"><div class="lbl">h3 · .9rem / 600</div><div class="demo" style="font-size:.9rem;font-weight:600">wasm-pixel-kernels</div></div>
+  <div class="type-row"><div class="lbl">.tagline · .9rem / 400</div><div class="demo" style="font-size:.9rem;color:var(--dim)">让人类远离计算机，AI 可做任何事</div></div>
+  <div class="type-row"><div class="lbl">p · .87rem / 1.65</div><div class="demo" style="font-size:.87rem;color:var(--dim);line-height:1.65">在 Termux 上一键装好 DeepSeek DSH CLI —— 顺手修掉 7 个让它在 Android 跑不起来的兼容问题，装完即用。</div></div>
+  <div class="type-row"><div class="lbl">.meta · .72rem / 400</div><div class="demo" style="font-size:.72rem;color:var(--dim)">Rust · ★ 18 · push 2026-09-23</div></div>
+</div>
+
+<h2><span class="n">04</span>组件</h2>
+
+<p class="note">按钮 —— <code>.btn</code> 次要 / <code>.btn.pri</code> 主要动作 / <code>.btn.play</code> 可玩（链接文字含「玩」时自动套用）</p>
+<div class="card">
+  <div class="btns">
+    <button class="btn">次要</button>
+    <button class="btn pri">GitHub →</button>
+    <button class="btn play">立即游玩</button>
+    <button class="btn" disabled style="opacity:.45;cursor:not-allowed">禁用</button>
+  </div>
+</div>
+
+<p class="note">标签与筛选 —— 标签<b>非交互</b>；筛选胶囊有 <code>.on</code> 选中态</p>
+<div class="card">
+  <div class="tags"><span class="tag">Termux</span><span class="tag">Android</span><span class="tag">DeepSeek DSH</span></div>
+  <div class="langs" style="margin-top:.8rem">
+    <button class="lang on">全部</button><button class="lang">Rust</button>
+    <button class="lang">Python</button><button class="lang">C++</button><button class="lang">Zig</button>
+  </div>
+</div>
+
+<p class="note">内容卡片 <code>.hcard</code> —— 34px 圆角 logo + 标题 + 标签 + 正文 + 按钮行</p>
+<div class="card">
+  <div style="display:flex;gap:.7rem;align-items:flex-start;margin-bottom:.7rem">
+    <img src="assets/logos/dsh-termux.svg" alt="dsh-termux" width="34" height="34" style="width:34px;height:34px;border-radius:9px;flex:none;display:block">
+    <div style="min-width:0">
+      <h2 style="font-size:1.08rem;margin:0 0 .4rem"><a href="https://github.com/lilyco-42/dsh-termux" style="color:var(--fg)">dsh-termux</a></h2>
+      <div class="tags"><span class="tag">Termux</span><span class="tag">Android</span></div>
+    </div>
+  </div>
+  <p style="color:var(--dim);font-size:.87rem;line-height:1.65;margin-bottom:.65rem">在 Termux 上一键装好 DeepSeek DSH CLI —— 顺手修掉 7 个让它在 Android 跑不起来的兼容问题，装完即用。</p>
+  <div class="btns"><a class="btn pri" href="https://github.com/lilyco-42/dsh-termux" target="_blank" rel="noopener">GitHub →</a></div>
+</div>
+
+<p class="note">仓库卡片 <code>.rcard</code> 网格 <code>minmax(290px,1fr)</code> —— 底部一行：语言色点 + ★ + push 日期</p>
+<div class="grid">
+  <div class="rcard">
+    <h3 style="font-size:.9rem;margin-bottom:.3rem"><a href="https://github.com/lilyco-42/lilyco" style="color:var(--fg)">lilyco</a></h3>
+    <p style="color:var(--dim);font-size:.79rem;line-height:1.5;margin-bottom:.5rem;min-height:2.2em">一个 struct 生成 CLI/TUI/Web/MCP，天然可被 Agent 调用。</p>
+    <div style="display:flex;gap:.7rem;align-items:center;font-size:.72rem;color:var(--dim)"><span><span class="dot" style="background:#dea584"></span>Rust</span><span>★ 6</span><span>push 2026-09-23</span></div>
+  </div>
+  <div class="rcard">
+    <h3 style="font-size:.9rem;margin-bottom:.3rem"><a href="https://github.com/lilyco-42/rembg-ui" style="color:var(--fg)">rembg-ui</a></h3>
+    <p style="color:var(--dim);font-size:.79rem;line-height:1.5;margin-bottom:.5rem;min-height:2.2em">图片留在设备处理，手机可安装 PWA；Android 10+ 原生端支持批量抠图。</p>
+    <div style="display:flex;gap:.7rem;align-items:center;font-size:.72rem;color:var(--dim)"><span><span class="dot" style="background:#f1e05a"></span>JavaScript</span><span>★ 7</span><span>push 2026-09-23</span></div>
+  </div>
+</div>
+
+<p class="note">应用磁贴 <code>.sapp</code> 网格 <code>minmax(170px,1fr)</code></p>
+<div class="subapps">
+  <a class="sapp" href="rembg/"><img class="slogo" src="assets/logos/rembg-ui.svg" alt="" width="26" height="26"><span><b>Rembg Studio</b><div class="d">浏览器本地抠图 · WASM</div></span></a>
+  <a class="sapp" href="pet/"><img class="slogo" src="assets/logos/cute-pet.svg" alt="" width="26" height="26"><span><b>丛雨桌宠</b><div class="d">WASM 桌宠 · 即开即玩</div></span></a>
+  <a class="sapp" href="lyco/"><img class="slogo" src="assets/logos/lyco-tools.svg" alt="" width="26" height="26"><span><b>WASM 工具套件</b><div class="d">10 个浏览器内工具</div></span></a>
+</div>
+
+<p class="note">侧栏项 —— 默认 <code>--dim</code>，hover / 选中转 <code>--fg</code> + <code>--card</code> 底</p>
+<div class="side-demo">
+  <div class="nav-item"><span class="ic">★</span> 精选项目</div>
+  <div class="nav-item on"><span class="ic">◈</span> 本站应用</div>
+  <div class="nav-item"><span class="ic">◎</span> 研究 / 预研</div>
+  <div class="nav-item"><span class="ic">▤</span> 全部仓库</div>
+  <div class="nav-sec"><span>快速入门</span><a href="guide.html">全部 →</a></div>
+  <div class="side-repo" role="button" tabindex="0">lilyco</div>
+  <div class="side-repo" role="button" tabindex="0">webview-mini</div>
+  <div class="side-foot">
+    <a href="https://github.com/lilyco-42/lystack"><span class="ic">🗂</span> lystack 主仓</a>
+    <a href="design.html"><span class="ic">🎨</span> 设计规范</a>
+  </div>
+</div>
+
+<p class="note">页脚 —— 一行说明 + 一组 <code>.flinks</code>（<code>flex-wrap</code>，永不溢出）</p>
+<div class="card" style="padding:1rem 1.3rem">
+  <div style="color:var(--dim);font-size:.76rem"><b style="color:var(--fg)">lilyco-42</b> · 让人类远离计算机，AI 可做任何事。</div>
+  <div class="flinks"><a href="#">设计规范</a><a href="#">快速入门</a><a href="#">仓库说明</a><a href="#">更新日志</a><a href="#">GitHub</a></div>
+</div>
+
+<h2><span class="n">05</span>布局刻度</h2>
+<p class="note">侧栏 <code>264px</code> 固定 · 内容 <code>max-width 860px</code> 居中 · 卡片网格 <code>minmax(290px,1fr)</code> · 只有 <code>main</code> 滚动</p>
+<div class="card">
+  <div class="scale">
+    <div><div class="bar" style="height:2px"></div><div class="lb">.2</div></div>
+    <div><div class="bar" style="height:3px"></div><div class="lb">.3</div></div>
+    <div><div class="bar" style="height:4px"></div><div class="lb">.4</div></div>
+    <div><div class="bar" style="height:5px"></div><div class="lb">.5</div></div>
+    <div><div class="bar" style="height:6px"></div><div class="lb">.6</div></div>
+    <div><div class="bar" style="height:7px"></div><div class="lb">.7</div></div>
+    <div><div class="bar" style="height:8px"></div><div class="lb">.8</div></div>
+    <div><div class="bar" style="height:9px"></div><div class="lb">.9</div></div>
+    <div><div class="bar" style="height:10px"></div><div class="lb">1</div></div>
+    <div><div class="bar" style="height:12px"></div><div class="lb">1.2</div></div>
+    <div><div class="bar" style="height:13px"></div><div class="lb">1.3</div></div>
+    <div><div class="bar" style="height:16px"></div><div class="lb">1.6</div></div>
+    <div><div class="bar" style="height:20px"></div><div class="lb">2</div></div>
+    <div><div class="bar" style="height:24px"></div><div class="lb">2.4</div></div>
+    <div><div class="bar" style="height:30px"></div><div class="lb">3</div></div>
+  </div>
+  <p class="note" style="margin:.9rem 0 0">全部用 <code>rem</code> 而非 <code>px</code> —— 跟随用户字号设置，这是无障碍的一部分。</p>
+</div>
+
+<h2><span class="n">06</span>层次：不用阴影</h2>
+<p class="note">层次靠<b>背景色阶</b>（3 层）+ <b>1px 描边</b> 表达。禁止 <code>box-shadow</code> / 玻璃模糊 —— 深色下阴影几乎不可见，只增加噪音。</p>
+<table>
+  <tr><th>层级</th><th>表面</th><th>表达</th></tr>
+  <tr><td>0 导航</td><td><code>--sidebar</code></td><td>最暗，靠右描边与主区分离</td></tr>
+  <tr><td>1 画布</td><td><code>--main</code></td><td>基础底</td></tr>
+  <tr><td>2 内容</td><td><code>--card</code> + <code>--edge</code></td><td>卡片</td></tr>
+  <tr><td>3 反馈</td><td><code>--card2</code></td><td>hover 加深</td></tr>
+</table>
+
+<h2><span class="n">07</span>Do / Don't</h2>
+<div class="dd">
+  <div class="do"><h3>Do</h3><ul>
+    <li>颜色一律走 token：<code>var(--acc)</code></li>
+    <li>外部链接加 <code>target="_blank" rel="noopener"</code></li>
+    <li>站内相对链接<b>相对文件所在目录</b>写</li>
+    <li>图片带 <code>width</code>/<code>height</code> 与 <code>alt</code></li>
+    <li>空态 / 错误态写中文人话</li>
+    <li>新 logo 沿用「圆角矩形 + 两字母缩写」</li>
+    <li>点击目标补 <code>role="button"</code> + <code>tabindex="0"</code> + Enter/Space</li>
+    <li><code>&lt;head&gt;</code> 带 <code>color-scheme</code> / <code>description</code> / favicon</li>
+  </ul></div>
+  <div class="dont"><h3>Don't</h3><ul>
+    <li>不要把 <code>--acc</code> 用在既非交互、也非标签的文字上</li>
+    <li>不要引入 webfont / CDN（页面零外部请求）</li>
+    <li>不要用 <code>box-shadow</code> 做层次</li>
+    <li>不要给卡片加大圆角（&gt;14px）或彩色边框</li>
+    <li>不要在页面里写死会过期的数字</li>
+    <li>不要把 <code>div</code> 当按钮用而不给键盘支持</li>
+    <li>不要写死只在深色下成立的透明色（走 token）</li>
+  </ul></div>
+</div>
+
+<h2><span class="n">08</span>响应式</h2>
+<p class="note">唯一断点 <code>860px</code>。≤860px 时侧栏变抽屉（<code>translateX(-100%)</code>），汉堡按钮出现，触摸目标 ≥44px。</p>
+<table>
+  <tr><th>宽度</th><th>行为</th></tr>
+  <tr><td>&gt; 860px</td><td>侧栏常驻左侧 264px；内容区居中 860px</td></tr>
+  <tr><td>≤ 860px</td><td>侧栏固定定位移出屏幕；汉堡按钮出现；主区 padding 收窄至 <code>1.2rem 1.1rem 2rem</code></td></tr>
+</table>
+<p class="note" style="margin-top:.9rem">同时必须尊重两个偏好：<code>prefers-reduced-motion</code>（取消动效）与 <code>prefers-color-scheme</code>（切换主题）。</p>
+<p class="note">键盘焦点必须可见：全局 <code>:focus-visible { outline:2px solid var(--acc) }</code> —— 不要用 <code>outline:none</code> 抹掉。</p>
+<p class="note">移动端触摸目标：<code>.nav-item</code> 44px · <code>.side-repo</code> / <code>.side-foot a</code> 40px · <code>.lang</code> 34px。</p>
+
+<h2><span class="n">09</span>给 AI agent 的提示词</h2>
+<div class="card">
+  <p style="font-size:.85rem;color:var(--dim);line-height:1.7">
+    在 <code>lilyco-42.github.io</code> 里新增一个页面。严格遵守 <code>DESIGN.md</code>：
+    用 <code>:root</code> 里的 CSS 变量，不硬编码颜色；卡片用 <code>--card</code> 底 +
+    <code>1px var(--edge)</code> 描边 + 12~14px 圆角；不加 <code>box-shadow</code>；
+    <code>--acc</code> 只用于可点击元素与 <code>.tag</code>；正文行高 ≥1.5；中文文案；支持
+    <code>prefers-color-scheme: light</code> 与 <code>prefers-reduced-motion</code>；
+    移动端（≤860px）触摸目标 ≥44px；页面零外部请求；
+    <code>&lt;head&gt;</code> 带 <code>color-scheme</code> / <code>description</code> / favicon；
+    非 <code>&lt;a&gt;</code>/<code>&lt;button&gt;</code> 的点击目标补 <code>role="button"</code> + <code>tabindex="0"</code> + Enter/Space。
+  </p>
+</div>
+
+<h2><span class="n">10</span>已修正 / 仍存在的偏差</h2>
+<p class="note">本页描述<b>现状</b>，不是理想态。完整版见 DESIGN.md §10。</p>
+<table>
+  <tr><th>项</th><th>状态</th></tr>
+  <tr><td>侧栏「快速入门」列 15 项，但只有 8 篇 guide</td><td>已修正 —— 改为从卡片自带的 <code>guide.html?name=</code> 链接推导，正好 8 项</td></tr>
+  <tr><td>导航项 Tab 键够不到</td><td>已修正 —— <code>role="button"</code> + <code>tabindex="0"</code> + Enter/Space + <code>aria-current</code></td></tr>
+  <tr><td>浅色下标签底色 / 按钮字色写死</td><td>已修正 —— 新增 <code>--tagbg</code> / <code>--on-acc</code> 两个 token</td></tr>
+  <tr><td>焦点不可见、未响应 <code>prefers-reduced-motion</code></td><td>已修正</td></tr>
+  <tr><td>移动端触摸目标 &lt; 44px</td><td>已修正 —— ≤860px 下 34–44px</td></tr>
+  <tr><td>页面间无互链、<code>footer</code> 样式是死代码</td><td>已修正 —— 补上真实页脚并互链</td></tr>
+  <tr><td><code>guide.html</code> 与仪表盘色值不统一</td><td><b>仍存在</b>（<code>#0d1117</code> vs <code>#212121</code>）—— 统一等于一次可见重配色，未做</td></tr>
+  <tr><td>精选项目不按星数排序</td><td><b>刻意如此</b> —— 15 项里 8 项是 0 星，按星数排等于让尾部随机</td></tr>
+</table>
+
+<footer>
+  规范正文：<a href="https://github.com/lilyco-42/lilyco-42.github.io/blob/HEAD/DESIGN.md">DESIGN.md</a>
+  · 格式参考 <a href="https://github.com/voltagent/awesome-design-md" target="_blank" rel="noopener">awesome-design-md</a>
+  · 本页零外部请求，跟随系统主题 ·
+  <a href="./">← 回仪表盘</a>
+</footer>
+
+</div>
+</body>
+</html>

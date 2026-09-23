@@ -3,11 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="lilyco-42 项目仪表盘：AI 优先的 Rust 框架 lilyco、浏览器内 WASM 应用、Windows 桌面工具，以及逐条可核验的预研记录。">
+<link rel="icon" href="assets/logos/brand.svg" type="image/svg+xml">
 <title>lilyco-42 —— 项目仪表盘</title>
 <style>
 :root {
   --sidebar:#171717; --main:#212121; --card:#2f2f2f; --card2:#383838;
   --edge:#ffffff1a; --fg:#ececec; --dim:#a3a3a3; --acc:#58a6ff; --ok:#3fb950;
+  --on-acc:#0d1117; --tagbg:#ffffff0d;
+}
+@media (prefers-color-scheme: light) {
+  :root { --sidebar:#f7f7f7; --main:#ffffff; --card:#f2f2f2; --card2:#e8e8e8;
+          --edge:#00000014; --fg:#1f1f1f; --dim:#5c5c5c; --acc:#0969da; --ok:#1a7f37;
+          --on-acc:#ffffff; --tagbg:#0000000a; }
 }
 * { box-sizing:border-box; margin:0; }
 html, body { height:100%; }
@@ -15,6 +24,8 @@ body { display:flex; background:var(--main); color:var(--fg); font-family:"Segoe
 a { color:var(--acc); text-decoration:none; }
 a:hover { text-decoration:underline; }
 button { font-family:inherit; }
+:focus-visible { outline:2px solid var(--acc); outline-offset:2px; border-radius:6px; }
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }
 
 /* ── 侧边栏 (ChatGPT/Kimi 布局) ── */
 .sidebar { width:264px; min-width:264px; background:var(--sidebar); border-right:1px solid var(--edge); display:flex; flex-direction:column; padding:12px; gap:4px; }
@@ -24,7 +35,9 @@ button { font-family:inherit; }
 .nav-item:hover { background:var(--card); color:var(--fg); }
 .nav-item.on { background:var(--card); color:var(--fg); }
 .nav-item .ic { width:1.1rem; text-align:center; }
-.nav-sec { color:var(--dim); font-size:.7rem; padding:.9rem .7rem .3rem; letter-spacing:.05em; }
+.nav-sec { display:flex; align-items:center; justify-content:space-between; gap:.5rem; color:var(--dim); font-size:.7rem; padding:.9rem .7rem .3rem; letter-spacing:.05em; }
+.nav-sec a { color:var(--dim); letter-spacing:0; }
+.nav-sec a:hover { color:var(--acc); text-decoration:none; }
 .side-search { background:var(--card); border:1px solid transparent; border-radius:10px; color:var(--fg); padding:.5rem .7rem; font-size:.83rem; outline:none; width:100%; }
 .side-search:focus { border-color:var(--acc); }
 .side-repos { flex:1; overflow-y:auto; margin-top:.3rem; }
@@ -52,12 +65,12 @@ h1 { font-size:1.45rem; font-weight:600; }
 .hcard h2 a { color:var(--fg); }
 .hcard p { color:var(--dim); font-size:.87rem; line-height:1.65; margin-bottom:.65rem; }
 .tags { margin-bottom:0; }
-.tag { display:inline-block; background:#ffffff0d; border:1px solid var(--edge); color:var(--acc); padding:2px 10px; border-radius:14px; font-size:.72rem; margin:2px 4px 2px 0; }
+.tag { display:inline-block; background:var(--tagbg); border:1px solid var(--edge); color:var(--acc); padding:2px 10px; border-radius:14px; font-size:.72rem; margin:2px 4px 2px 0; }
 .btns { display:flex; gap:.5rem; flex-wrap:wrap; }
 .btn { border:1px solid var(--edge); border-radius:10px; padding:.42rem .85rem; font-size:.8rem; color:var(--fg); background:transparent; cursor:pointer; }
 .btn:hover { background:var(--card2); }
-.btn.pri { background:var(--acc); border-color:var(--acc); color:#0d1117; font-weight:600; }
-.btn.play { background:var(--ok); border-color:var(--ok); color:#0d1117; font-weight:600; }
+.btn.pri { background:var(--acc); border-color:var(--acc); color:var(--on-acc); font-weight:600; }
+.btn.play { background:var(--ok); border-color:var(--ok); color:var(--on-acc); font-weight:600; }
 .sec-title { font-size:.95rem; font-weight:600; margin:1.6rem 0 .8rem; }
 .subapps { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:.7rem; }
 .sapp { background:var(--card); border:1px solid var(--edge); border-radius:12px; padding:.85rem 1rem; color:var(--fg); display:flex; gap:.65rem; align-items:center; }
@@ -78,31 +91,38 @@ h1 { font-size:1.45rem; font-weight:600; }
 .lang.on { border-color:var(--acc); color:var(--acc); }
 .empty { color:var(--dim); padding:1rem; font-size:.85rem; }
 footer { color:var(--dim); font-size:.76rem; margin-top:2rem; line-height:1.7; border-top:1px solid var(--edge); padding-top:1rem; }
+footer .flinks { display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin-top:.55rem; }
 
 @media (max-width: 860px) {
   .sidebar { position:fixed; left:0; top:0; bottom:0; z-index:10; transform:translateX(-100%); transition:transform .2s; }
   .sidebar.open { transform:translateX(0); }
-  .burger-btn { display:block; }
+  .burger-btn { display:block; padding:.5rem .75rem; }
   .main { padding:1.2rem 1.1rem 2rem; }
+  /* 触摸目标不小于 40-44px，手指才点得中 */
+  .nav-item { min-height:44px; }
+  .side-repo { min-height:40px; display:flex; align-items:center; }
+  .side-foot a { min-height:40px; align-items:center; }
+  .lang { min-height:34px; padding:.35rem .8rem; }
 }
 </style>
 </head>
 <body>
 
-<aside class="sidebar" id="sidebar">
+<nav class="sidebar" id="sidebar" aria-label="主导航">
   <div class="logo"><img class="avatar" src="assets/logos/brand.svg" alt="lilyco-42" width="28" height="28"> lilyco-42</div>
-  <input class="side-search" id="q" placeholder="搜索仓库…">
+  <input class="side-search" id="q" type="search" autocomplete="off" aria-label="搜索仓库" placeholder="搜索仓库…">
   <div class="nav-item on" data-view="featured"><span class="ic">★</span> 精选项目</div>
   <div class="nav-item" data-view="apps"><span class="ic">◈</span> 本站应用</div>
   <div class="nav-item" data-view="research"><span class="ic">◎</span> 研究 / 预研</div>
   <div class="nav-item" data-view="repos"><span class="ic">▤</span> 全部仓库</div>
-  <div class="nav-sec">快速入门</div>
+  <div class="nav-sec"><span>快速入门</span><a href="guide.html">全部 →</a></div>
   <div class="side-repos" id="side-guides"></div>
   <div class="side-foot">
     <a href="https://lilyco-42.github.io/mpkg-registry/" target="_blank"><span class="ic">📦</span> 记忆包市场</a>
     <a href="https://github.com/lilyco-42/lystack"><span class="ic">🗂</span> lystack 主仓</a>
+    <a href="design.html"><span class="ic">🎨</span> 设计规范</a>
   </div>
-</aside>
+</nav>
 
 <main class="main">
   <div class="main-inner">
@@ -123,6 +143,17 @@ footer { color:var(--dim); font-size:.76rem; margin-top:2rem; line-height:1.7; b
       <div class="langs" id="langs"></div>
       <div class="grid" id="repos"><div class="empty">加载 GitHub 仓库…</div></div>
     </div>
+
+    <footer>
+      <div><b>lilyco-42</b> · 让人类远离计算机，AI 可做任何事。</div>
+      <div class="flinks">
+        <a href="design.html">设计规范</a>
+        <a href="guide.html">快速入门</a>
+        <a href="README.md">仓库说明</a>
+        <a href="https://github.com/lilyco-42/lilyco-42.github.io/commits" target="_blank" rel="noopener">更新日志</a>
+        <a href="https://github.com/lilyco-42/lilyco-42.github.io" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </footer>
   </div>
 </main>
 
@@ -191,8 +222,13 @@ function switchView(v) {
   document.querySelectorAll(".view").forEach(function (x) { x.classList.remove("on"); });
   document.getElementById("v-" + v).classList.add("on");
   document.getElementById("view-title").textContent = TITLES[v];
-  document.querySelectorAll(".nav-item").forEach(function (x) { x.classList.toggle("on", x.dataset.view === v); });
+  document.querySelectorAll(".nav-item").forEach(function (x) {
+    var on = x.dataset.view === v;
+    x.classList.toggle("on", on);
+    if (on) { x.setAttribute("aria-current", "true"); } else { x.removeAttribute("aria-current"); }
+  });
   document.getElementById("sidebar").classList.remove("open");
+  document.querySelector(".main").scrollTop = 0;
   if (v === "repos") renderRepos();   // 切到仓库视图时刷新计数
 }
 
@@ -204,7 +240,7 @@ function renderFeatured() {
       '<p>' + f.blurb + '</p>' +
       '<div class="btns">' + f.links.map(function (l, i) {
         const cls = i === 0 ? 'btn pri' : (l[0].indexOf("玩") >= 0 ? 'btn play' : 'btn');
-        return '<a class="' + cls + '" href="' + l[1] + '"' + (l[1][0] === "/" ? '' : ' target="_blank"') + '>' + l[0] + '</a>';
+        return '<a class="' + cls + '" href="' + l[1] + '"' + (l[1][0] === "/" ? '' : ' target="_blank" rel="noopener"') + '>' + l[0] + '</a>';
       }).join("") + '</div></div>';
   }).join("");
 }
@@ -227,9 +263,9 @@ function renderResearch() {
     '<div class="empty" style="padding:0 0 1rem">每个仓都是 <b>preflight 输出，不是实现</b>：先给出可审计的数字、写清做不到的边界，再决定要不要动手。</div>' +
     RESEARCH.map(function (r) {
       return '<div class="hcard"><div class="hhead"><img class="hlogo" src="assets/logos/' + r.name + '.svg" alt="' + r.name + ' logo" width="34" height="34">' +
-        '<div class="hbody"><h2><a href="https://github.com/lilyco-42/' + r.name + '" target="_blank">' + r.name + '</a></h2>' +
+        '<div class="hbody"><h2><a href="https://github.com/lilyco-42/' + r.name + '" target="_blank" rel="noopener">' + r.name + '</a></h2>' +
         '<div class="tags"><span class="tag">' + r.tag + '</span></div></div></div>' +
-        '<p>' + r.blurb + '</p><div class="btns"><a class="btn pri" href="https://github.com/lilyco-42/' + r.name + '" target="_blank">GitHub →</a></div></div>';
+        '<p>' + r.blurb + '</p><div class="btns"><a class="btn pri" href="https://github.com/lilyco-42/' + r.name + '" target="_blank" rel="noopener">GitHub →</a></div></div>';
     }).join("");
 }
 
@@ -283,23 +319,33 @@ function renderRepos() {
   if (!items.length) { grid.innerHTML = '<div class="empty">无匹配仓库</div>'; return; }
   grid.innerHTML = items.map(function (r) {
     const c = LANGC[r.language] || "#8b949e";
-    return '<div class="rcard"><h3><a href="' + r.html_url + '" target="_blank">' + r.name + '</a></h3>' +
+    return '<div class="rcard"><h3><a href="' + r.html_url + '" target="_blank" rel="noopener">' + r.name + '</a></h3>' +
       '<p>' + (r.description || "（无描述）") + '</p>' +
       '<div class="meta"><span><span class="dot" style="background:' + c + '"></span>' + (r.language || "-") + '</span>' +
       '<span>★ ' + r.stargazers_count + '</span><span>push ' + (r.pushed_at || "").slice(0, 10) + '</span></div></div>';
   }).join("");
 }
 
+// 侧栏列表直接从精选卡片自己的「快速入门」链接推导 —— 卡上有入口才列进侧栏，
+// 不会再出现「侧栏有、点进去却没有这一篇」的情况。
 function renderSideGuides() {
-  document.getElementById("side-guides").innerHTML = Object.keys(FEATURED.reduce(function (o, f) {
-    o[f.name] = 1; return o;
-  }, {})).map(function (n) {
-    return '<div class="side-repo" onclick="location=\'guide.html?name=' + n + '\'">' + n + '</div>';
+  var withGuide = FEATURED.filter(function (f) {
+    return f.links.some(function (l) { return l[1].indexOf("guide.html?name=") === 0; });
+  });
+  document.getElementById("side-guides").innerHTML = withGuide.map(function (f) {
+    return '<div class="side-repo" role="button" tabindex="0" onclick="location=\'guide.html?name=' + f.name + '\'">' + f.name + '</div>';
   }).join("");
 }
 
 document.querySelectorAll(".nav-item").forEach(function (el) {
+  el.setAttribute("role", "button");
+  el.setAttribute("tabindex", "0");
   el.addEventListener("click", function () { switchView(el.dataset.view); });
+  el.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+      e.preventDefault(); switchView(el.dataset.view);
+    }
+  });
 });
 document.getElementById("burger").addEventListener("click", function () {
   document.getElementById("sidebar").classList.toggle("open");
@@ -313,6 +359,7 @@ document.getElementById("q").addEventListener("input", function (e) {
 renderFeatured();
 renderApps();
 renderResearch();
+renderSideGuides();
 loadRepos();
 </script>
 </body>

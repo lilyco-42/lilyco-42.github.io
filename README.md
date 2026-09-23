@@ -8,6 +8,8 @@
 | 路径 | 项目 | 说明 |
 |---|---|---|
 | `/` | 首页 Dashboard | `index.html`；卡片由 JS 动态渲染 |
+| `/design.html` | **设计规范（可视化）** | `DESIGN.md` 的可视化版：色板 / 字阶 / 组件 / 布局刻度 / Do-Don't |
+| `/DESIGN.md` | **设计系统（给 agent 读）** | 纯 markdown 规范 —— 改本仓 UI 前先读它 |
 | `/rembg/` | Rembg Studio · 浏览器版 | 商品图抠图 PWA；源码与构建见 `rembg-ui/web` |
 | `/pet/` | 丛雨桌宠 | Rust + WASM；源码见 `cute-pet` |
 | `/tool/` | WASM 工具箱 | 把下面几个小内核汇成一个入口页 |
@@ -30,6 +32,24 @@
 > 每个子目录都是**独立可运行**的，互不依赖；`/tool/` 与 `/lyco/` 只是入口页。
 > `/lyco/` **不是** lyco-engine 的在线 demo —— 那个仓发的是原生二进制，没有网页版。
 
+## 设计系统（改样式前必读）
+
+规范正文在 [`DESIGN.md`](./DESIGN.md)，可视化版是 [`design.html`](./design.html)
+（跟随系统深/浅色，打开就能看到两套配色）。
+
+**只管三个页面**：`index.html` / `guide.html` / `design.html`。
+`/rembg/` `/pet/` `/tool/` `/wasm-demo/` `/lyco/*` 是各自独立构建的第三方应用，
+有自己的视觉，**不要**拿这份规范去「统一」它们。
+
+三条硬约束：
+
+- **颜色一律走 `:root` 的 CSS 变量**，组件里不写死十六进制（`LANGC` 语言数据色除外）。
+- **不用 `box-shadow`** —— 层次靠背景色阶（`--sidebar` / `--main` / `--card`）+ 1px `--edge` 描边。
+- **零外部请求** —— 不用 webfont、不用 CDN；图标一律 `assets/logos/*.svg`。
+
+另外必须同时支持 `prefers-color-scheme: light` 与 `prefers-reduced-motion`；
+移动端（≤860px）触摸目标 ≥40px；键盘焦点要可见。
+
 ## 如何加一个新项目（给新手，2 分钟）
 
 1. 把网页产物复制到一个新子目录（如 `/newproject/`，放 `index.html` + 资源）。
@@ -42,6 +62,9 @@
 
    要展示**本地页面**就加进 `APPS`。`FEATURED` 里**没有** `local` 字段
    —— 早期文档这么写过，实际不存在，照写不会生效。
+
+   > 动样式前先读 [`DESIGN.md`](./DESIGN.md)；改完按它 §9 的「改文件前必做」自查
+   > （`node --check` + 浏览器桩实跑 + 图标文件存在 + 链接 200）。
 3. `git add . && git commit -m "add: newproject" && git push`。GitHub Pages 自动发布。
 
 ### 关于 WASM 项目（如 /pet/）
