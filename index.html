@@ -184,6 +184,7 @@ function switchView(v) {
   document.getElementById("view-title").textContent = TITLES[v];
   document.querySelectorAll(".nav-item").forEach(function (x) { x.classList.toggle("on", x.dataset.view === v); });
   document.getElementById("sidebar").classList.remove("open");
+  if (v === "repos") renderRepos();   // 切到仓库视图时刷新计数
 }
 
 function renderFeatured() {
@@ -232,10 +233,18 @@ function renderApps() {
 async function loadRepos() {
   const headers = {};
   if (localStorage.getItem("gh_token")) headers.Authorization = "Bearer " + localStorage.getItem("gh_token");
+  // 分页拉全量：公开仓已超过 100 个，单页 per_page=100 会静默截断，
+  // 「全部仓库」就会少显示一批。循环到取完或取不满一页为止。
+  REPOS = [];
   try {
-    const r = await fetch("https://api.github.com/users/" + OWNER + "/repos?per_page=100&sort=pushed", { headers: headers });
-    REPOS = await r.json();
-  } catch (e) { REPOS = []; }
+    for (let page = 1; page <= 10; page++) {
+      const r = await fetch("https://api.github.com/users/" + OWNER + "/repos?per_page=100&sort=pushed&page=" + page, { headers: headers });
+      const batch = await r.json();
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      REPOS = REPOS.concat(batch);
+      if (batch.length < 100) break;
+    }
+  } catch (e) { /* 网络失败：保留已取到的部分，不要清空 */ }
   const langs = new Set();
   REPOS.forEach(function (r) { if (r.language) langs.add(r.language); });
   document.getElementById("langs").innerHTML =
@@ -259,6 +268,9 @@ function renderRepos() {
     if (Q && (r.name + " " + (r.description || "")).toLowerCase().indexOf(Q) < 0) return false;
     return true;
   });
+  if (document.getElementById("v-repos").classList.contains("on")) {
+    document.getElementById("view-title").textContent = "全部仓库 · " + items.length + " 个";
+  }
   if (!items.length) { grid.innerHTML = '<div class="empty">无匹配仓库</div>'; return; }
   grid.innerHTML = items.map(function (r) {
     const c = LANGC[r.language] || "#8b949e";
