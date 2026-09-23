@@ -32,9 +32,9 @@ const GUIDES = {
     "t": "lilyco —— 一个 struct 生成 CLI/TUI/Web/MCP",
     "s": "AI 优先的 Rust 框架：定义一个 struct，四个端自动生成，天然可被 Agent 调用。已发布 crates.io。",
     "steps": [
-      ["安装", "cargo add lilyco   # crates.io (core/macros/cli/tui/gui/mcp)"],
-      ["定义 struct", "use lilyco::prelude::*;\n#[derive(App)]\nstruct Hello {\n    #[arg(about = \"名字\")] name: String,\n}\nfn main() { lilyco::run::<Hello>(); }"],
-      ["四端启动", "cargo run                  # CLI\ncargo run -- --tui         # TUI\ncargo run -- --serve 8080  # Web GUI\ncargo run -- --mcp         # MCP 服务器"]
+      ["安装", "cargo add lilyco   # crates.io；一个依赖搞定四端"],
+      ["定义 struct", "use lilyco::prelude::*;\n#[derive(App)]\n#[app(run = \"run_hello\")]      // run 必填，指向业务函数\nstruct Hello {\n    /// 问谁\n    #[arg(default = \"world\")]\n    name: String,\n}\n\nfn run_hello(app: &Hello, ctx: &Context) -> Result<serde_json::Value, AppError> {\n    ctx.done(serde_json::json!({ \"hello\": app.name }), 0);\n    Ok(serde_json::json!({ \"status\": \"ok\" }))\n}\n\nfn main() { lilyco::run::<Hello>(); }"],
+      ["四端启动", "cargo run              # 按环境自动选端：交互终端→TUI，管道/脚本→CLI\ncargo run -- --gui     # Web GUI（SSE 进度）\ncargo run -- --mcp     # MCP stdio 服务器\ncargo run -- --schema  # 导出 JSON Schema\nLILYCO_UI=cli <bin>    # 环境变量强制指定端（CI 里避免 TUI 卡住管道）"],
     ],
     "links": [["crates.io", "https://crates.io/crates/lilyco"], ["仓库", "https://github.com/lilyco-42/lilyco"], ["README", "https://github.com/lilyco-42/lilyco#readme"]]
   },
@@ -51,8 +51,8 @@ const GUIDES = {
     "t": "lyco-cli —— 多语言脚手架",
     "s": "gh api 拉模板 + 声明式渲染，一套配置生成项目骨架。",
     "steps": [
-      ["获取", "git clone https://github.com/lilyco-42/lyco-cli && cd lyco-cli\ncargo build --release"],
-      ["生成项目", "./target/release/lyco-cli --template rust --name my-proj"]
+      ["安装", "cargo install --git https://github.com/lilyco-42/lyco-cli\n# 依赖：gh CLI 且已 gh auth login（模板走 gh api 拉）"],
+      ["生成项目", "lyco new myapp                      # 默认模板 rust-android\nlyco new mymod --template fabric-mod --param mod_id=auto-sprint\nlyco template list                  # 看有哪些模板"]
     ],
     "links": [["仓库", "https://github.com/lilyco-42/lyco-cli"]]
   },
@@ -68,8 +68,10 @@ const GUIDES = {
     "t": "lyco-skill —— 项目预研技能",
     "s": "需求钉死一句话 → gh 近义词搜索 → 论坛冷门知识 → 决策，少造 80% 轮子。",
     "steps": [
-      ["安装", "git clone https://github.com/lilyco-42/lyco-skill ~/.zcode/skills/lyco"],
-      ["使用", "在 ZCode 会话中: /lyco <需求一句话>"]
+      ["安装（Windows）", "iex (irm https://raw.githubusercontent.com/lilyco-42/lyco-skill/main/install.ps1)"],
+      ["安装（Linux/macOS）", "bash <(curl -fsSL https://raw.githubusercontent.com/lilyco-42/lyco-skill/main/install.sh)   # 加 --all-agents 装到全部 agent"],
+      ["手动安装", "git clone https://github.com/lilyco-42/lyco-skill.git ~/.agents/skills/lyco"],
+      ["使用", "在会话中: /lyco <需求一句话>"]
     ],
     "links": [["仓库", "https://github.com/lilyco-42/lyco-skill"]]
   },
@@ -78,7 +80,7 @@ const GUIDES = {
     "s": "跨平台悬浮桌宠 (Rust + WASM + lazy-UI)，点击玩耍、聊天、看屏幕。",
     "steps": [
       ["浏览器即玩", "打开本站 /pet/ （WASM 版，无需安装）"],
-      ["桌面版", "git clone https://github.com/lilyco-42/cute-pet && cd cute-pet\ncargo build --release"]
+      ["桌面版", "git clone https://github.com/lilyco-42/cute-pet && cd cute-pet\ncargo build --release                 # 商业版：不含任何角色素材\ncargo run --features bundle-murasame  # 开发版：带角色立绘"]
     ],
     "links": [["立即游玩", "/pet/"], ["仓库", "https://github.com/lilyco-42/cute-pet"]]
   },
@@ -86,7 +88,7 @@ const GUIDES = {
     "t": "webview-mini —— 极速 WebView2 封装",
     "s": "Windows 单头文件 WebView2（211 KB）| STL-free | xmake / CMake 一键构建。",
     "steps": [
-      ["xmake.lua", "add_requires(\"webview-mini\")\ntarget(\"my-app\")\n    set_kind(\"binary\")\n    add_files(\"main.c\")\n    add_packages(\"webview-mini\")\n    add_syslinks(\"user32\",\"shell32\",\"ole32\",\"shlwapi\",\"version\")"],
+      ["xmake.lua", "add_repositories(\"lyco-mirror https://github.com/lilyco-42/xmake-mirror.git\")  // 不加这行找不到包\nadd_requires(\"webview-mini\")\n\ntarget(\"my-app\")\n    set_kind(\"binary\")\n    add_files(\"main.c\")\n    add_packages(\"webview-mini\")\n    add_syslinks(\"user32\",\"shell32\",\"ole32\",\"oleaut32\",\"shlwapi\",\"version\",\"uuid\",\"dwmapi\")\ntarget_end()\n\n// 仓库自带 xmake.lua 时，直接 xmake 即可（无需上面的包管理）\n// 包只提供 MinGW 预编译静态库；MSVC 用户请用 webview-capi"],
       ["main.c", "#include \"webview.h\"\nint main(void) {\n    webview_t w = webview_create(0, NULL);\n    webview_set_title(w, \"app\");\n    webview_run(w);\n}"]
     ],
     "links": [["仓库", "https://github.com/lilyco-42/webview-mini"]]
@@ -95,7 +97,7 @@ const GUIDES = {
     "t": "webview-capi —— WebView2 C API",
     "s": "17 个导出函数，ctypes/cgo/FFI 绑定，30 秒上手。",
     "steps": [
-      ["Python 绑定", "import ctypes\ndll = ctypes.CDLL(\"webview_capi.dll\")"]
+      ["Python 绑定", "import ctypes\ndll = ctypes.CDLL(\"lib/webview.dll\")   # 预编译产物在 lib/，不是 webview_capi.dll\ndll.webview_create.restype = ctypes.c_void_p"],\n      ["xmake 引入", "add_repositories(\"lyco-mirror https://github.com/lilyco-42/xmake-mirror.git\")\nadd_requires(\"webview-capi\")   # 支持 MSVC / MinGW"]
     ],
     "links": [["仓库", "https://github.com/lilyco-42/webview-capi"]]
   }
