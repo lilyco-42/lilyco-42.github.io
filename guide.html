@@ -100,7 +100,7 @@ const GUIDES = {
   },
   "webview-mini": {
     "t": "webview-mini —— 极速 WebView2 封装",
-    "s": "Windows 单头文件 WebView2（211 KB）| STL-free | xmake / CMake 一键构建。",
+    "s": "Windows 单头文件 WebView2（205 KB）| STL-free | xmake / CMake 一键构建。",
     "steps": [
       ["xmake.lua", "add_repositories(\"lyco-mirror https://github.com/lilyco-42/xmake-mirror.git\")  // 不加这行找不到包\nadd_requires(\"webview-mini\")\n\ntarget(\"my-app\")\n    set_kind(\"binary\")\n    add_files(\"main.c\")\n    add_packages(\"webview-mini\")\n    add_syslinks(\"user32\",\"shell32\",\"ole32\",\"oleaut32\",\"shlwapi\",\"version\",\"uuid\",\"dwmapi\")\ntarget_end()\n\n// 仓库自带 xmake.lua 时，直接 xmake 即可（无需上面的包管理）\n// 包只提供 MinGW 预编译静态库；MSVC 用户请用 webview-capi"],
       ["main.c", "#include \"webview.h\"\nint main(void) {\n    webview_t w = webview_create(0, NULL);\n    webview_set_title(w, \"app\");\n    webview_run(w);\n}"]
