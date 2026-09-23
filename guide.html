@@ -84,7 +84,7 @@ const GUIDES = {
   },
   "webview-mini": {
     "t": "webview-mini —— 极速 WebView2 封装",
-    "s": "Windows 200KB 独立 exe | 单头文件引入 | xmake 一键构建。",
+    "s": "Windows 单头文件 WebView2（211 KB）| STL-free | xmake / CMake 一键构建。",
     "steps": [
       ["xmake.lua", "add_requires(\"webview-mini\")\ntarget(\"my-app\")\n    set_kind(\"binary\")\n    add_files(\"main.c\")\n    add_packages(\"webview-mini\")\n    add_syslinks(\"user32\",\"shell32\",\"ole32\",\"shlwapi\",\"version\")"],
       ["main.c", "#include \"webview.h\"\nint main(void) {\n    webview_t w = webview_create(0, NULL);\n    webview_set_title(w, \"app\");\n    webview_run(w);\n}"]
