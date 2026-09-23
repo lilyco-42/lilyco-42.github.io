@@ -5,17 +5,43 @@
 
 ## 目录结构（每个子目录 = 一个独立项目）
 
-| 路径 | 项目 | 如何跑 |
+| 路径 | 项目 | 说明 |
 |---|---|---|
-| `/` | 首页 Dashboard | 自动；编辑 `index.html` |
-| `/rembg/` | **Rembg Studio WASM** 抠图验证版 | 浏览器打开；源码与构建见 rembg-ui/web |
-| `/pet/` | **丛雨桌宠**（Rust + WASM + lazy-UI） | 浏览器打开 `/pet/` 即玩 |
+| `/` | 首页 Dashboard | `index.html`；卡片由 JS 动态渲染 |
+| `/rembg/` | Rembg Studio · 浏览器版 | 商品图抠图 PWA；源码与构建见 `rembg-ui/web` |
+| `/pet/` | 丛雨桌宠 | Rust + WASM；源码见 `cute-pet` |
+| `/tool/` | WASM 工具箱 | 把下面几个小内核汇成一个入口页 |
+| `/tool/lyco_chat/` | lyco_chat BitNet | 浏览器内 1.58-bit 推理的 wasm 包 |
+| `/wasm-demo/` | WASM Demo | C → WASM 最小示例（`demo.wasm` 2.1 KB） |
+| `/lyco/` | **lyco web tools** | WASM 工具套件总入口（10 个工具 + 产业矩阵） |
+| `/lyco/clang/` | C 编译器 | clang.wasm 40.6MB + lld.wasm 22.1MB + sysroot 27.3MB，全部自托管 |
+| `/lyco/db/` | DuckDB | 浏览器内 SQL 分析 |
+| `/lyco/ffmpeg/` | ffmpeg.wasm | 浏览器内转码；core 31MB 走 unpkg CDN |
+| `/lyco/magick/` | ImageMagick | 官方 C++ → WASM，100+ 图像格式（需 Memory64） |
+| `/lyco/opencv/` | OpenCV.js | 官方移植 10.9MB |
+| `/lyco/chem/` | RDKit.js | 分子工作台，官方 C++ 移植 |
+| `/lyco/lp/` | HiGHS 线性规划 | 爱丁堡大学 C++ 求解器 → wasm 3.3MB |
+| `/lyco/industry/` | 现实产业 × WASM | 移植可行性调研矩阵 |
+| `/lyco/pad/` | 文本统计 | pad.wasm 3 KB |
+| `/lyco/paint/` | 油漆桶 | paint.wasm 4.2 KB |
+| `/lyco/photo/` | 图像滤镜 | photo.wasm 7.2 KB |
+| `/lyco/sheet/` | 公式引擎 | sheet.wasm 11 KB |
+
+> 每个子目录都是**独立可运行**的，互不依赖；`/tool/` 与 `/lyco/` 只是入口页。
+> `/lyco/` **不是** lyco-engine 的在线 demo —— 那个仓发的是原生二进制，没有网页版。
 
 ## 如何加一个新项目（给新手，2 分钟）
 
 1. 把网页产物复制到一个新子目录（如 `/newproject/`，放 `index.html` + 资源）。
-2. **可选**：编辑首页 `index.html` 的 `const FEATURED = [...]`，加一条项目卡片，
-   让它在首页展示（`name` 填 GitHub repo 名；或加 `local: '/newproject/'` 指向本地页）。
+2. **可选**：在首页 `index.html` 里登记，让它出现在导航中。**有两个数组，别搞混**：
+
+   | 数组 | 放什么 | 字段 |
+   |---|---|---|
+   | `FEATURED` | **GitHub 仓**卡片 | `{ name, icon, tags, blurb, links }` —— `name` 必须是仓名，图标自动取 `assets/logos/<name>.svg` |
+   | `APPS` | **本站页面** | `{ n, d, u, l }` —— `u` 是站内路径（如 `/newproject/`），`l` 是图标用的 logo 名 |
+
+   要展示**本地页面**就加进 `APPS`。`FEATURED` 里**没有** `local` 字段
+   —— 早期文档这么写过，实际不存在，照写不会生效。
 3. `git add . && git commit -m "add: newproject" && git push`。GitHub Pages 自动发布。
 
 ### 关于 WASM 项目（如 /pet/）
