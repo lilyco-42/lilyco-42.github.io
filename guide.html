@@ -97,7 +97,8 @@ const GUIDES = {
     "t": "webview-capi —— WebView2 C API",
     "s": "17 个导出函数，ctypes/cgo/FFI 绑定，30 秒上手。",
     "steps": [
-      ["Python 绑定", "import ctypes\ndll = ctypes.CDLL(\"lib/webview.dll\")   # 预编译产物在 lib/，不是 webview_capi.dll\ndll.webview_create.restype = ctypes.c_void_p"],\n      ["xmake 引入", "add_repositories(\"lyco-mirror https://github.com/lilyco-42/xmake-mirror.git\")\nadd_requires(\"webview-capi\")   # 支持 MSVC / MinGW"]
+      ["Python 绑定", "import ctypes\ndll = ctypes.CDLL(\"lib/webview.dll\")   # 预编译产物在 lib/，不是 webview_capi.dll\ndll.webview_create.restype = ctypes.c_void_p"],
+      ["xmake 引入", "add_repositories(\"lyco-mirror https://github.com/lilyco-42/xmake-mirror.git\")\nadd_requires(\"webview-capi\")   # 支持 MSVC / MinGW"]
     ],
     "links": [["仓库", "https://github.com/lilyco-42/webview-capi"]]
   }
