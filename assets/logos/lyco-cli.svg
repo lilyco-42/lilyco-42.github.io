@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="lyco-cli">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1016"/><stop offset="1" stop-color="#134e4a"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="#14b8a6" stroke-opacity="0.55"/>
+  <text x="32" y="33" font-size="26" font-weight="700" fill="#5eead4" text-anchor="middle" dominant-baseline="central" font-family="Consolas,'Segoe UI',monospace">CL</text>
+</svg>

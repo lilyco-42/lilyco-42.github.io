@@ -19,7 +19,7 @@ button { font-family:inherit; }
 /* ── 侧边栏 (ChatGPT/Kimi 布局) ── */
 .sidebar { width:264px; min-width:264px; background:var(--sidebar); border-right:1px solid var(--edge); display:flex; flex-direction:column; padding:12px; gap:4px; }
 .logo { display:flex; align-items:center; gap:.55rem; padding:.5rem .6rem .9rem; font-weight:600; }
-.logo .avatar { width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--acc),var(--purple,#bc8cff)); display:flex; align-items:center; justify-content:center; font-size:.85rem; color:#fff; }
+.logo .avatar { width:28px; height:28px; border-radius:8px; display:block; flex:none; }
 .nav-item { display:flex; align-items:center; gap:.6rem; padding:.55rem .7rem; border-radius:10px; cursor:pointer; color:var(--dim); font-size:.88rem; user-select:none; }
 .nav-item:hover { background:var(--card); color:var(--fg); }
 .nav-item.on { background:var(--card); color:var(--fg); }
@@ -45,11 +45,13 @@ h1 { font-size:1.45rem; font-weight:600; }
 .view { display:none; }
 .view.on { display:block; }
 .hcard { background:var(--card); border:1px solid var(--edge); border-radius:14px; padding:1.2rem 1.3rem; margin-bottom:.9rem; }
-.hcard .icon { font-size:1.5rem; }
-.hcard h2 { font-size:1.08rem; margin:.45rem 0 .45rem; }
+.hcard .hhead { display:flex; gap:.7rem; align-items:flex-start; margin-bottom:.7rem; }
+.hcard .hlogo { width:34px; height:34px; border-radius:9px; flex:none; display:block; }
+.hcard .hbody { min-width:0; }
+.hcard h2 { font-size:1.08rem; margin:0 0 .4rem; }
 .hcard h2 a { color:var(--fg); }
 .hcard p { color:var(--dim); font-size:.87rem; line-height:1.65; margin-bottom:.65rem; }
-.tags { margin-bottom:.75rem; }
+.tags { margin-bottom:0; }
 .tag { display:inline-block; background:#ffffff0d; border:1px solid var(--edge); color:var(--acc); padding:2px 10px; border-radius:14px; font-size:.72rem; margin:2px 4px 2px 0; }
 .btns { display:flex; gap:.5rem; flex-wrap:wrap; }
 .btn { border:1px solid var(--edge); border-radius:10px; padding:.42rem .85rem; font-size:.8rem; color:var(--fg); background:transparent; cursor:pointer; }
@@ -58,7 +60,9 @@ h1 { font-size:1.45rem; font-weight:600; }
 .btn.play { background:var(--ok); border-color:var(--ok); color:#0d1117; font-weight:600; }
 .sec-title { font-size:.95rem; font-weight:600; margin:1.6rem 0 .8rem; }
 .subapps { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:.7rem; }
-.sapp { background:var(--card); border:1px solid var(--edge); border-radius:12px; padding:.85rem 1rem; color:var(--fg); display:block; }
+.sapp { background:var(--card); border:1px solid var(--edge); border-radius:12px; padding:.85rem 1rem; color:var(--fg); display:flex; gap:.65rem; align-items:center; }
+.sapp .slogo { width:26px; height:26px; border-radius:7px; flex:none; display:block; }
+.sapp .stx { min-width:0; }
 .sapp:hover { background:var(--card2); }
 .sapp b { font-size:.88rem; }
 .sapp .d { color:var(--dim); font-size:.76rem; margin-top:.2rem; }
@@ -86,10 +90,11 @@ footer { color:var(--dim); font-size:.76rem; margin-top:2rem; line-height:1.7; b
 <body>
 
 <aside class="sidebar" id="sidebar">
-  <div class="logo"><span class="avatar">L</span> lilyco-42</div>
+  <div class="logo"><img class="avatar" src="assets/logos/_brand.svg" alt="lilyco-42" width="28" height="28"> lilyco-42</div>
   <input class="side-search" id="q" placeholder="搜索仓库…">
   <div class="nav-item on" data-view="featured"><span class="ic">★</span> 精选项目</div>
   <div class="nav-item" data-view="apps"><span class="ic">◈</span> 本站应用</div>
+  <div class="nav-item" data-view="research"><span class="ic">◎</span> 研究 / 预研</div>
   <div class="nav-item" data-view="repos"><span class="ic">▤</span> 全部仓库</div>
   <div class="nav-sec">快速入门</div>
   <div class="side-repos" id="side-guides"></div>
@@ -111,6 +116,8 @@ footer { color:var(--dim); font-size:.76rem; margin-top:2rem; line-height:1.7; b
     <div class="view" id="v-apps">
       <div class="subapps" id="apps"></div>
     </div>
+
+    <div class="view" id="v-research"></div>
 
     <div class="view" id="v-repos">
       <div class="langs" id="langs"></div>
@@ -160,17 +167,17 @@ const FEATURED = [
     links: [["GitHub →", "https://github.com/lilyco-42/lyco-cli"], ["快速入门", "guide.html?name=lyco-cli"]] }
 ];
 const APPS = [
-  { n: "Rembg Studio", d: "浏览器本地抠图 · WASM 验证版", u: "/rembg/" },
-  { n: "丛雨桌宠", d: "WASM 桌宠 · 即开即玩", u: "/pet/" },
-  { n: "视觉小说引擎", d: "lyco-engine 在线 demo", u: "/lyco/" },
-  { n: "lyco_chat", d: "transformer 聊天工具", u: "/tool/" },
-  { n: "WASM demo", d: "C → WebAssembly 示例", u: "/wasm-demo/" }
+  { n: "Rembg Studio", d: "浏览器本地抠图 · WASM 验证版", u: "/rembg/", l: "rembg-ui" },
+  { n: "丛雨桌宠", d: "WASM 桌宠 · 即开即玩", u: "/pet/", l: "cute-pet" },
+  { n: "视觉小说引擎", d: "lyco-engine 在线 demo", u: "/lyco/", l: "lyco-engine" },
+  { n: "lyco_chat", d: "transformer 聊天工具", u: "/tool/", l: "lyco_chat" },
+  { n: "WASM demo", d: "C → WebAssembly 示例", u: "/wasm-demo/", l: "clings" }
 ];
 const LANGC = { Rust: "#dea584", Python: "#3572A5", JavaScript: "#f1e05a", TypeScript: "#3178c6", "C++": "#f34b7d", C: "#8b8b8b", Java: "#b07219", Kotlin: "#A97BFF", Shell: "#89e051", HTML: "#e34c26", Go: "#00ADD8", Zig: "#ec915c", Lua: "#000080", Xmake: "#339999", Nushell: "#4E4E4E", "Jupyter Notebook": "#DA5B0B" };
 
 // ── 视图切换 ──
 let REPOS = [], LANG = "", Q = "";
-const TITLES = { featured: "精选项目", apps: "本站应用", repos: "全部仓库" };
+const TITLES = { featured: "精选项目", apps: "本站应用", research: "研究 / 预研", repos: "全部仓库" };
 function switchView(v) {
   document.querySelectorAll(".view").forEach(function (x) { x.classList.remove("on"); });
   document.getElementById("v-" + v).classList.add("on");
@@ -181,8 +188,10 @@ function switchView(v) {
 
 function renderFeatured() {
   document.getElementById("v-featured").innerHTML = FEATURED.map(function (f) {
-    return '<div class="hcard"><div class="icon">' + f.icon + '</div><h2><a href="https://github.com/lilyco-42/' + f.name + '">' + f.name + '</a></h2>' +
-      '<p>' + f.blurb + '</p><div class="tags">' + f.tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join("") + '</div>' +
+    return '<div class="hcard"><div class="hhead"><img class="hlogo" src="assets/logos/' + f.name + '.svg" alt="' + f.name + ' logo" width="34" height="34">' +
+      '<div class="hbody"><h2><a href="https://github.com/lilyco-42/' + f.name + '">' + f.name + '</a></h2>' +
+      '<div class="tags">' + f.tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join("") + '</div></div></div>' +
+      '<p>' + f.blurb + '</p>' +
       '<div class="btns">' + f.links.map(function (l, i) {
         const cls = i === 0 ? 'btn pri' : (l[0].indexOf("玩") >= 0 ? 'btn play' : 'btn');
         return '<a class="' + cls + '" href="' + l[1] + '"' + (l[1][0] === "/" ? '' : ' target="_blank"') + '>' + l[0] + '</a>';
@@ -190,9 +199,33 @@ function renderFeatured() {
   }).join("");
 }
 
+const RESEARCH = [
+  { name: "wasm-binary-formats", tag: "WebAssembly", blurb: "APK 解包 + 1826 项格式编目（可行动 138 项）—— 先证明「≥200」这个数字站得住，再谈实现。" },
+  { name: "wasm-pixel-kernels", tag: "WebAssembly", blurb: "65 个修图算子编成 55 KB wasm，每个都在 CI 里与独立 JS 参考实现做过数值对照。" },
+  { name: "android-wasm-lab", tag: "可行性实测", blurb: "不用真机也能验证：Android 模拟器 + 内置 Chrome 133，附零依赖 CDP 脚本。" },
+  { name: "lyco-router-eval", tag: "端侧评测", blurb: "0.6B 够不够？40+ 案例横评，结论是够了 —— 但得配拒答 + 白名单 + 人工拍板。" },
+  { name: "cimgui-notes", tag: "Obsidian 知识图", blurb: "43 笔记 / 438 wikilink / 零悬空引用，逐行读源码后人工整理的第一手理解。" },
+  { name: "xiaomi-r3gv2-pppoe-1603", tag: "故障实录", blurb: "同一条入户线电脑能拨通、路由器不行：对照实验 + 错误码辨析 + 6 个诊断方案。" },
+  { name: "happy-sugar-life-live2d", tag: "全流程可复现", blurb: "从一张 AI 立绘到可循环的真骨骼动画，含 Stretchy Studio 可编辑工程与坑记录。" },
+  { name: "awesome-radxa-a733", tag: "硬件索引", blurb: "A733 板端「什么真的能用」的实测索引：内核 / NPU / GPU / VPU 逐项状态。" },
+  { name: "lystack", tag: "路线与核验", blurb: "零边际成本 AI 能力栈，含 AI 生成内容逐条核验表（标真 / 标落后一版）。" },
+  { name: "lyco_agent", tag: "工具调用 + 学习", blurb: "能学、能验证、能执行：视频与 CLI 手册 → 可验证问答 → 学习闭环。" }
+];
+
+function renderResearch() {
+  document.getElementById("v-research").innerHTML =
+    '<div class="empty" style="padding:0 0 1rem">每个仓都是 <b>preflight 输出，不是实现</b>：先给出可审计的数字、写清做不到的边界，再决定要不要动手。</div>' +
+    RESEARCH.map(function (r) {
+      return '<div class="hcard"><div class="hhead"><img class="hlogo" src="assets/logos/' + r.name + '.svg" alt="' + r.name + ' logo" width="34" height="34">' +
+        '<div class="hbody"><h2><a href="https://github.com/lilyco-42/' + r.name + '" target="_blank">' + r.name + '</a></h2>' +
+        '<div class="tags"><span class="tag">' + r.tag + '</span></div></div></div>' +
+        '<p>' + r.blurb + '</p><div class="btns"><a class="btn pri" href="https://github.com/lilyco-42/' + r.name + '" target="_blank">GitHub →</a></div></div>';
+    }).join("");
+}
+
 function renderApps() {
   document.getElementById("apps").innerHTML = APPS.map(function (a) {
-    return '<a class="sapp" href="' + a.u + '"><b>' + a.n + '</b><div class="d">' + a.d + '</div></a>';
+    return '<a class="sapp" href="' + a.u + '"><img class="slogo" src="assets/logos/' + a.l + '.svg" alt="" width="26" height="26"><span class="stx"><b>' + a.n + '</b><div class="d">' + a.d + '</div></span></a>';
   }).join("");
 }
 
@@ -258,6 +291,7 @@ document.getElementById("q").addEventListener("input", function (e) {
 
 renderFeatured();
 renderApps();
+renderResearch();
 loadRepos();
 </script>
 </body>
