@@ -21,11 +21,11 @@ a{color:var(--acc);text-decoration:none}
 </style></head>
 <body>
 <div class="wrap">
-  <h1>lyco opencv <span style="color:var(--dim);font-size:12px">OpenCV.js 官方移植 10.9MB (docs.opencv.org)</span></h1>
+  <h1>lyco opencv <span style="color:var(--dim);font-size:12px">OpenCV.js · OSS 直出 10.9MB</span></h1>
   <div class="sub">完整 OpenCV 子集编译到 WASM:Canny/模糊/阈值/色彩空间 全部走 cv.Mat · <a href="../">← lyco 工具箱</a></div>
   <div class="card">
     <input type="file" id="file" accept="image/*">
-    <span class="stat" id="st" style="margin-left:10px">正在加载 OpenCV.js (10.9MB)…</span>
+    <span class="stat" id="st" style="margin-left:10px">正在从 OSS 加载 OpenCV.js (10.9MB)…</span>
     <button onclick="op('gray')">灰度</button>
     <button onclick="op('canny')">Canny 边缘</button>
     <button class="ghost" onclick="op('blur')">高斯模糊</button>
@@ -77,5 +77,5 @@ function op(kind) {
   } finally { src.delete(); dst.delete(); }
 }
 </script>
-<script src="https://docs.opencv.org/4.13.0/opencv.js" async></script>
+<script src="https://dl.lain42.top/wasm/opencv/4.13.0/opencv.js" async crossorigin="anonymous"></script>
 </body></html>

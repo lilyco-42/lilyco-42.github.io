@@ -21,7 +21,7 @@ a{color:var(--acc);text-decoration:none}
 </style></head>
 <body>
 <div class="wrap">
-  <h1>lyco ffmpeg <span style="color:var(--dim);font-size:12px">ffmpeg.wasm (官方移植) · core 31MB 经 unpkg CDN 加载</span></h1>
+  <h1>lyco ffmpeg <span style="color:var(--dim);font-size:12px">ffmpeg.wasm · WASM 32.1 MB · OSS 直出</span></h1>
   <div class="sub">视频/音频转码全程浏览器内完成,文件不上传 · <a href="../">← lyco 工具箱</a></div>
   <div class="card">
     <input type="file" id="file" accept="video/*,audio/*">
@@ -32,13 +32,14 @@ a{color:var(--acc);text-decoration:none}
       <button onclick="go('png')" disabled>→ 截帧 PNG</button>
     </div>
     <div class="bar"><div id="pb"></div></div>
-    <div class="stat" id="st" style="margin-top:8px">选择文件后自动加载内核 (~31MB, 首次较慢)</div>
+    <div class="stat" id="st" style="margin-top:8px">选择文件后自动从 OSS 加载内核 (~32MB, 首次较慢)</div>
     <div id="dls"></div>
   </div>
   <div class="card"><div id="log">ffmpeg 日志…</div></div>
+  <div class="card"><a href="../THIRD-PARTY-NOTICES.md" target="_blank" rel="noopener">第三方许可与源码说明 →</a></div>
 </div>
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
-<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+<script src="./ffmpeg.js"></script>
+<script src="https://dl.lain42.top/wasm/ffmpeg-util/0.12.1/dist/umd/index.js" crossorigin="anonymous"></script>
 <script>
 const { FFmpeg } = FFmpegWASM, { fetchFile, toBlobURL } = FFmpegUtil;
 const ff = new FFmpeg();
@@ -51,10 +52,10 @@ ff.on('progress', ({ progress }) => { document.getElementById('pb').style.width 
 async function load() {
   if (loaded) return true;
   try {
-    log('加载 ffmpeg 内核 (单线程版, ~31MB)…', '#58a6ff');
+    log('从 OSS 加载 ffmpeg 内核 (单线程版, ~32MB)…', '#58a6ff');
     await ff.load({
-      coreURL: await toBlobURL('https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js', 'text/javascript'),
-      wasmURL: await toBlobURL('https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm', 'application/wasm'),
+      coreURL: await toBlobURL('https://dl.lain42.top/wasm/ffmpeg-core/0.12.6/dist/umd/ffmpeg-core.js', 'text/javascript'),
+      wasmURL: await toBlobURL('https://dl.lain42.top/wasm/ffmpeg-core/0.12.6/dist/umd/ffmpeg-core.wasm', 'application/wasm'),
     });
     loaded = true;
     document.querySelectorAll('button').forEach(b => b.disabled = false);

@@ -95,6 +95,7 @@ Bounds
  x33 >= 0
 End`};
 let highs = null;
+const HIGHS_BASE = 'https://dl.lain42.top/wasm/highs/1.15.3/build/';
 window.load = k => { $('lp').value = PRESETS[k]; };
 load('prod');
 
@@ -105,8 +106,8 @@ window.solve = async () => {
     if (!highs) {
       $('st')?.remove?.();
       document.querySelector('.sub').textContent += ' · 内核加载中…';
-      const m = await import('https://cdn.jsdelivr.net/npm/highs@1.15.2/build/highs.js');
-      highs = await (m.default ?? m)({ locateFile: f => 'https://cdn.jsdelivr.net/npm/highs@1.15.2/build/' + f });
+      const m = await import(HIGHS_BASE + 'highs.mjs');
+      highs = await m.default({ locateFile: f => HIGHS_BASE + f });
     }
     const r = highs.solve($('lp').value);
     $('res').style.display = 'block';

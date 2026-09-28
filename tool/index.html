@@ -4,7 +4,7 @@
 <meta charset="utf-8" data-page-node-id="Q9VxTuTB2alc7r09oVj0LC" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" data-page-node-id="7HpH5HpzcfVOX4kDSbSHKq" />
 <title>WASM 工具箱 · 云枢智创</title>
-<meta name="description" content="云枢智创 WASM 工具箱 — 浏览器内跑真原生代码，离线可用，支持下载 HTML 与 WASM 模块。" data-page-node-id="R7Y4MjspXipMW8XCCm3NS0" />
+<meta name="description" content="浏览器内使用图像、化学、编译、优化与本地 AI 工具；大型 WASM 和模型从 lain42 OSS 直出。" data-page-node-id="R7Y4MjspXipMW8XCCm3NS0" />
 <meta name="theme-color" content="#ffffff" data-page-node-id="P9GTeGnv3ZO5ohJtRW14RF" />
 <link rel="manifest" href="./manifest.json" data-page-node-id="qTjI5NwttzmDjqktscFXLa" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%234f6ef7'/%3E%3Cpath d='M9 21c3.5-14 9.5 4 14-10' stroke='white' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" data-page-node-id="A8oClusvwmBiuP9QYyjlu8" />
@@ -106,7 +106,7 @@ footer{border-top:1px solid var(--line);padding:34px 0;background:var(--bg-soft)
 <header class="head" data-page-node-id="jigQbkOWXPO1MYNg8sXZYF">
   <div class="wrap" data-page-node-id="dmm9IogquCFsNIMg9BdU6U">
     <h1 data-page-node-id="bjxfqcdIx2CZkltqMZRUtE">浏览器里跑<span class="grad" data-page-node-id="9MCjDD8gdVnLHrURUEwiGv">真原生代码</span></h1>
-    <p class="sub" data-page-node-id="b3OkZLuy2AdaoqQr2Wg7Kp">每个工具的内核都是编译成 WebAssembly 的原生程序 —— 不上传、不联网、装完就能离线用。可以整体下载，也可以只要那个 .wasm 模块。</p>
+    <p class="sub" data-page-node-id="b3OkZLuy2AdaoqQr2Wg7Kp">打开页面就能处理文件、编译代码、求解模型或运行本地 AI。工具数据留在浏览器；较大的 WASM 内核与模型从 OSS 直出，不经网站应用服务器。</p>
     <div class="stats" data-page-node-id="NWkyj0mrtqkE5BKi8zpUOW">
       <div class="stat" data-page-node-id="wkRjD5idkIOGniYTlqeBiB"><b data-page-node-id="vLRxYB0A5CRQ3f5WJBd4wQ">12</b><span data-page-node-id="G035p7aB1AMVOjCmqvEyHU">在线工具</span></div>
       <div class="stat" data-page-node-id="St0dC1o79EuNkKYEsx2wr6"><b data-page-node-id="0DqoQu0RIIuCTWvkUA9DCb">~25KB</b><span data-page-node-id="7wuSGNAwhMhGq3eISNoY4x">轻量内核均值</span></div>
@@ -120,10 +120,8 @@ footer{border-top:1px solid var(--line);padding:34px 0;background:var(--bg-soft)
   <div class="wrap" data-page-node-id="bcshWcertMILMJKp246qd7">
     <div class="grid" id="grid" data-page-node-id="19miW4ASqPmYTzeWQPXFjW"></div>
     <div class="note" data-page-node-id="RJlz0ABZDsmGyL1nfoGAHJ">
-      <b data-page-node-id="vg784tb3cAOk32T3R2nFtN">怎么离线用？</b>下载 HTML 后，把它和对应的 <code data-page-node-id="CM9wgkvqoKjLMvHRsj7jtu">.wasm</code> 放在<b data-page-node-id="6v7ku8Y52hGcv2lfqQIX58">同一个目录</b>下，
-      双击 HTML 即可离线运行（部分浏览器需用本地服务器，因为 <code data-page-node-id="TCaYvK5lJHaSrcM4arQ6W6">file://</code> 下不能 fetch wasm）。<br data-page-node-id="d4pZWMi5YkBHMIRQ463Gs1">
-      <b data-page-node-id="zWEvt7CqjnM8vvAXttMcDs">只要内核？</b>点「WASM」下载原生模块，自己写宿主页面 <code data-page-node-id="qNo1HJ8p5qTHbcsOQ3qUKs">fetch → WebAssembly.instantiate</code> 就能调用。<br data-page-node-id="rjPnWKlYaFiYjkU7iHFJKT">
-      <b data-page-node-id="NWazwRTutWSepTvn8IdoEo">标注 CDN 的工具</b>内核体积较大（10–90MB），由官方 CDN 加载，不提供单文件下载。
+      工具页可直接运行。首次打开时，浏览器会从 <code>dl.lain42.top</code> 的 OSS 加载所需 WASM 和 JS；这些静态文件不经过网站应用服务器。<br>
+      图片、文本和代码在本机处理。<b>lyco_chat</b> 另需下载约 397 MB 的 Qwen3 模型，之后可在本机离线生成文本。其它工具首次加载内核也需要联网，页面不再把“下载 HTML”伪装成完整离线包。
     </div>
   </div>
 </section>
@@ -140,7 +138,7 @@ footer{border-top:1px solid var(--line);padding:34px 0;background:var(--bg-soft)
 </footer>
 
 <script>
-var BASE = "/lyco";
+var BASE = "https://lilyco-42.github.io/lyco";
 var TOOLS = [
   {n:"lyco photo", i:"🖼️", d:"photo", w:"photo.wasm", s:"图像滤镜 · 7.2 KB",
    p:"灰度/反相/亮度/对比度/像素化/Sobel 边缘/盒模糊，撤销 5 步，导出 PNG。"},
@@ -150,24 +148,22 @@ var TOOLS = [
    p:"画笔/橡皮/油漆桶，扫描线泛洪填充带颜色容差，填充一次完成。"},
   {n:"lyco pad", i:"📝", d:"pad", w:"pad.wasm", s:"记事本 · 3 KB",
    p:"实时统计字符/词/中文字数/行数/阅读时长，大小写与格式转换。"},
-  {n:"lyco_chat BitNet", i:"🧠", d:"lyco_chat", w:"pkg/lyco_chat_wasm_bg.wasm", s:"BitNet b1.58 · 60KB",
-   p:"真 1.58-bit 推理：三值权重打包进 u8，256 项 LUT 查表完成矩阵乘，全程无浮点乘法。可在页面里实测吞吐。"},
+  {n:"lyco_chat 本地 AI", i:"🧠", d:"/tool/lyco_chat", s:"Qwen3 · 首次下载 397MB",
+   p:"加载真实 GGUF 语言模型，使用 Wllama WASM 在当前设备本地生成文本；不把提示词发送给推理服务器。"},
   {n:"丛雨桌宠", i:"🌸", d:"/pet", w:"app.wasm", s:"Rust · 桌宠",
    p:"会说话的桌面宠物，中日双语，语音气泡与交互全部本地运行。"},
   {n:"lyco clang", i:"⚙️", d:"clang", w:"wasm/clang.wasm", s:"Clang+LLD · 90MB",
    p:"浏览器里跑真 Clang+LLD：写 C → 编译 → 链接 → WASI 运行，全流程本地。"},
-  {n:"lyco ffmpeg", i:"🎬", d:"ffmpeg", w:"", s:"CDN · 31MB", cdn:1,
+  {n:"lyco ffmpeg", i:"🎬", d:"ffmpeg", s:"OSS · 31MB",
    p:"视频转 GIF / 提取 MP3 / 压缩 MP4，ffmpeg.wasm 官方移植。"},
-  {n:"lyco opencv", i:"👁️", d:"opencv", w:"", s:"CDN · 10.9MB", cdn:1,
+  {n:"lyco opencv", i:"👁️", d:"opencv", s:"OSS · 10.9MB",
    p:"Canny 边缘/高斯模糊/二值化/灰度，OpenCV.js 官方移植。"},
-  {n:"lyco magick", i:"🪄", d:"magick", w:"", s:"CDN · 14.8MB", cdn:1,
+  {n:"lyco magick", i:"🪄", d:"magick", s:"OSS · 14.8MB",
    p:"PNG/JPEG/WebP/GIF 互转与批处理，ImageMagick 官方 wasm64。"},
-  {n:"lyco chem", i:"🧪", d:"chem", w:"", s:"CDN · 7MB", cdn:1,
+  {n:"lyco chem", i:"🧪", d:"chem", s:"OSS · 7.3MB",
    p:"SMILES → 2D 结构 + 分子量/logP/TPSA，RDKit.js 化学信息学。"},
-  {n:"lyco lp", i:"🏭", d:"lp", w:"", s:"HiGHS · 3.3MB", cdn:1,
-   p:"线性/整数规划：生产排产、饲料配比、运输问题，LP 文本直接输入。"},
-  {n:"产业调研矩阵", i:"📋", d:"industry", w:"", s:"10 产业 · 20+ 项目", cdn:1,
-   p:"化工/EDA/CAD/机器人/运筹/GIS/生信/编译器 × WASM 移植可行性全表。"}
+  {n:"lyco lp", i:"🏭", d:"lp", s:"HiGHS · OSS · 3.5MB",
+   p:"线性/整数规划：生产排产、饲料配比、运输问题，LP 文本直接输入。"}
 ];
 
 var g=document.getElementById('grid');
@@ -181,11 +177,7 @@ TOOLS.forEach(function(t){
     '<div class="top"><div class="ic">'+t.i+'</div><div><h3>'+t.n+'</h3>'+
     '<div class="meta">'+t.s+'</div></div></div>'+
     '<p>'+t.p+'</p><div class="acts">'+
-    '<a class="main" href="'+dir+'index.html">打开 →</a>'+
-    '<a href="'+dir+'index.html" download>下载 HTML</a>'+
-    (t.w && !t.cdn
-      ? '<a href="'+dir+t.w+'" download>下载 WASM</a>'
-      : '<a class="off" href="#" title="内核由 CDN 加载，无单文件">WASM</a>')+
+    '<a class="main" href="'+dir+'index.html">打开工具 →</a>'+
     '</div>';
   g.appendChild(card);
 });

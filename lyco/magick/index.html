@@ -32,18 +32,18 @@ select{background:#0d1117;color:var(--fg);border:1px solid #30363d;border-radius
       缩放 <input type="range" id="pct" min="5" max="200" value="100"> <span id="pv">100%</span>
       <button id="go" onclick="conv()" disabled>转换</button>
     </div>
-    <div class="stat" id="st">加载 ImageMagick 内核 (14.8MB)…</div>
+    <div class="stat" id="st">从 OSS 加载 ImageMagick 内核 (15.2MB)…</div>
     <a class="dl" id="dl" style="display:none" download>⬇ 下载结果</a>
   </div>
   <div class="card"><canvas id="cv"></canvas></div>
 </div>
 <script type="module">
-import { initializeImageMagickx64, ImageMagick, Magick, MagickFormat, Percentage } from 'https://cdn.jsdelivr.net/npm/@imagemagick/magick-wasm@0.0.43/dist/index.js';
+import { initializeImageMagickx64, ImageMagick, Magick, MagickFormat, Percentage } from 'https://dl.lain42.top/wasm/magick-wasm/0.0.43/dist/index.js';
 const $ = id => document.getElementById(id);
 $('pct').oninput = e => $('pv').textContent = e.target.value + '%';
 let loaded = false;
-const WASM_URL = 'https://cdn.jsdelivr.net/npm/@imagemagick/magick-wasm@0.0.43/dist/x64/magick.wasm';
-$('st').textContent = '下载 ImageMagick 内核 (14.8MB, 浏览器会缓存)…';
+const WASM_URL = 'https://dl.lain42.top/wasm/magick-wasm/0.0.43/dist/x64/magick.wasm';
+$('st').textContent = '从 OSS 下载 ImageMagick 内核 (15.2MB, 浏览器会缓存)…';
 const wasmBytes = new Uint8Array(await (await fetch(WASM_URL)).arrayBuffer());
 await initializeImageMagickx64(wasmBytes);
 loaded = true;
