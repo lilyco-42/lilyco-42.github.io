@@ -49,5 +49,6 @@ test('the toolbox links to the running local model app and does not list researc
   assert.match(page, /lyco_chat 本地 AI/);
   assert.doesNotMatch(page, /n:"产业调研矩阵"/);
   assert.match(page, /首次打开时，浏览器会从/);
-  assert.match(page, /全部加载后当前页面可离线对话，重新打开时若运行时未被缓存则需要联网/);
+  assert.match(page, /本地 AI 小模型/);
+  assert.match(page, /模型和 WASM 均从 OSS 直出/);
 });

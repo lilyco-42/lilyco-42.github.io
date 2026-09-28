@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "transport": "https://hf-mirror.com",
+  "source": "https://huggingface.co",
+  "bucketPrefix": "models/hf",
+  "models": [
+    {
+      "id": "onnx-community/whisper-tiny",
+      "bootstrapRevision": "ff4177021cc41f7db950912b73ea4fdf7d01d8e7",
+      "license": "Apache-2.0",
+      "baseModel": "openai/whisper-tiny",
+      "task": "automatic-speech-recognition",
+      "label": "语音转文字",
+      "description": "将音频文件在浏览器本机转成文字，支持多语言；单次不超过 90 秒。",
+      "files": [
+        { "path": "added_tokens.json", "maxBytes": 65536 },
+        { "path": "config.json", "maxBytes": 8192 },
+        { "path": "generation_config.json", "maxBytes": 8192 },
+        { "path": "merges.txt", "maxBytes": 1048576 },
+        { "path": "onnx/decoder_model_merged_quantized.onnx", "maxBytes": 33554432 },
+        { "path": "onnx/encoder_model_quantized.onnx", "maxBytes": 12582912 },
+        { "path": "preprocessor_config.json", "maxBytes": 4096 },
+        { "path": "quantize_config.json", "maxBytes": 16384 },
+        { "path": "special_tokens_map.json", "maxBytes": 8192 },
+        { "path": "tokenizer.json", "maxBytes": 3145728 },
+        { "path": "tokenizer_config.json", "maxBytes": 393216 },
+        { "path": "vocab.json", "maxBytes": 1572864 }
+      ]
+    },
+    {
+      "id": "Xenova/multilingual-e5-small",
+      "bootstrapRevision": "761b726dd34fb83930e26aab4e9ac3899aa1fa78",
+      "license": "MIT",
+      "baseModel": "intfloat/multilingual-e5-small",
+      "task": "feature-extraction",
+      "label": "语义检索",
+      "description": "在本机为中文和多语言文本建立语义向量，按意思搜索粘贴的笔记。",
+      "files": [
+        { "path": "config.json", "maxBytes": 8192 },
+        { "path": "onnx/model_quantized.onnx", "maxBytes": 134217728 },
+        { "path": "quant_config.json", "maxBytes": 8192 },
+        { "path": "sentencepiece.bpe.model", "maxBytes": 6291456 },
+        { "path": "special_tokens_map.json", "maxBytes": 4096 },
+        { "path": "tokenizer.json", "maxBytes": 20971520 },
+        { "path": "tokenizer_config.json", "maxBytes": 8192 }
+      ]
+    },
+    {
+      "id": "onnx-community/multilingual-MiniLMv2-L6-mnli-xnli-ONNX",
+      "bootstrapRevision": "ca5daf3d11b6c4b3143b1f4602a2edfb64c3ad7e",
+      "license": "MIT",
+      "baseModel": "MoritzLaurer/multilingual-MiniLMv2-L6-mnli-xnli",
+      "task": "zero-shot-classification",
+      "label": "自定义文本分类",
+      "description": "输入文本和自己的标签，让本地模型判断最匹配的类别，支持中文。",
+      "files": [
+        { "path": "config.json", "maxBytes": 8192 },
+        { "path": "onnx/model_quantized.onnx", "maxBytes": 117440512 },
+        { "path": "quantize_config.json", "maxBytes": 4096 },
+        { "path": "special_tokens_map.json", "maxBytes": 4096 },
+        { "path": "tokenizer.json", "maxBytes": 20971520 },
+        { "path": "tokenizer_config.json", "maxBytes": 8192 }
+      ]
+    }
+  ]
+}

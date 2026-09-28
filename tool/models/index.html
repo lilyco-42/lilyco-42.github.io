@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f5f2">
+<title>本地 AI 小模型工作台 · 云枢智创</title>
+<meta name="description" content="从 OSS 下载 Hugging Face 开源小模型，在浏览器本机运行语音转写、语义搜索和自定义文本分类。">
+<style>
+:root{color-scheme:light dark;--bg:#f6f5f2;--panel:#fff;--text:#202123;--muted:#6b6c6e;--line:#e4e2dc;--accent:#346c58;--accent-soft:#e8f1eb;--error:#a43f35;--code:#f3f2ee}
+@media(prefers-color-scheme:dark){:root{--bg:#171816;--panel:#20211f;--text:#eeeee9;--muted:#a7a79f;--line:#373832;--accent:#a5d3b5;--accent-soft:#29372e;--error:#ff9388;--code:#181916}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--accent);text-decoration:none}button,select,input,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);padding:10px 14px;min-height:42px}button:disabled{opacity:.55;cursor:wait}button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:650}button.ghost{background:transparent}header{max-width:1000px;margin:auto;padding:24px 20px 14px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-size:14px;font-weight:700;letter-spacing:.02em}header nav{display:flex;gap:8px;flex-wrap:wrap}header nav a{padding:8px 12px;border-radius:9px;border:1px solid var(--line);color:var(--muted);font-size:13px}main{max-width:1000px;padding:12px 20px 46px;margin:auto}.hero{padding:22px 2px 20px}.eyebrow{font-size:12px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px}h1{font-size:clamp(27px,5vw,40px);line-height:1.12;letter-spacing:-.035em;margin:0 0 10px}.lead{color:var(--muted);margin:0;max-width:760px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0}.model-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.model-name{font-weight:700}.details{color:var(--muted);font-size:13px;margin:7px 0 0}.badge{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--muted);font-size:12px;gap:6px}.badge.ready{color:var(--accent);background:var(--accent-soft);border-color:transparent}.badge.error{color:var(--error)}.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}select,input[type=file]{max-width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel);color:var(--text)}label{display:block;font-size:13px;font-weight:650;margin:13px 0 6px}textarea{width:100%;resize:vertical;min-height:90px;max-height:300px;border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--panel);color:var(--text);font:inherit}textarea:focus,button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent);outline-offset:2px}.task[hidden]{display:none}.statusline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}progress{display:block;width:100%;height:8px;margin-top:14px;accent-color:var(--accent)}.progress-label{font-size:12px;color:var(--muted);margin-top:5px;min-height:1.2em}.privacy{background:var(--accent-soft);border-radius:12px;padding:11px 13px;color:var(--accent);font-size:13px;margin:14px 0}.result{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--code);padding:12px;border-radius:10px;min-height:46px;margin-top:12px}.result:empty{display:none}.result ol{margin:0;padding-left:1.4em}.result li{padding:3px 0}.score{color:var(--muted);font-variant-numeric:tabular-nums}.footnote{font-size:12px;color:var(--muted)}footer{max-width:1000px;margin:auto;padding:12px 20px 32px;color:var(--muted);font-size:12px}.small{font-size:12px;color:var(--muted)}
+@media(max-width:600px){header{padding:16px 14px 8px;align-items:flex-start}header nav a{padding:7px 9px}main{padding:8px 14px 32px}.panel{padding:14px}.panel .actions button{flex:1}.model-row .actions{width:100%}.model-row .actions button{flex:1}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">云枢智创 · WASM Studio</div>
+  <nav aria-label="主导航"><a href="/tool/">工具箱</a><a href="../../lyco/">lyco WASM</a><a href="../lyco_chat/">本地聊天模型</a></nav>
+</header>
+<main>
+  <section class="hero">
+    <div class="eyebrow">Open models · On-device inference</div>
+    <h1>小模型，直接在你的设备上干活。</h1>
+    <p class="lead">挑一个要完成的任务，模型从 OSS 直下到浏览器并由 WASM 在本机推理。音频、笔记和分类文本不会上传。首次使用需要下载所选模型，缓存后同一浏览器可重复使用。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="model-title">
+    <div class="model-row">
+      <div>
+        <div class="eyebrow">Model catalog</div>
+        <div class="model-name" id="model-title">正在读取模型目录…</div>
+        <p class="details" id="model-details">模型权重来自 Hugging Face，并由 lain42 OSS 直接分发。</p>
+      </div>
+      <div class="actions">
+        <label for="model-select" class="small">选择要运行的模型</label>
+        <select id="model-select" aria-label="选择本地模型" disabled><option>读取模型目录…</option></select>
+      </div>
+    </div>
+    <div class="statusline"><span class="badge" id="model-state">正在检查 OSS…</span><span class="details" id="storage-state">检查浏览器存储…</span></div>
+    <progress id="model-progress" max="100" value="0" hidden></progress>
+    <div class="progress-label" id="progress-label" aria-live="polite"></div>
+    <div class="privacy">🔒 文件下载只用于模型推理；模型输入在浏览器本机处理，不发送给网站、模型厂商或第三方推理 API。</div>
+    <p class="footnote" id="catalog-state">首次下载后模型会缓存在这个浏览器中。手机 CPU 较慢或内存紧张时，优先尝试 Whisper Tiny；不要同时打开多个模型工作台。</p>
+  </section>
+
+  <section class="panel task" id="task-asr" hidden aria-labelledby="asr-heading">
+    <h2 id="asr-heading">🎙️ 音频转文字</h2>
+    <p class="details">选择常见音频文件，Whisper Tiny 会在本机识别语音。最多 90 秒，支持中文和多种语言。</p>
+    <label for="audio-file">音频文件</label><input id="audio-file" type="file" accept="audio/*">
+    <div class="actions" style="margin-top:12px"><button class="primary run-task" data-action="asr" disabled>本机转写</button></div>
+    <div class="result" id="asr-result" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="panel task" id="task-search" hidden aria-labelledby="search-heading">
+    <h2 id="search-heading">🔎 按意思搜索笔记</h2>
+    <p class="details">每行一条资料。E5 会区分“词相同”和“意思相近”，适合查找自己的摘录、灵感或会议记录。</p>
+    <label for="search-query">你要找什么</label><textarea id="search-query" maxlength="1000" placeholder="例如：离线运行的中文语音识别方案"></textarea>
+    <label for="search-passages">笔记或段落（每行一条，最多 30 条）</label><textarea id="search-passages" maxlength="30000" placeholder="小模型在手机 CPU 上运行，不依赖云端推理。&#10;把 Hugging Face 上的 ONNX 模型镜像到 OSS。&#10;Whisper 支持多语言自动语音识别。"></textarea>
+    <div class="actions" style="margin-top:12px"><button class="primary run-task" data-action="search" disabled>本机检索</button></div>
+    <div class="result" id="search-result" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="panel task" id="task-classify" hidden aria-labelledby="classify-heading">
+    <h2 id="classify-heading">🏷️ 用自己的标签分类</h2>
+    <p class="details">定义标签，不需要训练。适合把反馈分成“退款、故障、功能建议”等类别，结果只保留在当前页面。</p>
+    <label for="classify-text">待分类文本</label><textarea id="classify-text" maxlength="4000" placeholder="例如：安卓打开模型后过一会儿就闪退了。"></textarea>
+    <label for="classify-labels">候选标签（每行一个或用逗号分隔，最多 12 个）</label><textarea id="classify-labels" maxlength="1000" placeholder="功能建议&#10;使用问题&#10;付款问题"></textarea>
+    <div class="actions" style="margin-top:12px"><button class="primary run-task" data-action="classify" disabled>本机分类</button></div>
+    <div class="result" id="classify-result" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="panel">
+    <h2>模型与来源</h2>
+    <p class="details" id="source-list">模型目录加载后会显示准确 revision、文件大小、许可证和 Hugging Face 来源页。</p>
+  </section>
+</main>
+<footer>推理由浏览器中的 Transformers.js + ONNX Runtime Web 执行，模型与 WASM 通过 <a href="https://dl.lain42.top/models/hf/catalog.json">lain42 OSS</a> 直接交付。<a href="https://github.com/huggingface/transformers.js">Transformers.js</a> · <a href="https://github.com/microsoft/onnxruntime">ONNX Runtime</a></footer>
+<script type="module" src="./app.mjs"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "lain42-browser-model-runtime",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node build-runtime.mjs"
+  },
+  "devDependencies": {
+    "@huggingface/transformers": "3.8.1",
+    "esbuild": "0.25.5"
+  }
+}

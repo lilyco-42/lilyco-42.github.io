@@ -1,0 +1,6 @@
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PYTHONUNBUFFERED=1
+
+# The OSS host uses CST (UTC+8): this runs daily at 03:15 UTC.
+15 11 * * * root /usr/bin/flock -n /var/lock/lain42-hf-model-sync.lock /usr/bin/python3 /opt/lain42-model-sync/sync_hf_models.py --manifest /opt/lain42-model-sync/models.json --state /opt/lain42-model-sync/state.json --temp-dir /var/tmp 2>&1 | /usr/bin/logger -t lain42-hf-model-sync

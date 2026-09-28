@@ -121,7 +121,7 @@ footer{border-top:1px solid var(--line);padding:34px 0;background:var(--bg-soft)
     <div class="grid" id="grid" data-page-node-id="19miW4ASqPmYTzeWQPXFjW"></div>
     <div class="note" data-page-node-id="RJlz0ABZDsmGyL1nfoGAHJ">
       工具页可直接运行。首次打开时，浏览器会从 <code>dl.lain42.top</code> 的 OSS 加载所需 WASM 和 JS；这些静态文件不经过网站应用服务器。<br>
-      图片、文本和代码在本机处理。<b>lyco_chat</b> 需要下载约 397 MB 的 Qwen3 模型和 WASM 运行时；全部加载后当前页面可离线对话，重新打开时若运行时未被缓存则需要联网。其它工具首次加载内核也需要联网。
+      图片、文本、音频和代码在本机处理。<b>lyco_chat</b> 的 Qwen3 对话模型约 397 MB；<b>本地 AI 小模型</b>按需下载语音转写、语义检索或分类模型，约 43–134 MiB。模型和 WASM 均从 OSS 直出，不经过网站应用服务器。
     </div>
   </div>
 </section>
@@ -150,6 +150,8 @@ var TOOLS = [
    p:"实时统计字符/词/中文字数/行数/阅读时长，大小写与格式转换。"},
   {n:"lyco_chat 本地 AI", i:"🧠", d:"/tool/lyco_chat", s:"Qwen3 · 首次下载 397MB",
    p:"加载真实 GGUF 语言模型，使用 Wllama WASM 在当前设备本地生成文本；不把提示词发送给推理服务器。"},
+  {n:"本地 AI 小模型", i:"🧩", d:"https://lain42.top/tool/models/", s:"Whisper · E5 · MiniLM · OSS",
+   p:"本机语音转写、按语义搜索笔记、自定义文本分类；模型只在你选择任务时下载。"},
   {n:"丛雨桌宠", i:"🌸", d:"/pet", w:"app.wasm", s:"Rust · 桌宠",
    p:"会说话的桌面宠物，中日双语，语音气泡与交互全部本地运行。"},
   {n:"lyco clang", i:"⚙️", d:"clang", w:"wasm/clang.wasm", s:"Clang+LLD · 90MB",
