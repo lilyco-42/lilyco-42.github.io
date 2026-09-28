@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
-<meta name="description" content="lilyco-42 项目仪表盘：AI 优先的 Rust 框架 lilyco、浏览器内 WASM 应用、Windows 桌面工具，以及逐条可核验的预研记录。">
+<meta name="description" content="lilyco-42 项目仪表盘：AI 优先的 Rust 框架、浏览器内 WASM 应用、Windows 桌面工具，以及网页和手机即开即用的 Lain42 Agent。">
 <link rel="icon" href="assets/logos/brand.svg" type="image/svg+xml">
 <title>lilyco-42 —— 项目仪表盘</title>
 <style>
@@ -55,6 +55,7 @@ button { font-family:inherit; }
 .burger-btn { display:none; background:var(--card); border:1px solid var(--edge); color:var(--fg); border-radius:8px; padding:.35rem .6rem; cursor:pointer; font-size:1rem; }
 h1 { font-size:1.45rem; font-weight:600; }
 .tagline { color:var(--dim); font-size:.9rem; margin-top:.25rem; }
+.agent-cta { display:inline-block; margin-top:.65rem; }
 .view { display:none; }
 .view.on { display:block; }
 .hcard { background:var(--card); border:1px solid var(--edge); border-radius:14px; padding:1.2rem 1.3rem; margin-bottom:.9rem; }
@@ -118,6 +119,7 @@ footer .flinks { display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin-top:.55r
   <div class="nav-sec"><span>快速入门</span><a href="guide.html">全部 →</a></div>
   <div class="side-repos" id="side-guides"></div>
   <div class="side-foot">
+    <a href="https://api.lain42.top/agent"><span class="ic">🤖</span> Lain42 Agent</a>
     <a href="https://lilyco-42.github.io/mpkg-registry/" target="_blank"><span class="ic">📦</span> 记忆包市场</a>
     <a href="https://github.com/lilyco-42/lystack"><span class="ic">🗂</span> lystack 主仓</a>
     <a href="design.html"><span class="ic">🎨</span> 设计规范</a>
@@ -129,6 +131,7 @@ footer .flinks { display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin-top:.55r
     <div class="topbar"><button class="burger-btn" id="burger">☰</button><div>
       <h1 id="view-title">精选项目</h1>
       <div class="tagline">让人类远离计算机，AI 可做任何事 —— 工具调用与学习能力 &gt; scaling law。</div>
+      <a class="btn pri agent-cta" href="https://api.lain42.top/agent">打开 Lain42 Agent →</a>
     </div></div>
 
     <div class="view on" id="v-featured"></div>
@@ -147,6 +150,7 @@ footer .flinks { display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin-top:.55r
     <footer>
       <div><b>lilyco-42</b> · 让人类远离计算机，AI 可做任何事。</div>
       <div class="flinks">
+        <a href="https://api.lain42.top/agent">Lain42 Agent</a>
         <a href="design.html">设计规范</a>
         <a href="guide.html">快速入门</a>
         <a href="README.md">仓库说明</a>
@@ -211,7 +215,8 @@ const APPS = [
   { n: "丛雨桌宠", d: "WASM 桌宠 · 即开即玩", u: "/pet/", l: "cute-pet" },
   { n: "WASM 工具套件", d: "10 个浏览器内工具 + 产业调研矩阵", u: "/lyco/", l: "lyco-tools" },
   { n: "lyco_chat", d: "transformer 聊天工具", u: "/tool/", l: "lyco_chat" },
-  { n: "WASM demo", d: "C → WebAssembly 示例", u: "/wasm-demo/", l: "clings" }
+  { n: "WASM demo", d: "C → WebAssembly 示例", u: "/wasm-demo/", l: "clings" },
+  { n: "Lain42 Agent", d: "网页和手机即开即用 · 网站模型 · 可选 CLI/MCP 工具", u: "https://api.lain42.top/agent", l: "brand" }
 ];
 const LANGC = { Rust: "#dea584", Python: "#3572A5", JavaScript: "#f1e05a", TypeScript: "#3178c6", "C++": "#f34b7d", C: "#8b8b8b", Java: "#b07219", Kotlin: "#A97BFF", Shell: "#89e051", HTML: "#e34c26", Go: "#00ADD8", Zig: "#ec915c", Lua: "#000080", Xmake: "#339999", Nushell: "#4E4E4E", "Jupyter Notebook": "#DA5B0B" };
 
