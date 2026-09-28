@@ -38,6 +38,8 @@ test('model workbench exposes the three practical task flows from the catalog', 
   for (const phrase of ['音频转文字', '按意思搜索笔记', '用自己的标签分类']) assert.ok(page.includes(phrase));
   assert.match(page, /OSS 直下/);
   assert.match(page, /不发送/);
+  assert.match(page, /href="\/tool\/lyco_chat\/"/);
+  assert.match(page, /https:\/\/lilyco-42\.github\.io\/lyco\//);
   assert.match(read('tool/index.html'), /本地 AI 小模型/);
   assert.match(read('lyco/index.html'), /本地 AI 小模型/);
 });
