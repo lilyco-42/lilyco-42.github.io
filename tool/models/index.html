@@ -11,6 +11,7 @@
 @media(prefers-color-scheme:dark){:root{--bg:#171816;--panel:#20211f;--text:#eeeee9;--muted:#a7a79f;--line:#373832;--accent:#a5d3b5;--accent-soft:#29372e;--error:#ff9388;--code:#181916}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--accent);text-decoration:none}button,select,input,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);padding:10px 14px;min-height:42px}button:disabled{opacity:.55;cursor:wait}button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:650}button.ghost{background:transparent}header{max-width:1000px;margin:auto;padding:24px 20px 14px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-size:14px;font-weight:700;letter-spacing:.02em}header nav{display:flex;gap:8px;flex-wrap:wrap}header nav a{padding:8px 12px;border-radius:9px;border:1px solid var(--line);color:var(--muted);font-size:13px}main{max-width:1000px;padding:12px 20px 46px;margin:auto}.hero{padding:22px 2px 20px}.eyebrow{font-size:12px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px}h1{font-size:clamp(27px,5vw,40px);line-height:1.12;letter-spacing:-.035em;margin:0 0 10px}.lead{color:var(--muted);margin:0;max-width:760px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0}.model-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.model-name{font-weight:700}.details{color:var(--muted);font-size:13px;margin:7px 0 0}.badge{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--muted);font-size:12px;gap:6px}.badge.ready{color:var(--accent);background:var(--accent-soft);border-color:transparent}.badge.error{color:var(--error)}.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}select,input[type=file]{max-width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel);color:var(--text)}label{display:block;font-size:13px;font-weight:650;margin:13px 0 6px}textarea{width:100%;resize:vertical;min-height:90px;max-height:300px;border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:var(--panel);color:var(--text);font:inherit}textarea:focus,button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent);outline-offset:2px}.task[hidden]{display:none}.statusline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}progress{display:block;width:100%;height:8px;margin-top:14px;accent-color:var(--accent)}.progress-label{font-size:12px;color:var(--muted);margin-top:5px;min-height:1.2em}.privacy{background:var(--accent-soft);border-radius:12px;padding:11px 13px;color:var(--accent);font-size:13px;margin:14px 0}.result{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--code);padding:12px;border-radius:10px;min-height:46px;margin-top:12px}.result:empty{display:none}.result ol{margin:0;padding-left:1.4em}.result li{padding:3px 0}.score{color:var(--muted);font-variant-numeric:tabular-nums}.footnote{font-size:12px;color:var(--muted)}footer{max-width:1000px;margin:auto;padding:12px 20px 32px;color:var(--muted);font-size:12px}.small{font-size:12px;color:var(--muted)}
 @media(max-width:600px){header{padding:16px 14px 8px;align-items:flex-start}header nav a{padding:7px 9px}main{padding:8px 14px 32px}.panel{padding:14px}.panel .actions button{flex:1}.model-row .actions{width:100%}.model-row .actions button{flex:1}}
+.button-link{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:9px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);font-weight:600}.button-link.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 </style>
 </head>
 <body>
@@ -42,6 +43,21 @@
     <div class="progress-label" id="progress-label" aria-live="polite"></div>
     <div class="privacy">🔒 文件下载只用于模型推理；模型输入在浏览器本机处理，不发送给网站、模型厂商或第三方推理 API。</div>
     <p class="footnote" id="catalog-state">首次下载后模型会缓存在这个浏览器中。手机 CPU 较慢或内存紧张时，优先尝试 Whisper Tiny；不要同时打开多个模型工作台。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="candle-title">
+    <div class="model-row">
+      <div>
+        <div class="eyebrow">Rust · Candle · WebAssembly</div>
+        <h2 id="candle-title">体验 Candle Rust/WASM 推理</h2>
+        <p class="details">Candle 官方 Whisper 示例已编译成浏览器 WASM。打开演示后选 tiny_quantized_multilingual_q80（41.5 MB），点击内置 jfk.wav，再运行转写。</p>
+      </div>
+      <div class="actions">
+        <a class="button-link primary" href="https://huggingface.co/spaces/lmz/candle-whisper" target="_blank" rel="noopener noreferrer">体验 Candle 在线演示 ↗</a>
+        <a class="button-link" href="https://github.com/huggingface/candle/tree/main/candle-wasm-examples/whisper" target="_blank" rel="noopener noreferrer">GitHub 源码 ↗</a>
+      </div>
+    </div>
+    <p class="footnote">这是 Hugging Face 上的官方关联演示，页面、量化模型和音频样例由 Hugging Face 提供；Candle 在浏览器本地执行 Rust/WASM 推理。与上方 lain42 OSS 工作台分开。</p>
   </section>
 
   <section class="panel task" id="task-asr" hidden aria-labelledby="asr-heading">

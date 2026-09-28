@@ -46,6 +46,10 @@ test('model workbench exposes the three practical task flows from the catalog', 
   assert.match(page, /不发送/);
   assert.match(page, /href="\/tool\/lyco_chat\/"/);
   assert.match(page, /https:\/\/lilyco-42\.github\.io\/lyco\//);
+  assert.match(page, /https:\/\/huggingface\.co\/spaces\/lmz\/candle-whisper/);
+  assert.match(page, /https:\/\/github\.com\/huggingface\/candle\/tree\/main\/candle-wasm-examples\/whisper/);
+  assert.match(page, /tiny_quantized_multilingual_q80（41\.5 MB）/);
   assert.match(read('tool/index.html'), /本地 AI 小模型/);
+  assert.match(read('tool/index.html'), /Candle Whisper/);
   assert.match(read('lyco/index.html'), /本地 AI 小模型/);
 });
