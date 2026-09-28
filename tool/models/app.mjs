@@ -124,7 +124,7 @@ async function ensurePipeline(model) {
   if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
   const { env, pipeline } = await import(RUNTIME_URL);
   env.remoteHost = OSS_MODELS;
-  env.remotePathTemplate = '{model}/resolve/{revision}/{file}';
+  env.remotePathTemplate = '{model}/resolve/{revision}/';
   env.useBrowserCache = true;
   env.allowLocalModels = false;
   env.backends.onnx.wasm.wasmPaths = WASM_BASE;

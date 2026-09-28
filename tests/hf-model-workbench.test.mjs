@@ -11,7 +11,7 @@ test('model workbench runs only allowlisted HF revisions through OSS and local W
   const page = read('tool/models/app.mjs');
   assert.match(page, /https:\/\/dl\.lain42\.top\/models\/hf/);
   assert.match(page, /https:\/\/dl\.lain42\.top\/wasm\/transformers-js\/3\.8\.1\/transformers\.bundle\.mjs/);
-  assert.match(page, /env\.remotePathTemplate = '\{model\}\/resolve\/\{revision\}\/\{file\}'/);
+  assert.match(page, /env\.remotePathTemplate = '\{model\}\/resolve\/\{revision\}\/'/);
   assert.match(page, /device: 'wasm'/);
   assert.match(page, /dtype: 'q8'/);
   assert.match(page, /env\.backends\.onnx\.wasm\.numThreads = 1/);
