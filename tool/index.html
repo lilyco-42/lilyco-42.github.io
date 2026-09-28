@@ -121,7 +121,7 @@ footer{border-top:1px solid var(--line);padding:34px 0;background:var(--bg-soft)
     <div class="grid" id="grid" data-page-node-id="19miW4ASqPmYTzeWQPXFjW"></div>
     <div class="note" data-page-node-id="RJlz0ABZDsmGyL1nfoGAHJ">
       工具页可直接运行。首次打开时，浏览器会从 <code>dl.lain42.top</code> 的 OSS 加载所需 WASM 和 JS；这些静态文件不经过网站应用服务器。<br>
-      图片、文本和代码在本机处理。<b>lyco_chat</b> 另需下载约 397 MB 的 Qwen3 模型，之后可在本机离线生成文本。其它工具首次加载内核也需要联网，页面不再把“下载 HTML”伪装成完整离线包。
+      图片、文本和代码在本机处理。<b>lyco_chat</b> 需要下载约 397 MB 的 Qwen3 模型和 WASM 运行时；全部加载后当前页面可离线对话，重新打开时若运行时未被缓存则需要联网。其它工具首次加载内核也需要联网。
     </div>
   </div>
 </section>
@@ -154,11 +154,11 @@ var TOOLS = [
    p:"会说话的桌面宠物，中日双语，语音气泡与交互全部本地运行。"},
   {n:"lyco clang", i:"⚙️", d:"clang", w:"wasm/clang.wasm", s:"Clang+LLD · 90MB",
    p:"浏览器里跑真 Clang+LLD：写 C → 编译 → 链接 → WASI 运行，全流程本地。"},
-  {n:"lyco ffmpeg", i:"🎬", d:"ffmpeg", s:"OSS · 31MB",
+  {n:"lyco ffmpeg", i:"🎬", d:"ffmpeg", s:"OSS · 32MB",
    p:"视频转 GIF / 提取 MP3 / 压缩 MP4，ffmpeg.wasm 官方移植。"},
   {n:"lyco opencv", i:"👁️", d:"opencv", s:"OSS · 10.9MB",
    p:"Canny 边缘/高斯模糊/二值化/灰度，OpenCV.js 官方移植。"},
-  {n:"lyco magick", i:"🪄", d:"magick", s:"OSS · 14.8MB",
+  {n:"lyco magick", i:"🪄", d:"magick", s:"OSS · 15.2MB",
    p:"PNG/JPEG/WebP/GIF 互转与批处理，ImageMagick 官方 wasm64。"},
   {n:"lyco chem", i:"🧪", d:"chem", s:"OSS · 7.3MB",
    p:"SMILES → 2D 结构 + 分子量/logP/TPSA，RDKit.js 化学信息学。"},
