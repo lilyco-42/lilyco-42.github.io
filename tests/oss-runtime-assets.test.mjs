@@ -38,6 +38,7 @@ test('local chat loads a real GGUF model and streams generated text in-browser',
   assert.match(page, /createChatCompletion\([\s\S]*?stream: true/);
   assert.match(page, /for await \(const chunk of stream\)/);
   assert.match(page, /不请求 lain42 的推理服务/);
+  assert.match(page, /下次重新打开时，若运行时未被浏览器缓存则需要联网重载/);
   assert.doesNotMatch(page, /\/v1\/chat\/completions|api\.lain42\.top\/v1/);
   assert.match(page, /不是语言模型，也不会产生文本/);
 });

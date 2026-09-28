@@ -94,7 +94,7 @@ footer{max-width:1000px;margin:auto;padding:12px 20px 32px;color:var(--muted);fo
       <button class="ghost" id="clear-chat" aria-label="清空对话">清空对话</button>
     </div>
     <div class="messages" id="messages" aria-live="polite">
-      <div class="message assistant"><span class="role">本地助手</span><div class="bubble">模型加载后，在这里直接提问。首次运行需要下载模型；下载完成后可以断网继续对话。</div></div>
+      <div class="message assistant"><span class="role">本地助手</span><div class="bubble">模型加载后，在这里直接提问。首次运行需要下载模型与 WASM 运行时；两者加载完成后，可在当前页面断网继续对话。下次重新打开时，若运行时未被浏览器缓存则需要联网重载。</div></div>
     </div>
     <form class="composer" id="composer">
       <textarea id="prompt" maxlength="3000" placeholder="输入问题…（最多 3000 字）" aria-label="输入问题" disabled></textarea>
@@ -176,7 +176,7 @@ $('load-model').addEventListener('click', async () => {
       }
     });
     state('本地模型已就绪', 'ready');
-    $('download-label').textContent = '模型已加载，可断网对话。';
+    $('download-label').textContent = '模型与 WASM 已就绪，可在当前页面断网对话。';
     $('download-progress').value = 100;
     $('prompt').disabled = false;
     $('send').disabled = false;
