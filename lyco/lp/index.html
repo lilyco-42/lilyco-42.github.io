@@ -96,6 +96,8 @@ Bounds
 End`};
 let highs = null;
 const HIGHS_BASE = 'https://dl.lain42.top/wasm/highs/1.15.3/build/';
+const sub = document.querySelector('.sub');
+const subBaseText = sub.textContent;
 window.load = k => { $('lp').value = PRESETS[k]; };
 load('prod');
 
@@ -105,9 +107,10 @@ window.solve = async () => {
   try {
     if (!highs) {
       $('st')?.remove?.();
-      document.querySelector('.sub').textContent += ' · 内核加载中…';
+      sub.textContent = subBaseText + ' · 正在从 OSS 加载 HiGHS…';
       const m = await import(HIGHS_BASE + 'highs.mjs');
       highs = await m.default({ locateFile: f => HIGHS_BASE + f });
+      sub.textContent = subBaseText + ' · HiGHS WASM 已就绪';
     }
     const r = highs.solve($('lp').value);
     $('res').style.display = 'block';
@@ -118,6 +121,7 @@ window.solve = async () => {
     $('tbl').innerHTML = h;
     $('out').textContent = '';
   } catch (e) {
+    if (!highs) sub.textContent = subBaseText + ' · HiGHS WASM 加载失败，请重试';
     $('res').style.display = 'block';
     $('obj').innerHTML = '<span class="err">解析/求解失败</span>';
     $('tbl').innerHTML = ''; $('out').textContent = String(e.message || e);
