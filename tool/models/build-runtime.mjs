@@ -21,7 +21,12 @@ await build({
   legalComments: 'eof',
 });
 
-for (const file of ['ort-wasm-simd-threaded.mjs', 'ort-wasm-simd-threaded.wasm']) {
+for (const file of [
+  'ort-wasm-simd-threaded.mjs',
+  'ort-wasm-simd-threaded.wasm',
+  'ort-wasm-simd-threaded.jsep.mjs',
+  'ort-wasm-simd-threaded.jsep.wasm',
+]) {
   await copyFile(join(ortDist, file), join(output, file));
 }
 await copyFile(join(root, 'THIRD-PARTY-NOTICES.md'), join(output, 'THIRD-PARTY-NOTICES.md'));

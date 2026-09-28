@@ -35,14 +35,14 @@ The host schedule is 03:15 UTC daily (11:15 China time) and prevents overlapping
 
 ## Runtime build
 
-This repository pins Transformers.js 3.8.1 and esbuild 0.25.5. Build its ESM bundle and single-threaded CPU WASM runtime with:
+This repository pins Transformers.js 3.8.1 and esbuild 0.25.5. Build its ESM bundle plus the ONNX Runtime Web SIMD and JSEP WASM assets with:
 
 ```sh
 npm ci --ignore-scripts --registry=https://registry.npmjs.org
 npm run build
 ```
 
-The generated bundle and ONNX Runtime Web assets are uploaded to `wasm/transformers-js/3.8.1/` in OSS, separate from the website server.
+The generated bundle and all ONNX Runtime Web module/WASM assets (including the JSEP modules loaded by the runtime) are uploaded to `wasm/transformers-js/3.8.1/` in OSS, separate from the website server.
 
 ## Model source cards
 

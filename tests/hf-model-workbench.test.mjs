@@ -28,6 +28,12 @@ test('model workbench runs only allowlisted HF revisions through OSS and local W
   assert.doesNotMatch(page, /api\.lain42\.top|fetch\([^)]*huggingface\.co/);
 });
 
+test('runtime build includes ONNX Runtime Web JSEP module and WASM dependencies', () => {
+  const build = read('tool/models/build-runtime.mjs');
+  assert.match(build, /ort-wasm-simd-threaded\.jsep\.mjs/);
+  assert.match(build, /ort-wasm-simd-threaded\.jsep\.wasm/);
+});
+
 test('model workbench exposes the three practical task flows from the catalog', () => {
   const page = read('tool/models/index.html');
   const catalog = JSON.parse(read('tool/models/models.json'));
