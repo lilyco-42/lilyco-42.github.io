@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: lilyco-42/rembg-ui
-          ref: 7dea36c10dfa3276acb84967b100427e5f8c3a60
+          ref: 48fa274e2eb1b10dfcff6231ec74a5a041622e7e
           path: runner
       - uses: actions/setup-node@v4
         with:
@@ -39,7 +39,7 @@ jobs:
           cp website/tests/rembg-live.mjs runner/web/browser/live-acceptance.mjs
       - name: Candidate unit and real WASM browser acceptance
         if: github.event_name != 'workflow_dispatch' || !inputs.verify_live
-        run: node --check browser/live-acceptance.mjs && npm test && node browser/region-acceptance.mjs
+        run: node --check browser/live-acceptance.mjs && npm test && node browser/region-acceptance.mjs && node browser/history-acceptance.mjs
         working-directory: runner/web
       - name: Published website fingerprint and real WASM acceptance
         if: github.event_name == 'workflow_dispatch' && inputs.verify_live
