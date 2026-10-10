@@ -1,9 +1,9 @@
 // 自动生成，请勿手改 —— 改 scripts/ecosystem-map.json 后跑 node scripts/gen-ecosystem.mjs
 // 数据源：GitHub API users/lilyco-42/repos（非 fork、公开），生成于 2026-10-10
-// 校验：分组总和 = 124 = 非 fork 公开仓数；名称唯一；URL 由名称推导
+// 校验：分组总和 = 125 = 非 fork 公开仓数；名称唯一；URL 由名称推导
 const ECOSYSTEM = {
   "asOf": "2026-10-10",
-  "totals": { "repos": 124, "langs": 18, "stars": 78, "groups": 10 },
+  "totals": { "repos": 125, "langs": 18, "stars": 78, "groups": 10 },
   "groups": [
     {
       "key": "core", "title": "框架与基础层", "note": "一个 struct 出四端的底座、脚手架、共享模块与协议",
@@ -33,6 +33,7 @@ const ECOSYSTEM = {
         {"n":"qq-bot-rust","l":"Rust","s":0,"p":"2026-10-10","d":"Radxa ARM64 上的 QQ 机器人 + webhook 网关，带群图 OCR 视觉"},
         {"n":"bitnet-rs","l":"Rust","s":0,"p":"2026-10-10","d":"BitNet b1.58-2B 推理引擎，手机上 0.5s/token"},
         {"n":"lyco-model-bench","l":"Rust","s":0,"p":"2026-10-10","d":"每日模型发现 + token 测速：NVIDIA NIM / OpenRouter 的供给变化与中文响应速度"},
+        {"n":"lgame","l":"Rust","s":0,"p":"2026-10-10","d":"AI 控制实体的中间层：l3d / l2d 用 MCP/CLI 驱动 3D 与 2D 游戏角色，机器人是下一档位"},
         {"n":"dsh-tool-nu","l":"JavaScript","s":0,"p":"2026-10-10","d":"面向模型的 Nushell 工具，Windows 上的 bash 兼容层"},
         {"n":"dsh-tool-brush","l":"JavaScript","s":0,"p":"2026-10-10","d":"Rust 原生 brush shell：Windows 上跑满血 bash 语法"},
         {"n":"lyco-model","l":"Python","s":0,"p":"2026-09-30","d":"模型评测报告与可复现实验脚本：RAG / OODA / 投毒 / 声明核验"},
