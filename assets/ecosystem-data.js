@@ -1,9 +1,9 @@
 // 自动生成，请勿手改 —— 改 scripts/ecosystem-map.json 后跑 node scripts/gen-ecosystem.mjs
 // 数据源：GitHub API users/lilyco-42/repos（非 fork、公开），生成于 2026-10-10
-// 校验：分组总和 = 123 = 非 fork 公开仓数；名称唯一；URL 由名称推导
+// 校验：分组总和 = 124 = 非 fork 公开仓数；名称唯一；URL 由名称推导
 const ECOSYSTEM = {
   "asOf": "2026-10-10",
-  "totals": { "repos": 123, "langs": 18, "stars": 78, "groups": 10 },
+  "totals": { "repos": 124, "langs": 18, "stars": 78, "groups": 10 },
   "groups": [
     {
       "key": "core", "title": "框架与基础层", "note": "一个 struct 出四端的底座、脚手架、共享模块与协议",
@@ -141,6 +141,7 @@ const ECOSYSTEM = {
       "key": "game", "title": "游戏与同人", "note": "《卫戍协议：盟约》与 Minecraft 相关的客户端、素材与运维",
       "repos": [
         {"n":"StrongholdProtocolClient","l":"JavaScript","s":1,"p":"2026-10-10","d":"《卫戍协议：盟约》桌面版 + Android 客户端，素材本地化，服务器只做联机（GPL-3.0）"},
+        {"n":"stronghold-knowledge","l":"其他","s":0,"p":"2026-10-10","d":"卫戍协议知识增量库：群聊黑话、PRTS 来源索引与可验证答疑，每条标明出处 / 适用范围 / 置信度"},
         {"n":"zombie-raid","l":"Python","s":0,"p":"2026-10-10","d":"PVE 搜打撤（Lethal Company 风格），Godot 4.7，全平台 CI"},
         {"n":"lain42-stronghold-ops","l":"Python","s":0,"p":"2026-10-10","d":"低配 ECS 上跑 400+ 并发对局的运维改动集：FD 根因、WS 压缩、自愈 watchdog"},
         {"n":"sp-cdn-assets","l":"其他","s":0,"p":"2026-10-06","d":"《卫戍协议》v0.1.3 静态素材 CDN 源（334MB，GitHub Pages 分发）"},

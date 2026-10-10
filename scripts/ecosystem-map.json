@@ -124,6 +124,7 @@
     "buried-treasure-finder": ["game", "Fabric mod：手持藏宝图自动定位埋藏宝藏，渲染金色信标"],
     "fabric-mod-template": ["game", "Fabric 1.21.4 客户端 mod 模板：Mixin + 双语 lang + 初始化脚本"],
     "tsukishita": ["game", "浏览器游戏：宝箱 / 道具 / 进度数据 + 音频素材，另含桌面版"],
+    "stronghold-knowledge": ["game", "卫戍协议知识增量库：群聊黑话、PRTS 来源索引与可验证答疑，每条标明出处 / 适用范围 / 置信度"],
 
     "C": ["learn", "学习 C 语言"],
     "java-learning": ["learn", "Java 学习指南 & Zed 编辑器 Java 环境配置"],

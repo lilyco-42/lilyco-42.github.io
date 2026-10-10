@@ -1,0 +1,8 @@
+# Agent runtime state (observations / session events) — not source.
+# Curated outputs live in .agents/results/ and stay tracked.
+.agents/state/
+
+# Local editor / OS noise
+.DS_Store
+Thumbs.db
+*.log
