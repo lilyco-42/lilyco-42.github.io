@@ -65,7 +65,25 @@ try{
   const download=page.waitForEvent('download');await page.locator('#exportBatch').click();
   await (await download).saveAs(resolve(evidence,mobile?'mobile-delivery.zip':'desktop-delivery.zip'));
   await page.screenshot({path:resolve(evidence,mobile?'mobile-live.png':'desktop-live.png'),fullPage:true});
-  checks.push({mobile,box,...pixels,confirmed_export:true});await context.close();
+  await page.getByRole('button',{name:'删除图片 sample.webp',exact:true}).click();
+  await page.waitForFunction(()=>!document.querySelector('#files').disabled&&document.querySelector('#status').textContent.startsWith('已删除'));
+  await page.reload();
+  await page.waitForFunction(()=>!document.querySelector('#files').disabled&&document.querySelector('#saveStatus').textContent.startsWith('已恢复'));
+  assert.equal(await page.locator('.result-card').count(),0);
+  assert.equal(await page.locator('#exportBatch').isDisabled(),true);
+  const samples=Array.from({length:10},(_,i)=>({name:`history-${i}.webp`,mimeType:'image/webp',buffer:photo}));
+  await page.locator('#files').setInputFiles(samples);
+  await page.waitForFunction(()=>!document.querySelector('#files').disabled&&document.querySelector('#saveStatus').textContent.startsWith('批次已保存'));
+  assert.equal(await page.locator('.result-body:visible').count(),1);
+  assert.ok(await page.locator('#results').evaluate(el=>el.clientHeight<=innerHeight*.7+2&&el.scrollHeight>el.clientHeight));
+  await page.locator('#collapseHistory').click();assert.equal(await page.locator('.result-body:visible').count(),0);
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  await page.screenshot({path:resolve(evidence,mobile?'mobile-history-live.png':'desktop-history-live.png'),fullPage:true});
+  await page.locator('#clearHistory').click();
+  await page.waitForFunction(()=>!document.querySelector('#files').disabled&&document.querySelector('#saveStatus').textContent.startsWith('批次已保存'));
+  await page.reload();await page.waitForFunction(()=>!document.querySelector('#files').disabled&&document.querySelector('#saveStatus').textContent.startsWith('已恢复'));
+  assert.equal(await page.locator('.result-card').count(),0);
+  checks.push({mobile,box,...pixels,confirmed_export:true,delete_persists:true,bounded_history:true,clear_persists:true});await context.close();
  }
  assert.deepEqual(errors,[]);
  await writeFile(resolve(evidence,'live.json'),JSON.stringify({passed:true,site,source:info,fingerprints,checks,limitations:['Mobile Chromium emulation, not physical Android','Existing repository technical fixture; no commercial image quality certification']},null,2));
