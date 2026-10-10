@@ -1,0 +1,52 @@
+name: Rembg release acceptance
+on:
+  pull_request:
+    paths: ['rembg/**', 'tests/rembg-live.mjs', '.github/workflows/rembg-region.yml']
+  workflow_dispatch:
+    inputs:
+      verify_live:
+        description: Verify the published rembg website with real WASM inference
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: website
+      - uses: actions/checkout@v4
+        with:
+          repository: lilyco-42/rembg-ui
+          ref: 7dea36c10dfa3276acb84967b100427e5f8c3a60
+          path: runner
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+        working-directory: runner/web
+      - run: npm install --no-save --package-lock=false playwright@1.56.1
+        working-directory: runner/web
+      - run: npx playwright install --with-deps chromium
+        working-directory: runner/web
+      - name: Use the exact website candidate, without rebuilding it
+        run: |
+          mkdir -p runner/web/dist
+          cp -a website/rembg/. runner/web/dist/
+          cp website/tests/rembg-live.mjs runner/web/browser/live-acceptance.mjs
+      - name: Candidate unit and real WASM browser acceptance
+        if: github.event_name != 'workflow_dispatch' || !inputs.verify_live
+        run: node --check browser/live-acceptance.mjs && npm test && node browser/region-acceptance.mjs
+        working-directory: runner/web
+      - name: Published website fingerprint and real WASM acceptance
+        if: github.event_name == 'workflow_dispatch' && inputs.verify_live
+        run: node browser/live-acceptance.mjs
+        working-directory: runner/web
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rembg-release-acceptance
+          path: runner/web/browser-results*/

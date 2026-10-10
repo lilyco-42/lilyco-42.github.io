@@ -1,0 +1,7 @@
+{
+  "source_repository": "https://github.com/lilyco-42/rembg-ui",
+  "source_commit": "7dea36c10dfa3276acb84967b100427e5f8c3a60",
+  "source_workflow": "https://github.com/lilyco-42/rembg-ui/actions/runs/38048598110",
+  "artifact": "rembg-wasm-site",
+  "feature": "region-cutout"
+}
