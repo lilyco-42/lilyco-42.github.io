@@ -19,3 +19,5 @@ jobs:
           node-version: 22
       - name: Check every HTML page uses the shared theme
         run: node --test tests/site-theme.test.mjs
+      - name: Check the ecosystem overview data is self-consistent
+        run: node --test tests/ecosystem.test.mjs

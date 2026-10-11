@@ -91,6 +91,26 @@ h1 { font-size:1.45rem; font-weight:600; }
 .lang { border:1px solid var(--edge); color:var(--dim); background:transparent; border-radius:16px; padding:.18rem .7rem; font-size:.74rem; cursor:pointer; }
 .lang.on { border-color:var(--acc); color:var(--acc); }
 .empty { color:var(--dim); padding:1rem; font-size:.85rem; }
+
+/* ── 生态全景 ── */
+.eco-stats { display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:.9rem; }
+.eco-stat { background:var(--card); border:1px solid var(--edge); border-radius:12px; padding:.55rem .9rem; min-width:92px; }
+.eco-stat b { display:block; font-size:1.2rem; line-height:1.25; }
+.eco-stat span { color:var(--dim); font-size:.72rem; }
+.eco-note { color:var(--dim); font-size:.8rem; line-height:1.65; margin-bottom:1.4rem; }
+.eco-grp { margin-bottom:1.5rem; }
+.eco-grp h2 { font-size:.95rem; font-weight:600; }
+.eco-grp h2 em { color:var(--dim); font-style:normal; font-weight:400; }
+.eco-grp .gnote { color:var(--dim); font-size:.78rem; margin:.2rem 0 .7rem; }
+.eco-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(258px,1fr)); gap:.6rem; }
+.eco-card { background:var(--card); border:1px solid var(--edge); border-radius:11px; padding:.6rem .75rem; display:flex; gap:.6rem; align-items:flex-start; }
+.eco-card:hover { background:var(--card2); }
+.eco-badge { width:26px; height:26px; border-radius:7px; flex:none; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.78rem; }
+.eco-tx { min-width:0; }
+.eco-tx > a { color:var(--fg); font-size:.85rem; font-weight:600; word-break:break-all; }
+.eco-tx .ed { color:var(--dim); font-size:.75rem; line-height:1.5; margin-top:.15rem; }
+.eco-tx .em { color:var(--dim); font-size:.7rem; margin-top:.3rem; display:flex; gap:.55rem; flex-wrap:wrap; align-items:center; }
+.eco-back { margin-top:.4rem; }
 footer { color:var(--dim); font-size:.76rem; margin-top:2rem; line-height:1.7; border-top:1px solid var(--edge); padding-top:1rem; }
 footer .flinks { display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin-top:.55rem; }
 
@@ -113,6 +133,7 @@ footer .flinks { display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin-top:.55r
   <div class="logo"><img class="avatar" src="assets/logos/brand.svg" alt="lilyco-42" width="28" height="28"> lilyco-42</div>
   <input class="side-search" id="q" type="search" autocomplete="off" aria-label="搜索仓库" placeholder="搜索仓库…">
   <div class="nav-item on" data-view="featured"><span class="ic">★</span> 精选项目</div>
+  <div class="nav-item" data-view="ecosystem"><span class="ic">⬡</span> 生态全景</div>
   <div class="nav-item" data-view="apps"><span class="ic">◈</span> 本站应用</div>
   <div class="nav-item" data-view="research"><span class="ic">◎</span> 研究 / 预研</div>
   <div class="nav-item" data-view="repos"><span class="ic">▤</span> 全部仓库</div>
@@ -135,6 +156,8 @@ footer .flinks { display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin-top:.55r
     </div></div>
 
     <div class="view on" id="v-featured"></div>
+
+    <div class="view" id="v-ecosystem"></div>
 
     <div class="view" id="v-apps">
       <div class="subapps" id="apps"></div>
@@ -161,8 +184,17 @@ footer .flinks { display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin-top:.55r
   </div>
 </main>
 
+<script src="assets/ecosystem-data.js"></script>
 <script>
 const OWNER = "lilyco-42";
+// 生态全景的数据由 assets/ecosystem-data.js 提供（scripts/gen-ecosystem.mjs 生成）。
+// 这里兜底成空对象：数据文件万一没加载，也只是这一个视图空掉，不会让整页脚本崩。
+const ECO = typeof ECOSYSTEM === "undefined"
+  ? { asOf: "", totals: { repos: 0, langs: 0, stars: 0, groups: 0 }, groups: [] }
+  : ECOSYSTEM;
+// 精选/预研卡片用的是 assets/logos/<仓名>.svg。仓名对不上时不要让用户看到破图，
+// 直接回落到品牌图标 —— 少一个图标可以，一个碎图不行。
+const IMG_FALLBACK = ' onerror="this.onerror=null;this.src=\'assets/logos/brand.svg\'"';
 const FEATURED = [
   { name: "dsh-termux", icon: "📱", tags: ["Termux", "Android", "DeepSeek DSH"],
     blurb: "在 Termux 上一键装好 DeepSeek DSH CLI —— 顺手修掉 7 个让它在 Android 跑不起来的兼容问题（node-gyp 的 OS=android、koffi 的 statx、sharp 无 arm64 预编译、SELinux 拒硬链接等），装完即用。",
@@ -222,7 +254,7 @@ const LANGC = { Rust: "#dea584", Python: "#3572A5", JavaScript: "#f1e05a", TypeS
 
 // ── 视图切换 ──
 let REPOS = [], LANG = "", Q = "";
-const TITLES = { featured: "精选项目", apps: "本站应用", research: "研究 / 预研", repos: "全部仓库" };
+const TITLES = { featured: "精选项目", ecosystem: "生态全景 · " + ECO.totals.repos + " 个仓", apps: "本站应用", research: "研究 / 预研", repos: "全部仓库" };
 function switchView(v) {
   document.querySelectorAll(".view").forEach(function (x) { x.classList.remove("on"); });
   document.getElementById("v-" + v).classList.add("on");
@@ -235,11 +267,14 @@ function switchView(v) {
   document.getElementById("sidebar").classList.remove("open");
   document.querySelector(".main").scrollTop = 0;
   if (v === "repos") renderRepos();   // 切到仓库视图时刷新计数
+  // 视图可深链（index.html#ecosystem）。用 replaceState 而不是改 location.hash，
+  // 否则每点一次侧栏就往历史里塞一条，返回键会变成「在视图间来回跳」。
+  if (typeof history !== "undefined" && history.replaceState) history.replaceState(null, "", "#" + v);
 }
 
 function renderFeatured() {
   document.getElementById("v-featured").innerHTML = FEATURED.map(function (f) {
-    return '<div class="hcard"><div class="hhead"><img class="hlogo" src="assets/logos/' + f.name + '.svg" alt="' + f.name + ' logo" width="34" height="34">' +
+    return '<div class="hcard"><div class="hhead"><img class="hlogo" src="assets/logos/' + f.name + '.svg" alt="' + f.name + ' logo" width="34" height="34"' + IMG_FALLBACK + '>' +
       '<div class="hbody"><h2><a href="https://github.com/lilyco-42/' + f.name + '">' + f.name + '</a></h2>' +
       '<div class="tags">' + f.tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join("") + '</div></div></div>' +
       '<p>' + f.blurb + '</p>' +
@@ -267,16 +302,56 @@ function renderResearch() {
   document.getElementById("v-research").innerHTML =
     '<div class="empty" style="padding:0 0 1rem">每个仓都是 <b>preflight 输出，不是实现</b>：先给出可审计的数字、写清做不到的边界，再决定要不要动手。</div>' +
     RESEARCH.map(function (r) {
-      return '<div class="hcard"><div class="hhead"><img class="hlogo" src="assets/logos/' + r.name + '.svg" alt="' + r.name + ' logo" width="34" height="34">' +
+      return '<div class="hcard"><div class="hhead"><img class="hlogo" src="assets/logos/' + r.name + '.svg" alt="' + r.name + ' logo" width="34" height="34"' + IMG_FALLBACK + '>' +
         '<div class="hbody"><h2><a href="https://github.com/lilyco-42/' + r.name + '" target="_blank" rel="noopener">' + r.name + '</a></h2>' +
         '<div class="tags"><span class="tag">' + r.tag + '</span></div></div></div>' +
         '<p>' + r.blurb + '</p><div class="btns"><a class="btn pri" href="https://github.com/lilyco-42/' + r.name + '" target="_blank" rel="noopener">GitHub →</a></div></div>';
     }).join("");
 }
 
+// ── 生态全景：把全部自有仓按功能分组摆出来 ──
+// 徽章底色用 GitHub 的语言色板，文字色按底色亮度自动取黑/白 —— 否则浅色语言
+// （JavaScript 的 #f1e05a）配白字直接看不见。
+function badgeInk(hex) {
+  const h = (hex || "").replace("#", "");
+  const n = h.length === 3 ? h[0] + h[0] + h[1] + h[1] + h[2] + h[2] : h;
+  const r = parseInt(n.slice(0, 2), 16) || 0;
+  const g = parseInt(n.slice(2, 4), 16) || 0;
+  const b = parseInt(n.slice(4, 6), 16) || 0;
+  return 0.299 * r + 0.587 * g + 0.114 * b > 150 ? "#0d1117" : "#ffffff";
+}
+
+function renderEcosystem() {
+  const box = document.getElementById("v-ecosystem");
+  if (!box) return;
+  if (!ECO.groups.length) { box.innerHTML = '<div class="empty">生态数据未加载（assets/ecosystem-data.js）。</div>'; return; }
+  const t = ECO.totals;
+  const stat = function (v, label) { return '<div class="eco-stat"><b>' + v + '</b><span>' + label + '</span></div>'; };
+  let html = '<div class="eco-stats">' +
+    stat(t.repos, "自有公开仓") + stat(t.groups, "功能分组") + stat(t.langs, "语言") + stat(t.stars, "★ 合计") +
+    '</div><div class="eco-note">口径：<b>lilyco-42 名下非 fork 的公开仓</b>（fork 的上游不计入），数据截至 ' + ECO.asOf +
+    '，由 <code>scripts/gen-ecosystem.mjs</code> 从 GitHub API 生成 —— 分组总和恒等于 ' + t.repos +
+    '，每个仓直链到独立仓库。要看实时原始列表（语言筛选 / 搜索）请去「全部仓库」。</div>';
+  html += ECO.groups.map(function (g) {
+    return '<div class="eco-grp"><h2>' + g.title + ' <em>· ' + g.repos.length + '</em></h2>' +
+      '<div class="gnote">' + g.note + '</div><div class="eco-grid">' +
+      g.repos.map(function (r) {
+        const c = LANGC[r.l] || "#8b949e";
+        const badge = '<div class="eco-badge" style="background:' + c + ';color:' + badgeInk(c) + '">' + (r.n[0] || "?").toUpperCase() + '</div>';
+        const guide = r.g ? '<a href="guide.html?name=' + r.n + '">快速入门</a>' : "";
+        return '<div class="eco-card">' + badge + '<div class="eco-tx">' +
+          '<a href="https://github.com/' + OWNER + '/' + r.n + '" target="_blank" rel="noopener">' + r.n + '</a>' +
+          '<div class="ed">' + r.d + '</div>' +
+          '<div class="em"><span>' + r.l + '</span><span>★ ' + r.s + '</span><span>' + r.p + '</span>' + guide + '</div>' +
+          '</div></div>';
+      }).join("") + '</div></div>';
+  }).join("");
+  box.innerHTML = html;
+}
+
 function renderApps() {
   document.getElementById("apps").innerHTML = APPS.map(function (a) {
-    return '<a class="sapp" href="' + a.u + '"><img class="slogo" src="assets/logos/' + a.l + '.svg" alt="" width="26" height="26"><span class="stx"><b>' + a.n + '</b><div class="d">' + a.d + '</div></span></a>';
+    return '<a class="sapp" href="' + a.u + '"><img class="slogo" src="assets/logos/' + a.l + '.svg" alt="" width="26" height="26"' + IMG_FALLBACK + '><span class="stx"><b>' + a.n + '</b><div class="d">' + a.d + '</div></span></a>';
   }).join("");
 }
 
@@ -362,10 +437,16 @@ document.getElementById("q").addEventListener("input", function (e) {
 });
 
 renderFeatured();
+renderEcosystem();
 renderApps();
 renderResearch();
 renderSideGuides();
 loadRepos();
+// 深链：index.html#ecosystem 直接落到对应视图（认不出来的 hash 就留在默认视图）
+(function () {
+  const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
+  if (Object.prototype.hasOwnProperty.call(TITLES, h)) switchView(h);
+})();
 </script>
 </body>
 </html>
