@@ -32,23 +32,13 @@
 > 每个子目录都是**独立可运行**的，互不依赖；`/tool/` 与 `/lyco/` 只是入口页。
 > `/lyco/` **不是** lyco-engine 的在线 demo —— 那个仓发的是原生二进制，没有网页版。
 
-## 设计系统（改样式前必读）
+## 全站设计系统
 
-规范正文在 [`DESIGN.md`](./DESIGN.md)，可视化版是 [`design.html`](./design.html)
-（跟随系统深/浅色，打开就能看到两套配色）。
+所有已提交的 HTML 页面都使用 [`assets/site-theme.css`](./assets/site-theme.css) 共用视觉：ChatGPT 与 Apple 风格的浅色工作区、清晰排版、克制的绿色强调色和适合手机触控的控件。页面继续保留各自的工具布局、WASM 逻辑、代码区和画布。
 
-**只管三个页面**：`index.html` / `guide.html` / `design.html`。
-`/rembg/` `/pet/` `/tool/` `/wasm-demo/` `/lyco/*` 是各自独立构建的第三方应用，
-有自己的视觉，**不要**拿这份规范去「统一」它们。
+规范见 [`DESIGN.md`](./DESIGN.md)，可视化示例见 [`design.html`](./design.html)。新增 HTML 页面必须引用共用样式并带 `site-theme` body class；`Site design checks` GitHub Actions 会检查覆盖范围、主题令牌、焦点样式、减少动态效果和触控尺寸。
 
-三条硬约束：
-
-- **颜色一律走 `:root` 的 CSS 变量**，组件里不写死十六进制（`LANGC` 语言数据色除外）。
-- **不用 `box-shadow`** —— 层次靠背景色阶（`--sidebar` / `--main` / `--card`）+ 1px `--edge` 描边。
-- **零外部请求** —— 不用 webfont、不用 CDN；图标一律 `assets/logos/*.svg`。
-
-另外必须同时支持 `prefers-color-scheme: light` 与 `prefers-reduced-motion`；
-移动端（≤860px）触摸目标 ≥40px；键盘焦点要可见。
+模型/API 网关、算力市场和代理面板由独立服务提供，不在本仓库中；统一这些页面需要对应的源代码仓库。
 
 ## 如何加一个新项目（给新手，2 分钟）
 

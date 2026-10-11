@@ -1,0 +1,325 @@
+/* Lain42 shared site theme. Keep tool-specific layouts and canvases intact. */
+:root {
+  color-scheme: light;
+  --site-canvas: #f7f7f8;
+  --site-surface: #ffffff;
+  --site-surface-soft: #f1f3f4;
+  --site-text: #202123;
+  --site-muted: #62656a;
+  --site-border: #e3e5e8;
+  --site-accent: #0b6e4f;
+  --site-accent-hover: #075b40;
+  --site-danger: #b42318;
+  --site-code: #f2f3f5;
+
+  /* Compatibility aliases for existing standalone pages. */
+  --sidebar: var(--site-surface);
+  --main: var(--site-canvas);
+  --card: var(--site-surface);
+  --card2: var(--site-surface-soft);
+  --edge: var(--site-border);
+  --fg: var(--site-text);
+  --dim: var(--site-muted);
+  --acc: var(--site-accent);
+  --ok: var(--site-accent);
+  --on-acc: #ffffff;
+  --tagbg: #edf5f1;
+
+  --bg: var(--site-canvas);
+  --bg2: var(--site-surface);
+  --bg3: var(--site-surface-soft);
+  --border: var(--site-border);
+  --text: var(--site-text);
+  --muted: var(--site-muted);
+  --blue: var(--site-accent);
+  --green: var(--site-accent);
+  --purple: var(--site-accent);
+  --brand: var(--site-accent);
+  --brand-2: var(--site-accent);
+  --brand-soft: #edf5f1;
+  --bg-soft: var(--site-surface-soft);
+  --bg-elev: var(--site-surface);
+  --panel: var(--site-surface);
+  --line: var(--site-border);
+  --accent: var(--site-accent);
+  --accent-soft: #edf5f1;
+  --error: var(--site-danger);
+  --err: var(--site-danger);
+  --code: var(--site-code);
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+body.site-theme {
+  color: var(--site-text) !important;
+  background-color: var(--site-canvas) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif !important;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+body.site-theme a {
+  color: var(--site-accent);
+  text-underline-offset: 0.16em;
+}
+
+body.site-theme a:hover {
+  color: var(--site-accent-hover);
+}
+
+body.site-theme :is(h1, h2, h3, h4) {
+  color: var(--site-text) !important;
+  background: none !important;
+  -webkit-text-fill-color: currentColor;
+}
+
+body.site-theme :is(.sidebar, .side, .site-sidebar) {
+  color: var(--site-text);
+  background-color: var(--site-surface);
+  border-color: var(--site-border);
+}
+
+body.site-theme :is(.card, .panel, .surface, .hcard, .rcard, .sapp, .feature-card, section) {
+  color: var(--site-text);
+  background-color: var(--site-surface);
+  border-color: var(--site-border);
+}
+
+body.site-theme :is(p, .note, .muted, .dim, .description, .subtitle, .lead) {
+  color: var(--site-muted);
+}
+
+body.site-theme :is(button, input, select, textarea, .button-link, a.btn, a.download) {
+  box-sizing: border-box;
+  color: var(--site-text);
+  font: inherit;
+  border: 1px solid var(--site-border);
+  border-radius: 10px;
+  background-color: var(--site-surface);
+}
+
+body.site-theme :is(button, .button-link, a.btn, a.download) {
+  min-height: 44px;
+  padding: 9px 14px;
+}
+
+body.site-theme :is(button, .button-link, a.btn, a.download):hover:not(:disabled) {
+  border-color: #c8d2cd;
+  background-color: var(--site-surface-soft);
+}
+
+body.site-theme :is(button, .button-link, a.btn, a.download):disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+body.site-theme :is(button.primary, button.pri, button.play, button[type="submit"], .button-link.primary, a.btn.pri, a.btn.play) {
+  color: #ffffff;
+  border-color: var(--site-accent);
+  background-color: var(--site-accent);
+  font-weight: 600;
+}
+
+body.site-theme :is(button.primary, button.pri, button.play, button[type="submit"], .button-link.primary, a.btn.pri, a.btn.play):hover:not(:disabled) {
+  color: #ffffff;
+  border-color: var(--site-accent-hover);
+  background-color: var(--site-accent-hover);
+}
+
+body.site-theme :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  min-height: 44px;
+  padding: 9px 12px;
+}
+
+body.site-theme input[type="range"] {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--site-accent);
+}
+
+body.site-theme input[type="color"] {
+  min-height: 44px;
+  padding: 4px;
+}
+
+body.site-theme :is(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--site-accent);
+}
+
+body.site-theme :is(textarea#code, textarea#sql) {
+  color: var(--site-text);
+  background-color: var(--site-code);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 14px;
+}
+
+body.site-theme textarea {
+  width: 100%;
+}
+
+body.site-theme :is(input, select, textarea):focus-visible,
+body.site-theme :is(button, a, [tabindex]):focus-visible {
+  outline: 3px solid #0b6e4f66;
+  outline-offset: 2px;
+}
+
+body.site-theme :is(pre, .code, .code-editor, .terminal, #log) {
+  max-width: 100%;
+  overflow: auto;
+}
+
+body.site-theme :is(table, th, td) {
+  border-color: var(--site-border);
+}
+
+body.site-theme img,
+body.site-theme video {
+  max-width: 100%;
+}
+
+body.site-theme .tag,
+body.site-theme .badge {
+  color: var(--site-accent);
+  border-color: var(--site-border);
+  background-color: #edf5f1;
+}
+
+body.site-theme :is(.out, .ok, .success, .ready) {
+  color: var(--site-accent) !important;
+}
+
+body.site-theme :is(.error, .err, .failure) {
+  color: var(--site-danger) !important;
+}
+
+body.site-theme .art-canvas {
+  background-color: transparent !important;
+}
+
+body.site-theme.art-canvas {
+  background-color: transparent !important;
+}
+
+.design-system {
+  width: min(100% - 40px, 960px);
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.design-system > header {
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--site-border);
+}
+
+.design-system > header a {
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.design-system h1 {
+  margin: 28px 0 8px;
+  font-size: clamp(30px, 5vw, 44px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.design-system .intro {
+  max-width: 680px;
+  margin: 0;
+  color: var(--site-muted);
+}
+
+.design-system .design-section {
+  margin: 32px 0 0;
+}
+
+.design-system .design-section > h2 {
+  margin: 0 0 12px;
+  font-size: 19px;
+}
+
+.design-system .token-grid,
+.design-system .component-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 12px;
+}
+
+.design-system .token-card,
+.design-system .component-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--site-border);
+  border-radius: 14px;
+  background: var(--site-surface);
+}
+
+.design-system .token-swatch {
+  width: 100%;
+  height: 40px;
+  margin-bottom: 12px;
+  border: 1px solid var(--site-border);
+  border-radius: 8px;
+}
+
+.design-system .token-card code,
+.design-system .component-card code {
+  font-size: 13px;
+}
+
+.design-system .token-card p,
+.design-system .component-card p {
+  margin: 5px 0 0;
+  color: var(--site-muted);
+  font-size: 14px;
+}
+
+.design-system .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.design-system .surface-sample {
+  padding: 14px;
+  border: 1px solid var(--site-border);
+  border-radius: 10px;
+  background: var(--site-surface-soft);
+}
+
+@media (max-width: 640px) {
+  .design-system {
+    width: min(100% - 28px, 960px);
+    padding-top: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  body.site-theme {
+    font-size: 16px;
+  }
+
+  body.site-theme :is(button, .button-link, a.btn, a.download) {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  body.site-theme *,
+  body.site-theme *::before,
+  body.site-theme *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
