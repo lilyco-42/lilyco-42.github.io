@@ -1,16 +1,16 @@
 // 自动生成，请勿手改 —— 改 scripts/ecosystem-map.json 后跑 node scripts/gen-ecosystem.mjs
-// 数据源：GitHub API users/lilyco-42/repos（非 fork、公开），生成于 2026-10-10
+// 数据源：GitHub API users/lilyco-42/repos（非 fork、公开），生成于 2026-10-11
 // 校验：分组总和 = 125 = 非 fork 公开仓数；名称唯一；URL 由名称推导
 const ECOSYSTEM = {
-  "asOf": "2026-10-10",
-  "totals": { "repos": 125, "langs": 18, "stars": 78, "groups": 10 },
+  "asOf": "2026-10-11",
+  "totals": { "repos": 125, "langs": 18, "stars": 77, "groups": 10 },
   "groups": [
     {
       "key": "core", "title": "框架与基础层", "note": "一个 struct 出四端的底座、脚手架、共享模块与协议",
       "repos": [
-        {"n":"lilyco","l":"Rust","s":6,"p":"2026-10-07","d":"一个 struct 派生 CLI/TUI/Web/MCP 四端，天生 AI-callable；已发布 crates.io","g":true},
-        {"n":"Lazy-UI","l":"Rust","s":3,"p":"2026-09-29","d":"基于 plyx 的跨平台原生 UI 框架：组件、主题、国际化与无障碍"},
+        {"n":"lilyco","l":"Rust","s":6,"p":"2026-10-11","d":"一个 struct 派生 CLI/TUI/Web/MCP 四端，天生 AI-callable；已发布 crates.io","g":true},
         {"n":"lyco-engine","l":"Rust","s":3,"p":"2026-09-21","d":"WASM 视觉小说引擎 + 资源流式后端，浏览器即玩","g":true},
+        {"n":"Lazy-UI","l":"Rust","s":2,"p":"2026-09-29","d":"基于 plyx 的跨平台原生 UI 框架：组件、主题、国际化与无障碍"},
         {"n":"dev-env","l":"Nushell","s":1,"p":"2026-07-31","d":"nushell 跨平台一键开发环境搭建：单文件自解压，无需 pwsh / bash 双份脚本"},
         {"n":"xmake-mirror","l":"Xmake","s":0,"p":"2026-10-10","d":"Lyco WebView 的 xmake 包镜像"},
         {"n":"lf","l":"Rust","s":0,"p":"2026-10-10","d":"轻量系统识别 + 跨平台 shell 环境安装器（nushell / brush）"},
@@ -30,7 +30,7 @@ const ECOSYSTEM = {
         {"n":"dsh-termux","l":"Shell","s":20,"p":"2026-10-03","d":"Termux 上一键装好 DeepSeek DSH CLI，顺手修掉 7 个 Android 兼容问题"},
         {"n":"lyco-skill","l":"Shell","s":11,"p":"2026-10-10","d":"预研技能：需求钉死一句话 → gh 近义词搜现成方案 → 论坛挖冷门知识 → build-vs-buy","g":true},
         {"n":"letsgal-ai","l":"JavaScript","s":4,"p":"2026-10-10","d":"LetsGal Studio 的 AI 创作工具链：故事 DSL 编译器 + 生成器 + CLI/MCP"},
-        {"n":"qq-bot-rust","l":"Rust","s":0,"p":"2026-10-10","d":"Radxa ARM64 上的 QQ 机器人 + webhook 网关，带群图 OCR 视觉"},
+        {"n":"qq-bot-rust","l":"Rust","s":0,"p":"2026-10-11","d":"Radxa ARM64 上的 QQ 机器人 + webhook 网关，带群图 OCR 视觉"},
         {"n":"bitnet-rs","l":"Rust","s":0,"p":"2026-10-10","d":"BitNet b1.58-2B 推理引擎，手机上 0.5s/token"},
         {"n":"lyco-model-bench","l":"Rust","s":0,"p":"2026-10-10","d":"每日模型发现 + token 测速：NVIDIA NIM / OpenRouter 的供给变化与中文响应速度"},
         {"n":"lgame","l":"Rust","s":0,"p":"2026-10-10","d":"AI 控制实体的中间层：l3d / l2d 用 MCP/CLI 驱动 3D 与 2D 游戏角色，机器人是下一档位"},
@@ -49,7 +49,7 @@ const ECOSYSTEM = {
     {
       "key": "wasm", "title": "浏览器内 WASM", "note": "把重活搬进浏览器，且每一步都留可核对的数字",
       "repos": [
-        {"n":"rembg-ui","l":"HTML","s":8,"p":"2026-10-10","d":"抠图工具：浏览器本地处理 + Android 原生端（arm64/armv7/x86_64）"},
+        {"n":"rembg-ui","l":"HTML","s":8,"p":"2026-10-11","d":"抠图工具：浏览器本地处理 + Android 原生端（arm64/armv7/x86_64）"},
         {"n":"clings","l":"C","s":3,"p":"2026-10-10","d":"C 语言练习，配浏览器内的 WASM 编译器"},
         {"n":"cute-pet","l":"Rust","s":1,"p":"2026-10-10","d":"丛雨桌宠：跨平台悬浮桌宠，WASM 版即开即玩","g":true},
         {"n":"stemscan","l":"Rust","s":0,"p":"2026-10-10","d":"判断一首歌是纯器乐还是人声+伴奏：音源分离 + 100ms 分帧能量统计"},
@@ -172,8 +172,8 @@ const ECOSYSTEM = {
       "key": "meta", "title": "元仓库与其他", "note": "本站、组织级配置与尚未归类的实验",
       "repos": [
         {"n":"lilyco-42","l":"其他","s":1,"p":"2026-10-07","d":"GitHub 个人主页 README（项目总览）"},
+        {"n":"lilyco-42.github.io","l":"HTML","s":0,"p":"2026-10-11","d":"本站 —— 项目仪表盘与浏览器内工具"},
         {"n":"newland","l":"Python","s":0,"p":"2026-10-10","d":"GZ038 物联网应用开发赛项备赛资料库（2023 全国职业院校技能大赛）"},
-        {"n":"lilyco-42.github.io","l":"HTML","s":0,"p":"2026-10-10","d":"本站 —— 项目仪表盘与浏览器内工具"},
         {"n":"Li","l":"Rust","s":0,"p":"2026-09-23","d":"让技术沉淀，让 AI 远离"},
         {"n":".github","l":"其他","s":0,"p":"2026-09-23","d":"组织级配置 —— 架构守则 reusable workflow"},
         {"n":"CampusHotspotFix","l":"C#","s":0,"p":"2026-07-04","d":"Windows 上不用路由器给其他设备提供 WiFi"},
