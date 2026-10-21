@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark light">
-<meta name="description" content="lilyco-42 项目仪表盘：AI 优先的 Rust 框架、浏览器内 WASM 应用、Windows 桌面工具，以及网页和手机即开即用的 Lain42 Agent。">
+<meta name="description" content="Haoyu Zhou（lilyco-42）个人技术作品集：Allwinner A733 / ARM Linux、NPU 工具链与端侧 AI 推理、Rust BitNet、硬件验证和自动化工程。">
 <link rel="icon" href="assets/logos/brand.svg" type="image/svg+xml">
 <title>lilyco-42 —— 项目仪表盘</title>
 <style>
@@ -151,8 +151,8 @@ footer .flinks { display:flex; flex-wrap:wrap; gap:.3rem 1.1rem; margin-top:.55r
   <div class="main-inner">
     <div class="topbar"><button class="burger-btn" id="burger">☰</button><div>
       <h1 id="view-title">精选项目</h1>
-      <div class="tagline">让人类远离计算机，AI 可做任何事 —— 工具调用与学习能力 &gt; scaling law。</div>
-      <a class="btn pri agent-cta" href="https://api.lain42.top/agent">打开 Lain42 Agent →</a>
+      <div class="tagline">Haoyu Zhou · ARM Linux / 端侧 AI / NPU 部署与验证 / Rust 推理工程</div>
+      <a class="btn pri agent-cta" href="https://github.com/lilyco-42?tab=repositories" target="_blank" rel="noopener">查看 GitHub 主页 →</a>
     </div></div>
 
     <div class="view on" id="v-featured"></div>
@@ -196,6 +196,18 @@ const ECO = typeof ECOSYSTEM === "undefined"
 // 直接回落到品牌图标 —— 少一个图标可以，一个碎图不行。
 const IMG_FALLBACK = ' onerror="this.onerror=null;this.src=\'assets/logos/brand.svg\'"';
 const FEATURED = [
+  { name: "a7a-npu-cli", icon: "🧠", tags: ["Allwinner A733", "VIPLite", "NPU 工具链", "Python CLI"],
+    blurb: "面向 Radxa Cubie A7A / 全志 A733 的统一 NPU 命令行工具。覆盖硬件盘点、VIPLite/vpm_run、NBinfo、ACUITY、模型目录和 YOLOv5 demo；README 明确区分工具参数覆盖与逐模型实测范围，并记录板端检测框结果。",
+    links: [["GitHub →", "https://github.com/lilyco-42/a7a-npu-cli"], ["硬件实测与边界", "https://github.com/lilyco-42/radxa_utlra"]] },
+  { name: "radxa_utlra", icon: "🔧", tags: ["Radxa Cubie A7A", "ARM Linux", "硬件验证", "故障定位"],
+    blurb: "围绕 Debian 13 / Linux 6.6 BSP 的实机工程记录：NPU 驱动、时钟、电源域与任务执行链路；VE2 硬件编码和 PowerVR GPU 有实测数据；提供健康检查、风险分级、备份与恢复工具，并明确记录尚未解决的硬件/驱动边界。",
+    links: [["A7A 入门指南", "https://github.com/lilyco-42/radxa_utlra/blob/main/guide.md"], ["GitHub →", "https://github.com/lilyco-42/radxa_utlra"]] },
+  { name: "bitnet-rs", icon: "⚙️", tags: ["Rust", "BitNet b1.58", "GGUF", "NEON SIMD"],
+    blurb: "纯 Rust BitNet b1.58 推理引擎：实现 GGUF 解析、Llama 3 BPE、三值低比特权重、整数点积、KV Cache 与生成 API；核心量化/点积结果与 C++ 参考实现逐字节对拍。仓库 README 记录约 0.5 秒/token，正式展示时应同时注明具体测试设备与条件。",
+    links: [["GitHub →", "https://github.com/lilyco-42/bitnet-rs"]] },
+  { name: "lyco_chat", icon: "💬", tags: ["纯 Rust Transformer", "BitNet 1.58-bit", "MoE", "测试"],
+    blurb: "从零实现的纯 Rust 微型 GPT / Transformer 项目，包含 BitNet 量化、稀疏专家路由、知识检索与自动学习机制；README 记录 220 项测试通过。适合展示模型结构理解、可验证行为和工程化测试实践。",
+    links: [["GitHub →", "https://github.com/lilyco-42/lyco_chat"], ["测试报告", "https://github.com/lilyco-42/lyco_chat/blob/main/TEST_REPORT.md"]] },
   { name: "dsh-termux", icon: "📱", tags: ["Termux", "Android", "DeepSeek DSH"],
     blurb: "在 Termux 上一键装好 DeepSeek DSH CLI —— 顺手修掉 7 个让它在 Android 跑不起来的兼容问题（node-gyp 的 OS=android、koffi 的 statx、sharp 无 arm64 预编译、SELinux 拒硬链接等），装完即用。",
     links: [["GitHub →", "https://github.com/lilyco-42/dsh-termux"]] },
