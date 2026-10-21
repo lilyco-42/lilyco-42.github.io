@@ -27,6 +27,8 @@
     "shared": ["core", "PyWebView 共享模块（sponsor 等）"],
     "dev-env": ["core", "nushell 跨平台一键开发环境搭建：单文件自解压，无需 pwsh / bash 双份脚本"],
     "xmake-mirror": ["core", "Lyco WebView 的 xmake 包镜像"],
+    "afdian-cli": ["core", "爱发电开放接口 CLI：方案 / 下单 / 订单 / 查询，一个 struct 派生 CLI/TUI/Web/MCP"],
+    "lilyco-crypto": ["core", "no_std 零依赖密码学原语：MD5 / SHA-256 / HMAC / 常量时间比较 / 卡密生成"],
 
     "lyco-skill": ["ai", "预研技能：需求钉死一句话 → gh 近义词搜现成方案 → 论坛挖冷门知识 → build-vs-buy"],
     "dsh-termux": ["ai", "Termux 上一键装好 DeepSeek DSH CLI，顺手修掉 7 个 Android 兼容问题"],
@@ -45,6 +47,11 @@
     "apple-keynote-skill": ["ai", "Apple Keynote 风格的宣传片生成技能"],
     "blender-game-pipeline-experts": ["ai", "Blender 游戏资产管线专家包：低模拓扑 + PBR 烘焙 + 骨骼动画"],
     "qq-bot-rust": ["ai", "Radxa ARM64 上的 QQ 机器人 + webhook 网关，带群图 OCR 视觉"],
+    "lyco-ai-toolkit": ["ai", "多域 AI 资产工作室：骨骼渲染 / MC 皮肤 / 3D / 音乐 / 歌词 / 代码"],
+    "mcd-nightfuel": ["ai", "麦当劳夜宵 MCP Skill：入夜 / 续航 / 深夜 / 收尾四阶段，28 项回归测试"],
+    "opencode-termux": ["ai", "修 opencode 在 Termux + glibc 下的 shell 工具（libc.so 链接脚本污染 LD_LIBRARY_PATH）"],
+    "uncensored-api-relay": ["ai", "高性能 Rust API 中转站：Axum + Tokio，SSE 流式转发"],
+    "local-ai-studio": ["ai", "本地 AI 工具箱预研：引擎一律用上游预编译产物，构建与验证只在 GitHub Actions"],
 
     "wasm-pixel-kernels": ["wasm", "65 个 PS/AE 像素算子编成单个 55KB wasm，CI 里与 JS 参考实现做数值对照"],
     "wasm-binary-formats": ["wasm", "APK 解包 + 1826 项格式编目，逐级标注可实现性"],
@@ -77,6 +84,9 @@
     "character-theme-kit": ["app", "101 个动漫角色桌面主题套件：光标、壁纸、UI 组件"],
     "quote-replacer": ["app", "字符替换工具：中英文标点互转"],
     "exe-encryption-toolkit": ["app", "EXE 加密工具套件：AES-256-CBC + 硬件绑定许可证"],
+    "cute-pet-pixi": ["app", "跨平台桌宠宿主：Electron + PixiJS，素材包按需下载，构建全走 GitHub Actions"],
+    "freeproxy-auto": ["app", "免费节点订阅自动聚合：定时测活 / 测速 / 解锁与 IP 纯净度检测，分类发布"],
+    "lyco-browser": ["app", "指纹浏览器：多配置 Chromium + LYCO VPN 与计费集成，构建仅走 GitHub Actions"],
 
     "vp-publish": ["media", "一键上传视频到十余个平台（抖音/小红书/B站/YouTube…），social-auto-upload 的编排层"],
     "vp-pipeline": ["media", "A7A 全自动短视频生产线"],
@@ -89,6 +99,8 @@
     "acgn-studio": ["media", "明日方舟干员数据平台：449 名干员的立绘 / 语音搜索与下载"],
     "lilyco-brand": ["media", "品牌资产 + 确定性 HTML→视频管线（Blossom promo 等）"],
     "happy-sugar-life-live2d": ["media", "AI 立绘 → 可循环真骨骼动画的全流程：分层、绑定、动画与坑记录"],
+    "ip-wallpaper-pipeline": ["media", "IP 壁纸变现流水线：生成 → 4K 放大 → 闲鱼 / 小红书 / 夸克分发"],
+    "lyco_music": ["media", "LX Music 网易云风格界面重制：Vue3 + shadcn-vue + Tailwind"],
 
     "radxa-commander": ["hw", "A7A 路由器手机管家：WiFi / 设备 / 分流全套控制 App + 板端 API"],
     "radxa-monitor": ["hw", "A7A 局域网监控：Android APK（mDNS+SSH）+ 板端 nginx 状态页"],
