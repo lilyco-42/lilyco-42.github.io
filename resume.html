@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Haoyu Zhou 的技术简历：面向全志科技 NPU / AI 模型部署、ARM Linux 与端侧推理岗位。">
+<title>技术简历 · Haoyu Zhou</title>
+<link rel="stylesheet" href="/assets/site-theme.css?v=20261021">
+<style>
+.resume { max-width:900px; margin:0 auto; padding:28px 20px 56px; }
+.resume-head { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; flex-wrap:wrap; padding:26px; border:1px solid var(--site-border); border-radius:14px; background:var(--site-surface); }
+.eyebrow { color:var(--site-accent); font-size:.82rem; font-weight:700; letter-spacing:.08em; }
+h1 { font-size:clamp(1.8rem,4vw,2.5rem); margin:.35rem 0 .25rem; }
+.subtitle { font-size:1.05rem; font-weight:650; }
+.muted { color:var(--site-muted); }
+.pills { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.pill { border:1px solid var(--site-border); border-radius:999px; padding:5px 10px; font-size:.82rem; }
+.actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.actions a { display:inline-flex; align-items:center; min-height:44px; padding:0 14px; border:1px solid var(--site-border); border-radius:9px; color:var(--site-text); }
+.actions a.primary { background:var(--site-accent); border-color:var(--site-accent); color:white; }
+section { margin-top:22px; padding:22px 24px; background:var(--site-surface); border:1px solid var(--site-border); border-radius:14px; }
+h2 { font-size:1.1rem; margin:0 0 13px; }
+h3 { font-size:1rem; margin:0 0 7px; }
+p, li { line-height:1.75; }
+ul { padding-left:1.25rem; margin:.45rem 0 0; }
+li + li { margin-top:5px; }
+.project { padding:15px 0; border-top:1px solid var(--site-border); }
+.project:first-of-type { border-top:0; padding-top:0; }
+.project-meta { color:var(--site-muted); font-size:.85rem; margin-bottom:8px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+.skill { padding:13px; border:1px solid var(--site-border); border-radius:10px; }
+.skill b { display:block; margin-bottom:5px; }
+.notice { font-size:.86rem; color:var(--site-muted); }
+.back { display:inline-flex; min-height:44px; align-items:center; margin-bottom:15px; color:var(--site-text); }
+@media print {
+  body { background:#fff !important; color:#111 !important; }
+  .resume { max-width:none; padding:0; }
+  .resume-head, section { box-shadow:none; background:#fff !important; break-inside:avoid; }
+  .actions, .back { display:none; }
+  a { color:#111 !important; text-decoration:none; }
+}
+</style>
+</head>
+<body class="site-theme">
+<main class="resume">
+<a class="back" href="/">← 返回 lilyco-42 主页</a>
+<header class="resume-head">
+  <div>
+    <div class="eyebrow">TECHNICAL RESUME · 2026</div>
+    <h1>Haoyu Zhou（周昊宇）</h1>
+    <div class="subtitle">目标方向：NPU / AI 模型部署工程师（实习 / 校招）</div>
+    <p class="muted" style="margin-top:10px">大专在读 · 2025 年入学 · 工作经历：在校生 / 应届毕业生</p>
+    <div class="pills">
+      <span class="pill">ARM Linux</span><span class="pill">Allwinner A733 / Radxa Cubie A7A</span>
+      <span class="pill">端侧 AI 推理</span><span class="pill">NPU 工具链验证</span><span class="pill">Rust</span>
+    </div>
+  </div>
+  <div class="actions">
+    <a class="primary" href="https://github.com/lilyco-42">GitHub 主页</a>
+    <a href="https://github.com/lilyco-42/lilyco-42.github.io">作品集仓库</a>
+    <a href="javascript:window.print()">打印 / 保存 PDF</a>
+  </div>
+</header>
+
+<section>
+  <h2>个人简介</h2>
+  <p>面向 ARM Linux 与端侧 AI 部署方向的在校生，持续围绕 Radxa Cubie A7A（全志 A733 平台）开展板端环境维护、NPU 工具链梳理、模型运行验证与问题记录；同时通过 Rust 推理项目学习低比特模型、模型文件解析和生成式推理流程。希望从 NPU 模型部署、推理验证、性能测试或平台适配类实习 / 校招岗位切入，愿意从复现、测试、日志分析和文档工作做起。</p>
+  <p class="notice">说明：当前 C/C++ 为基础语法、能阅读简单代码；不将其表述为熟练开发。以下项目按已知工程记录描述，正式投递前应补齐可复现命令、测试环境与个人贡献边界。</p>
+</section>
+
+<section>
+  <h2>教育经历</h2>
+  <h3>大专 · 在读</h3>
+  <p class="muted">2025 年入学 · 预计毕业时间、学校名称及专业待补充</p>
+</section>
+
+<section>
+  <h2>重点项目经历</h2>
+  <div class="project">
+    <h3>Radxa Cubie A7A / 全志 A733 端侧 AI 与 NPU 工具链验证</h3>
+    <div class="project-meta">Linux · Debian 13 · ARM64 · VIPLite / vpm_run · YOLOv5</div>
+    <ul>
+      <li>围绕 A733 板端环境开展实机验证，整理内核、驱动、设备状态及 NPU 运行链路，记录工具调用方式和故障现象。</li>
+      <li>维护 <a href="https://github.com/lilyco-42/a7a-npu-cli">a7a-npu-cli</a>，将硬件盘点、VIPLite/vpm_run、NBinfo、ACUITY、模型目录与 YOLOv5 demo 等常用操作组织为统一 CLI 工作流。</li>
+      <li>在 <a href="https://github.com/lilyco-42/radxa_utlra">radxa_utlra</a> 中记录板端验证、健康检查、风险分级和恢复操作，区分已验证项目与仍受 BSP / 驱动限制的功能。</li>
+      <li><b>岗位关联：</b>适合 NPU SDK 适配、模型转换与运行验证、板端问题复现、日志分析及测试文档等工作；当前不宣称独立完成 NPU 算子开发或大规模模型性能优化。</li>
+    </ul>
+    <p class="actions"><a href="https://github.com/lilyco-42/a7a-npu-cli">a7a-npu-cli 仓库</a><a href="https://github.com/lilyco-42/radxa_utlra">板端记录</a></p>
+  </div>
+  <div class="project">
+    <h3>bitnet-rs：Rust 低比特模型推理研究</h3>
+    <div class="project-meta">Rust · GGUF · BPE tokenizer · KV Cache · NEON SIMD</div>
+    <ul>
+      <li>围绕 BitNet b1.58 推理流程开展实现与验证，项目包含 GGUF 解析、分词、低比特权重计算、KV Cache 与文本生成接口。</li>
+      <li>仓库记录核心量化 / 点积结果与 C++ 参考实现进行对拍；相关性能数字需与设备、模型、上下文长度和测试命令一并呈现。</li>
+      <li><b>岗位关联：</b>体现对模型文件、推理执行链路、数值正确性与性能测量的兴趣；该项目是 Rust 推理方向实践，不等同于全志 NPU 上的部署成果。</li>
+    </ul>
+    <p class="actions"><a href="https://github.com/lilyco-42/bitnet-rs">bitnet-rs 仓库</a></p>
+  </div>
+  <div class="project">
+    <h3>lyco_chat：Transformer / BitNet 学习与验证</h3>
+    <div class="project-meta">Rust · Transformer · Attention · MoE · 测试</div>
+    <ul>
+      <li>通过微型 Transformer / GPT 项目梳理注意力、自回归生成、低比特量化与稀疏专家路由等概念。</li>
+      <li>以测试报告呈现实现范围和验证情况；面试时可挑选一个模块说明数据流、测试方法与已知限制。</li>
+    </ul>
+    <p class="actions"><a href="https://github.com/lilyco-42/lyco_chat">lyco_chat 仓库</a><a href="https://github.com/lilyco-42/lyco_chat/blob/main/TEST_REPORT.md">测试报告</a></p>
+  </div>
+</section>
+
+<section>
+  <h2>技术能力</h2>
+  <div class="grid">
+    <div class="skill"><b>ARM Linux / 板端验证</b><p>有 A733 / A7A 实机环境维护、系统信息核对、运行记录与问题排查实践。</p></div>
+    <div class="skill"><b>NPU / AI 部署</b><p>接触 VIPLite、vpm_run、ACUITY 与 YOLOv5 demo；重点在工具链梳理和板端验证，具体模型转换、精度与性能需逐项核验。</p></div>
+    <div class="skill"><b>Rust</b><p>有推理项目代码实践，涉及模型文件解析、数值计算、缓存与测试；需以实际代码和可复现测试为准。</p></div>
+    <div class="skill"><b>C / C++</b><p>基础语法，能够阅读简单代码；正在补齐指针、内存、编译构建、调试与常见数据结构。</p></div>
+    <div class="skill"><b>工程习惯</b><p>GitHub 项目文档、自动化测试、命令行工具、问题复现记录和验证边界说明。</p></div>
+    <div class="skill"><b>学习方向</b><p>NPU SDK、模型量化与转换、推理性能评测、Linux 驱动 / 用户态调用链、C/C++ 工程实践。</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>求职意向与岗位匹配</h2>
+  <ul>
+    <li><b>首选：</b>NPU / AI 模型部署、端侧推理验证、AI SoC 平台测试 / 适配实习或校招岗位。</li>
+    <li><b>可关注：</b>全志科技 AI 平台验证、NPU SDK 测试、模型转换与部署支持、ARM Linux 系统测试等职位。</li>
+    <li><b>匹配优势：</b>有真实 A733 板端环境实践、围绕 NPU 工具链组织项目，以及对推理流程和验证方法的持续投入。</li>
+    <li><b>当前差距：</b>C/C++ 尚处基础阶段；需进一步证明独立完成模型转换、精度评估、延迟 / 吞吐测试和问题定位的能力。若岗位要求熟练 C++、算子开发或芯片底层驱动，现阶段匹配度偏低。</li>
+  </ul>
+  <p class="notice" style="margin-top:12px">工作地点：不限。岗位匹配基于当前项目与技能信息，不代表已核验某个具体招聘职位的任职要求。</p>
+</section>
+
+<section>
+  <h2>正式投递前需要补齐 / 核验</h2>
+  <ul>
+    <li>学校全称、专业、预计毕业时间、在校成绩 / 奖项（如有）。</li>
+    <li>可公开的手机号或求职邮箱；确认是否愿意在简历中公开。</li>
+    <li>A7A 实机：板卡型号、系统 / 内核版本、NPU SDK 版本、模型转换命令、输入尺寸、精度指标、单次延迟 / 吞吐、测试次数与日志链接。</li>
+    <li>明确 YOLOv5 的实际完成边界：模型是否完成转换、是否在 NPU 上真实运行、检测框输出是否来自实机；区分 CPU / NPU 路径。</li>
+    <li>各项目中个人独立完成的代码、参考上游代码、AI 辅助生成内容及第三方依赖边界。</li>
+    <li>确认 bitnet-rs 性能数字的测试设备、模型量化版本、上下文长度和命令，未复现前不把性能数字作为简历核心卖点。</li>
+    <li>针对具体岗位逐项核对 C/C++、Linux、Python、模型转换工具和硬件平台要求。</li>
+  </ul>
+</section>
+<footer class="muted" style="padding:18px 2px;font-size:.82rem">作品集：<a href="https://github.com/lilyco-42">github.com/lilyco-42</a> · 本简历仅陈述已知经历；待核验项已明确标注。</footer>
+</main>
+</body>
+</html>
